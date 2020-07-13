@@ -39,22 +39,22 @@ Existen por lo menos tres diferentes roles para tener un pipeline completo de ci
 
 ## Librerias
 
-### beautifulsoup4 
+#### beautifulsoup4 
 Sirve para parsear y manipular HTML.
 
-### requests
+#### requests
 Sirve para generar solicitudes a la web.
 
-### numpy
+#### numpy
 Sirve para un análisis numéricos de datos.
 
-### pandas
+#### pandas
 Sirve para analizar, modificar, transformar datos y generar análisis descriptivos sobre los mismos.
 
-### matplotlib
+#### matplotlib
 Permite generar visualizaciones de los datos.
 
-### yaml
+#### yaml
 Permite generar algunas configuraciones, es un archivo similar a Json.
 
 ## [Anaconda](https://docs.anaconda.com/ "Documentacion")
