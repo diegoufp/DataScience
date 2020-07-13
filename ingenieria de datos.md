@@ -68,7 +68,7 @@ Una buena práctica es generar un ambiente virtual por cada proyecto, los ambien
 conda create --name [nombre-del-proyecto] [librerías-a-usar]
 ```
 
-### Comandos
+### Comandos de anaconda
 
 #### Crear un ambiente en anaconda
 ```
@@ -92,7 +92,24 @@ conda env list
 
 #### Eliminar un entorno virtual con todos sus paquetes
 ```
-coda remove --name nombre-del-proyecto --all
+concomda remove --name nombre-del-proyecto --all
+```
+
+#### Instalar jupyter en un entorno virtual ya creado
+```
+conda install -c anaconda jupyter
+```
+
+#### Abrir el navegador de anaconda
+```
+conda activate
+anaconda-navigator
+```
+
+#### Inicializar el servidor de jupyter
+```
+conda activate
+jupyter notebook
 ```
 
 #### Activar anaconda (base)
@@ -121,4 +138,79 @@ conda --help
 #### Ver los paquetes que anaconda instaló
 ```
 conda list
+```
+
+## Jupyter Notebooks
+
+Algo interesante que tenemos con Anaconda es que nos trae Jupyter Notebooks.
+
+Jupyter Notebooks es un entorno de programación en el cual podemos mezclar ejecución de código en vivo, visualizaciones y añadir **markdown**.
+
+Markdown es un tipo de formato para escribir texto de manera sencilla, en donde podemos agrega pedazos de formato como headers, etc.
+
+### Comandos de jupyter notebooks
+
+- Inicializar el servidor de jupyter
+```
+conda activate
+jupyter notebook
+```
+#### Atajos de teclado
+
+- Ver todos los comando que tiene jupyter
+```
+p
+```
+
+- Modo edicion (celda color verde)
+```
+enter
+```
+
+- Modo navegacion (celda color azul)
+```
+esc
+```
+
+- Ejecutar el codigo
+```
+ctrl + enter
+```
+
+- Ejecutar el codigo y añadir una nueva celda
+```
+shift + enter
+```
+
+- Agregar celda
+```
+b
+```
+
+- Moverse entre celdas
+```
+k
+```
+```
+j
+```
+
+- Convertir a markdown (texto)
+```
+m
+```
+
+- Cortar celda
+```
+x
+```
+
+- Pegar celda 
+```
+v
+```
+
+- Eliminar celda
+```
+dd
 ```
