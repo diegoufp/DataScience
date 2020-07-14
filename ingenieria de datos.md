@@ -60,6 +60,42 @@ Los **no estructurados** son la mayoría de los datos que te vas a encontrar en 
 - Datos cientificos
 
 
+## Fuentes de datos
+
+De donde obtener datos.
+
+- **Web**
+
+    - Es una mina enorme con datos financieros, de startups, del clima, precipitación fluvial, astronómicos, de negocios, etc.
+
+    
+- **APIs**
+
+    - Endpoints que viven en la web y nos devuelven JSON. Por ejemplo, la API de twitter, google, facebook.
+
+    
+- **User Analytics**
+
+    - Son el comportamiento del usuario dentro de nuestra aplicaciones, algo similar a los que nos ofrece Google Analytics.
+
+- **IoT**
+
+    - Se ha vuelto una mina espectacular en los últimos años. Como automóviles.
+   
+
+### Links de fuentes de datos
+
+- [Data.world](https://data.world/ "Data.world")
+
+- [API Library](https://console.cloud.google.com/apis/library?pli=1 "API Library")
+
+- [Kaggle](https://www.kaggle.com/ "Kaggle")
+
+- [Informacion del gobierno](https://datos.gob.mx/ "Informacion del gobierno")
+
+- [Google Dataset](https://datasetsearch.research.google.com/ "Google Dataset")
+
+
 ## Roles
 
 Existen por lo menos tres diferentes roles para tener un pipeline completo de ciencia de datos. Este post trata sobre el primer rol:
