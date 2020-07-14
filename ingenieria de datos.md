@@ -360,7 +360,7 @@ Toda la documentacion esta dentro de "response" y la podemos ver de dos maneras:
 ```python
 response??
 ```
-2. En este nos dara todo los metodos que podermos utilizar con est objeto.
+2. En este nos dara todo los metodos que podermos utilizar con este objeto.
 ```python
 print(dir(response))
 ```
