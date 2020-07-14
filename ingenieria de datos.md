@@ -148,6 +148,10 @@ Permite generar visualizaciones de los datos.
 #### yaml
 Permite generar algunas configuraciones, es un archivo similar a **Json**.
 
+#### requests
+Permite generar solicitudes a la web dentro de python y nos permite utilizar todos los diferentes verbos HTTP
+- GET, POST, PUT, DELETE, PATCH, OPTIONS
+
 ## [Anaconda](https://docs.anaconda.com/ "Documentacion")
 
 [**Anaconda**](https://www.anaconda.com/products/individual "Instalacion") es una instalación de Python que ya trae preinstalado todos los paquetes necesarios para tu labor en la Ciencia de Datos, tiene más de 1400 paquetes. Nos permite configurar ambientes virtuales para poder utilizar diferentes versiones de nuestros paquetes.
@@ -335,4 +339,60 @@ Existen mecanismos como [**Puppeteer**](https://www.npmjs.com/package/puppeteer 
 **JSON** simplemente es una forma de transmitir datos entre servidores y clientes. Es la forma estándar en las que en la web y las aplicaciones se comunican con los servidores backend.
 
 
+## Solicitudes a la web
+
+Para poder experimentar con la web necesitamos un método programático para solicitar URLs y obtener HTML
+
+**Requests**: Nos permite generar solicitudes a la web dentro de Python y utilizar los diferentes verbos HTTP, normalmente utilizaremos el método GET porque vamos a traer datos.
+
+requests.get('url') para hacer una solicitud a la web y nos devolverá un objeto response
+
+### Ejemplo en jupyter
+
+```python
+import requests
+
+response = requests.get('https://www.platzi.com')
+```
+Toda la documentacion esta dentro de "response" y la podemos ver de dos maneras:
+
+1. En este nos dara el codigo fuente del objeto response
+```python
+response??
+```
+2. En este nos dara todo los metodos que podermos utilizar con est objeto.
+```python
+print(dir(response))
+```
+
+Todas las solicitudes HTTP tienen metadatos para que los diferentes sistemas y computadoras puedan entender de qué va la solicitud.
+
+#### Ver el HTML
+```python
+print(response.text)
+```
+
+#### Ver los headers
+```python
+print(response.headers)
+print(response.headers['Date'])
+```
+
+#### Codigos de estado del protocolo http
+- Los mas comunes son:
+    - 200 : OK - Petición correcta.
+    - 400 : Bad request - Petición incorrecta.
+    - 404 : Not found - Recurso no encontrado.
+
+- Estos códigos estan categorizados en los siguientes grupos:
+
+    - 1xx : Respuestas informativas (Ej: 100, 101, 102, etc.)
+    - 2xx : Peticiones correctas (Ej: 200, 201, 202, etc.)
+    - 3xx : Redirecciones (Ej: 300, 301, 302, etc.)
+    - 4xx : Errores en el lado del cliente (Ej: 400, 401, 402, etc.)
+    - 5xx : Errores en el lado del servidor (Ej: 500, 501, 502, etc.)
+
+```python
+print(response.status_code)
+```
 
