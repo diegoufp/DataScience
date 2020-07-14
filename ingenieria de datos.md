@@ -46,7 +46,7 @@ Los **estructurados** son los más fáciles de acceder a su información.
 
 Los **semi estructurados** son donde podemos usar las APIs.
 
-- Json APIs
+- **Json** APIs
 - Datos tabulares(csv, excel)
 - HTML
 
@@ -71,7 +71,7 @@ De donde obtener datos.
     
 - **APIs**
 
-    - Endpoints que viven en la web y nos devuelven JSON. Por ejemplo, la API de twitter, google, facebook.
+    - Endpoints que viven en la web y nos devuelven **JSON**. Por ejemplo, la API de twitter, google, facebook.
 
     
 - **User Analytics**
@@ -146,7 +146,7 @@ Sirve para analizar, modificar, transformar datos y generar análisis descriptiv
 Permite generar visualizaciones de los datos.
 
 #### yaml
-Permite generar algunas configuraciones, es un archivo similar a Json.
+Permite generar algunas configuraciones, es un archivo similar a **Json**.
 
 ## [Anaconda](https://docs.anaconda.com/ "Documentacion")
 
@@ -305,6 +305,28 @@ v
 ```
 dd
 ```
+
+
+## Tecnologías web
+
+Las tecnologías web en principio podemos pensarlas como el internet, pero el internet es mucho más grande, es la red de redes, la forma en la que millones de computadores se conectan entre ellas para transferirse información.
+
+El internet también se compone de otros pedazos como **telefonía**(voip), **mail**(pop3, imap), **compartir archivos**(ftp). El internet es una red que une varias redes públicas, privadas, académicas, de negocios, de gobiernos, etc.
+
+La **web** específicamente es un espacio de información en el cual varios documentos(y otros recursos web) se pueden acceder a través de URLs y vínculos(links). La comunicación se da a través del protocolo **HTTP**.
+
+Elementos básicos de la web:
+
+- **HTML**: nos da la estructura de la información. Es un lenguaje para anotar pedazos de información para que el navegador o otros tipos de programa puedan interpretar que tipo de información se encuentra ahí.
+[**Web Scraping**](https://en.wikipedia.org/wiki/Web_scraping "Web Scraping")
+
+- **CSS**: nos permite darle colores, arreglar el texto y añadir diferentes elementos de presentación.
+
+- **Javascript**: nos permite añadir interactividad y cómputo a nuestra web.
+**Single Page Web Applications**: Son apliaciones que su motor basico es el javascript y si no corremos javascript no se pueden renderizar (no podemos ver que hay adentro).
+Existen mecanismos como [**Puppeteer**](https://www.npmjs.com/package/puppeteer "Puppeteer") que me permite manipular programaticamente un web browser para que podamos renderizar la pagina y poder saber que hay ahi adentro
+
+- **JSON**: Simplemente es una forma de transmitir datos entre servidores y clientes. Es la forma estándar en las que en la web y las aplicaciones se comunican con los servidores backend.
 
 
 
