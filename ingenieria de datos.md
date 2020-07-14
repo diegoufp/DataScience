@@ -318,12 +318,14 @@ La **web** específicamente es un espacio de información en el cual varios docu
 Elementos básicos de la web:
 
 - **HTML**: nos da la estructura de la información. Es un lenguaje para anotar pedazos de información para que el navegador o otros tipos de programa puedan interpretar que tipo de información se encuentra ahí.
+
 [**Web Scraping**](https://en.wikipedia.org/wiki/Web_scraping "Web Scraping")
 
 - **CSS**: nos permite darle colores, arreglar el texto y añadir diferentes elementos de presentación.
 
 - **Javascript**: nos permite añadir interactividad y cómputo a nuestra web.
-**Single Page Web Applications**: Son apliaciones que su motor basico es el javascript y si no corremos javascript no se pueden renderizar (no podemos ver que hay adentro).
+
+[**Single Page Web Applications**](https://es.wikipedia.org/wiki/Single-page_application "Single Page Web Applications"): Son apliaciones que su motor basico es el javascript y si no corremos javascript no se pueden renderizar (no podemos ver que hay adentro).
 Existen mecanismos como [**Puppeteer**](https://www.npmjs.com/package/puppeteer "Puppeteer") que me permite manipular programaticamente un web browser para que podamos renderizar la pagina y poder saber que hay ahi adentro
 
 - **JSON**: Simplemente es una forma de transmitir datos entre servidores y clientes. Es la forma estándar en las que en la web y las aplicaciones se comunican con los servidores backend.
