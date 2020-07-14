@@ -27,6 +27,39 @@ También se auxilia de:
 - Análisis de señales digitales
 - Análisis de datos en la nube(Big Data)
 
+## Tipos de datos
+
+Los datos vienen en muchas formas y estas formas las podemos clasificar de diferentes maneras, permitiéndonos poder aplicar técnicas distintas a cada uno de los tipos de datos.
+
+### Primitivos 
+
+- int , str , bool, float, hex, oct, datetime, objetos especiales(clases).
+
+### Estructurados
+
+Los **estructurados** son los más fáciles de acceder a su información.
+
+- Bases de datos
+- Data warehouses
+
+### Semi estructurados
+
+Los **semi estructurados** son donde podemos usar las APIs.
+
+- Json APIs
+- Datos tabulares(csv, excel)
+- HTML
+
+### No estructurados
+
+Los **no estructurados** son la mayoría de los datos que te vas a encontrar en tu desarrollo profesional.
+
+- Texto libre
+- Curriculum vitaes
+- Imagenes, audios, social media
+- Datos cientificos
+
+
 ## Roles
 
 Existen por lo menos tres diferentes roles para tener un pipeline completo de ciencia de datos. Este post trata sobre el primer rol:
@@ -214,3 +247,6 @@ v
 ```
 dd
 ```
+
+
+
