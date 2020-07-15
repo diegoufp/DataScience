@@ -131,7 +131,7 @@ Existen por lo menos tres diferentes roles para tener un pipeline completo de ci
 ## Librerias
 
 #### beautifulsoup4 
-Sirve para parsear y manipular HTML.
+BeautifulSoup nos ayuda a organizar gramaticalmente(parsear) el documento HTML para que tengamos una estructura con la cual podamos manejar y extraer información. BeautifulSoup convierte el string de HTML en un árbol de nodos para poder manipularlo.
 
 #### requests
 Sirve para generar solicitudes a la web.
@@ -144,6 +144,10 @@ Sirve para analizar, modificar, transformar datos y generar análisis descriptiv
 
 #### matplotlib
 Permite generar visualizaciones de los datos.
+
+#### argparse
+
+#### logging
 
 #### yaml
 Permite generar algunas configuraciones, es un archivo similar a **Json**.
@@ -394,5 +398,128 @@ print(response.headers['Date'])
 
 ```python
 print(response.status_code)
+```
+
+## Extraccion de informacion del HTML
+
+Para poder desarrollar scrapers debemos entender los datos semi estructurados dados por el HTML para determinar qué tipo de selectores CSS necesitamos para sacar información.
+
+En el caso de Python la librería estándar para manipular los documentos HTML se llama **BeautifulSoup**.
+
+**BeautifulSoup** nos ayuda a organizar gramaticalmente(parsear) el documento HTML para que tengamos una estructura con la cual podamos manejar y extraer información. BeautifulSoup convierte el string de HTML en un árbol de nodos para poder manipularlo.
+
+Para manipularlo podemos usar los selectores CSS con:
+```python
+soup.select()
+```
+
+### Ejemplo en jupyter
+Apoyarse del [anterior ejemplo](https://github.com/diegoufp/DataScience/blob/master/ingenieria%20de%20datos.md#ejemplo-en-jupyter "anterior ejemplo") para desarrollar el ejemplo siguiente.
+
+```python
+import bs4
+
+soup = bs4.BeautifulSoup(response.text, 'html.parser')
+```
+
+De segundo parametro elegimos el tipo de parser a utilizar, se define porque BeautifulSoup tambien nos puede ayudar a manipular documentos de tipo xml.
+
+- Ver los vinculos a la url.Agregar este codigo al anterior:
+
+```python
+courses_links = soup.select('.HomeCategories-item > a')
+courses = [course['href'] for course in courses_links]
+
+for course in courses:
+    print(course)
+```
+
+
+## Page Object Patter
+
+Un buen **Data engineer** utiliza los conceptos de la ingeniería de software para poder desarrollar sus programa. En nuestro caso para poder desarrollar nos apoyaremos de un patrón.
+
+**Page Object Patter**: Es un patrón que consiste en esconder los queries especificos que se utilizan para manipular un documento HTML detrás de un objeto que representa la página web.
+
+Si estos queries se añaden directamente al código principal, el código se vuelve frágil y va a depender mucho de la modificación que hagan a la web otras personas y arreglarlo se vuelve muy complicado.
+
+
+## Implementando un web scapper
+
+### Configuración
+Se creeara una carpeta y dentro de ella se crearan 3 archivos. Los nombres pueden ser distintos.
+
+```
+mkdir web_scrapper
+cd web_scrapper
+touch config.yaml
+touch common.py
+touch main.py
+```
+
+En el archivo "config.yalm" siemplemente se generara un mapa de mapas y las propiedades de los mapas que se encuentran dentro del mapa inicial van a ser las que vamos  autilizar.
+
+```
+vim config.yaml
+```
+```yaml
+news_sites:
+    eluniversal:
+        url: https://www.eluniversal.com.mx/
+    elpais:
+        url: https://elpais.com/mexico/
+```
+---------------------------------------------------
+```
+vim common.py
+```
+```python
+import yaml
+
+# Esta variable ___config nos va a servir para poder cahear nuestra configuracion.
+# Es importante hacer esto por que estamos leyendo a disco
+# Y si queremos utilizar nuetsra configuracion en varias partes de nuestro codigo, 
+# no queremos leer a dsico cada vez que tengamos que utilizar la configuracion.
+__config = None
+
+# Con esto vamos a leer el archivo una sola vez
+# Y si ya tenemos la configuracion cargada no tenemos que volver a leer el archivo
+# simplemente vamos a regresarlo 
+def config():
+    global __config
+    if not __config:
+        with open('config.yaml', mode='r') as f:
+            __config = yaml.load(f)
+
+    return __config
+```
+------------------------------------------------------
+```
+vim main.py
+```
+```python
+import argparse
+import logging
+logging.basicConfig(level=logging.INFO)
+
+from common import config
+
+logger = logging.getLogger(__name__)
+
+def _new_scraper(news_site_uid):
+    host = config()['news_sites'][news_site_uid]['url']
+
+    logging.info('Beginning scraper for {}'.format(host))
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+
+    news_site_choices = list(config()['news_sites'].keys())
+    parser.add_argument('news_site', 
+                        help='The news site that you want to scrape', 
+                        type=str, choices=news_site_choices)
+
+    args = parsert.parse_args()
+    _news_scraper(args.news_site)
 ```
 
