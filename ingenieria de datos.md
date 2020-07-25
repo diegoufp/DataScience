@@ -523,3 +523,99 @@ if __name__ == "__main__":
     _news_scraper(args.news_site)
 ```
 
+### Obteniendo enlaces del front page
+
+Hora que ya tenemos el esqueleto de nuestra aplicacion lista, lo siguiente que tenemos que hacer es ir a la pagina principal del sitio de noticias e identificar todos los vinculos dentro de esa pagina que nos llevaran a los articulos de noticia.
+
+Para esto crearemos un nuevo archivo:
+```
+touch news_page_objects.py
+```
+```
+vim news_page_objects.py
+```
+```python
+import bs4
+import requests
+
+from common import config
+
+class HomePage:
+
+    def __init__(self,news_site_uid, url):
+        self._config = config()['new_sites'[news_site_uid]
+        self._queries = self.__config['queries']
+        self._html = None
+
+        self._visit(url)
+
+    @property
+    def article_links(self):
+        link_list = []
+        for link in self._select(self._queries['homepage_article_links']):
+            if link and link.has_attr('href'):
+                link_list.append(link)
+
+        return set(link['href'] for link in link_list)
+
+    def _select(self, query_string):
+        return self._html.select(query_string)
+
+    def _visit(self, url):
+        response = requests.get(url)
+
+        response.raise_for_status()
+        
+        self._html = bs4.BeautifulSoup(response.text, 'html.parser')
+```
+
+Ahora se editara el archivo de configuracion para agregar nuestros queries
+```
+vim config.yaml
+```
+```yaml
+news_sites:
+    eluniversal:
+        url: https://www.eluniversal.com.mx/
+        queries:
+            homepage_article_links: '.field-content a'
+    elpais:
+        url: https://elpais.com/mexico/
+        queries:
+            homepage_article_links: '.articulo-titulo a'
+```
+
+Ahora se modificara el archivo principal
+```
+vim main.py
+```
+```python
+import argparse
+import logging
+logging.basicConfig(level=logging.INFO)
+
+import news_page_objects as news
+from common import config
+
+logger = logging.getLogger(__name__)
+
+def _new_scraper(news_site_uid):
+    host = config()['news_sites'][news_site_uid]['url']
+
+    logging.info('Beginning scraper for {}'.format(host))
+    homepage = news.HomePage(news_site_uid, host)
+
+    for link in homepage,article_links:
+        print(link)
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+
+    news_site_choices = list(config()['news_sites'].keys())
+    parser.add_argument('news_site', 
+                        help='The news site that you want to scrape', 
+                        type=str, choices=news_site_choices)
+
+    args = parsert.parse_args()
+    _news_scraper(args.news_site)
+```
