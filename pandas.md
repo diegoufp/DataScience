@@ -29,3 +29,21 @@ series_test
 series_test2 = pd.Series({1999: 48, 2000: 65, 2001:89})
 series_test2
 ```
+
+### DataFrames 
+
+**DataFrames** son simplemente una tabla donde las filas y las columnas tienen etiquetas, se puede construir de diferentes formas pero siempre debemos considerar que la estructura que necesitamos construir para inicializarla tiene que ser bidimensional. Una matriz y puede ser una lista de listas, lista de tuplas, un diccionario de Python u otro **DataFrame**.
+
+Si solo tenemos una dimensión a eso no le llamamos **DataFrame**, le llamamos **Serie**. Cuando utilizamos un diccionario las llaves se convierten en las llaves de la columna.
+
+```python
+import pandas as pd
+
+frame_test = pd.DataFrame({1999: [74, 38, 39], 2000: [34, 32, 32], 2001: [23, 39, 23]})
+
+frame_test
+
+frame_test2 = pd.DataFrame([[74, 38, 39], [34, 32, 32], [23, 39, 23]], columns=[1999, 2000, 2001])
+
+frame_test2
+```
