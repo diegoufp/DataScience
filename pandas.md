@@ -47,3 +47,72 @@ frame_test2 = pd.DataFrame([[74, 38, 39], [34, 32, 32], [23, 39, 23]], columns=[
 
 frame_test2
 ```
+
+## Índices y selección
+
+Existen muchas formas de manipular los DataFrames y de seleccionar los elementos que queremos transformar.
+
+- **Dictionary like**:
+```
+df[`col1`] # Regresa un DataSeries
+df[['col1', 'col3']] # Regresa un DataFrame
+```
+
+- **Numpy like**:
+iloc = index location
+```
+df.iloc[:] # fila
+df.iloc[:,:] # fila, columna
+```
+
+- **Label based**:
+loc = location
+```
+df.loc[:] # fila
+df.loc[:,:] # fila, columna
+```
+
+Existe una gran diferencia en la forma en la que utilizamos estos slices porque varia de la forma tradicional de Python. `loc` va a incluir el final del que necesitamos.
+
+### Read data
+```python
+import pandas as pd
+
+#pd.options.display.max_rows = 10 <- Muestra cierta cantidad de datos en este caso 10 
+
+el_universal = pd.read_csv("web/web_scrapper_curso_data_eng/eluniversal_2019_06_07_articles.csv")
+
+type(el_universal)
+
+el_universal.head() # <- muestra las primeras 5 lineas
+#el_universal.tail() <- muestra las ultimas 5 lineas
+```
+
+### Index and selection
+
+#### dictionary like
+
+```python
+el_universal['title']
+```
+```python
+el_universal[['title', 'url']]
+```
+
+#### Numpy like
+
+```python
+el_universal.iloc[10:15]
+```
+```
+el_universal.iloc[66]['title']
+```
+```
+el_universal.iloc[:5, 0]
+```
+
+#### Label based (Forma recomendada)
+
+```
+el_universal.loc[:, 'body': 'title']
+```
