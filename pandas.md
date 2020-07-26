@@ -116,3 +116,41 @@ el_universal.iloc[:5, 0]
 ```
 el_universal.loc[:, 'body': 'title']
 ```
+
+## Data wrangling
+
+**Data wrangling** es una de las actividades más importantes de todos los profesionales de datos. Simplemente es limpiar, transformar y enriquecer el dataset para objetivos posteriores.
+
+Pandas es una de las herramientas más poderosas para realizar este ““domado”” de datos. Recordemos que Pandas trae muchas de sus abstracciones del lenguaje R, pero nos otorga lo mejor de ambos mundos, por eso es tan popular.
+
+Nos permite:
+
+- generar transformaciones con gran facilidad.
+- trabajar rápidamente con datasets grandes
+- detectar y reemplazar faltantes
+- agrupar y resumir nuestros datos
+- visualizar nuestros resultados.
+
+### 1. añadir newspaper_uid al DataFrame
+```python
+import pandas as pd
+
+el_universal = pd.read_csv("web/web_scrapper_curso_data_eng/eluniversal_2019_06_07_articles.csv")
+
+el_universal['newspaper_uid'] = 'eluniversal'
+el_universal
+```
+
+### # 2. Obtener el host
+```python
+from urllib.parse import urlparse #<- Permite parsear la url
+    #apply Lo que nos permit ees generar transformaciones custom que notros requeramos 
+el_universal['host'] = el_universal['url'].apply(lambda url: urlparse(url).netloc)
+
+el_universal
+```
+- Contar los sitios que se repiten
+```
+#value_counts (Es una funcion de pandas) Lo que nos permite es contar cuantos valores se repiten y sus frecuencias
+el_universal['host'].value_counts()
+```
