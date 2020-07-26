@@ -154,3 +154,100 @@ el_universal
 #value_counts (Es una funcion de pandas) Lo que nos permite es contar cuantos valores se repiten y sus frecuencias
 el_universal['host'].value_counts()
 ```
+
+## Creando el codigo para la automatización
+
+```
+touch newspaper_receipe.py
+```
+```
+vim newspaper_receipe.py
+```
+```python
+import argparse
+import logging
+logging.basicConfig(level=logging.INFO)
+from urllib.parse import urlparse
+import pandas as pd
+
+logger = logging.getLogger(__name__)
+
+
+def main(filename):
+    logger.info('Starting cleaning process')
+
+    df = _read_data(filename) #<- Leer los datos
+    newspaper_uid = _extract_newspaper_uid(filename) #<- Extraer
+    df = _add_newspaper_uid_column(df, newspaper_uid) #<- Añadirlo a la columna
+    df = _extract_host(df) # <- Extraer el host
+
+    return df
+
+def _read_data(filename):
+    logger.info('Reading file {}'.format(filename))
+
+    return pd.read_csv(filename)
+
+def _extract_newspaper_uid(filename):
+    logger.info('Extracting newspaper uid')
+    newspaper_uid = filename.split('_')[0]
+
+    logger.info('Newspaper uid detected: {}'.format(newspaper_uid))
+    return newspaper_uid
+
+def _add_newspaper_uid_column(df, newspaper_uid):
+    logger.info('Filling newspaper_uid column with {}'.format(newspaper_uid))
+    df['newspaper_uid'] = newspaper_uid
+
+    return df
+
+def _extract_host(df)
+    logger.info('Extracting host from urls')
+    df['host'] = df['url'].apply(lambda url: urlparse(url).netloc)
+
+    return df
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('filename', help='The path to the dirty data', type=str)
+
+    args = partser.parse_args()
+    df = main(args.filename)
+    print(df)
+```
+- Para ejecutarlo:
+```
+python3 newspaper_receipe.py *.csv
+```
+
+## ¿Cómo trabajar con datos faltantes?
+
+Los **datos faltantes** representan un verdadero problema sobre todo cuando estamos realizando agregaciones. Imagina que tenemos datos faltantes y los llenamos con 0, pero eso haría que la distribución de datos se modificaría **radicalmente**. Podemos eliminar los registros, pero la **fuerza** de nuestras conclusiones se debilita.
+
+Pandas nos otorga varias funcionalidades para identificarlas y para trabajar con ellas. Existe el concepto que se llama **NaN**, cuando existe un dato faltante simplemente se rellena con un NaN y en ese momento podemos preguntar cuáles son los datos faltantes con .isna().
+
+- isna() para preguntar donde hay datos faltantes.
+- notna() para preguntar dónde hay datos completos.
+- dropna() para eliminar el registro.
+
+Para reemplazar:
+
+- fillna() donde le damos un dato centinela
+- ffill() donde utiliza el último valor.
+
+### Quitar los caracteres de los datos
+
+En nuestros datos aparecen varios NaN (de datos faltantes), en el caso de los titulos en algunas ocaciones se encuentran en el ultimo fragmento de la url, nos aprovecharemos de este hecho para en lugar de eliminar los registros completarlos.
+
+```python
+missing_titles_mask = el_universal['title'].isna()
+
+missing_titles = (el_universal[missing_titles_mask]['url'].str.extract(r'(?P<missing_titles>[^/]+)$'))
+
+missing_titles = ((missing_titles['missing_titles'].str.split('-')).str.join(' '))
+
+missing_titles = missing_titles.to_frame()
+
+missing_titles
+```
+
