@@ -450,3 +450,9 @@ if __name__ == '__main__':
     df = main(args.filename)
     print(df)
 ```
+
+## Enriquecimiento de los datos
+
+Podemos enriquecer nuestra tabla con información adicional, un poco de información numérica para realizar análisis posterior.
+
+Usaremos **nltk** es una librería dentro del stack de Ciencia de Datos de Python que nos va a permitir tokenizar, separar palabras dentro del título y nos permitirá contar la frecuencia de cuántas palabras existen en nuestro título y body
