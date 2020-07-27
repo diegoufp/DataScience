@@ -456,3 +456,161 @@ if __name__ == '__main__':
 Podemos enriquecer nuestra tabla con información adicional, un poco de información numérica para realizar análisis posterior.
 
 Usaremos **nltk** es una librería dentro del stack de Ciencia de Datos de Python que nos va a permitir tokenizar, separar palabras dentro del título y nos permitirá contar la frecuencia de cuántas palabras existen en nuestro título y body
+
+### 6 tokenizar el titulo y el body
+```python
+import nltk 
+#nltk.download() <- Para instalar nltk en jupyter 
+from nltk.corpus import stopwords 
+# Los stopwords son palabras que no nos a;aden ningun tipo de analisis ulterir (el,la), palabras que se usan mucho en el lenguaje pero que no sirven para determinar que esta sucediendo dentro de nuestro analisis de texto
+# nltk es una libreria extensa con ella se puede trabajar con lenguaje natural de manera bastante facil
+
+
+stop_words = set(stopwords.words('spanish'))
+
+def tokenize_column(df, column_name):
+    return (df
+            .dropna()
+            .apply(lambda row: nltk.word_tokenize(row[column_name]), axis=1)
+            .apply(lambda tokens: list(filter(lambda token: token.isalpha(), tokens)))
+            .apply(lambda tokens: list(map(lambda token: token.lower(), tokens)))
+            .apply(lambda word_list: list(filter(lambda word: word not in stop_words, word_list)))
+            .apply(lambda valid_word_list: len(valid_word_list))
+            )
+
+el_universal['n_tokens_title'] = tokenize_column(el_universal, 'title')
+
+el_universal
+```
+
+### Integrar el codigo al programa
+
+
+```
+vim newspaper_receipe.py
+```
+```python
+import argparse
+import hashlib
+import logging
+logging.basicConfig(level=logging.INFO)
+from urllib.parse import urlparse
+import pandas as pd
+import nltk
+from nltk.corpus import stopwords 
+
+logger = logging.getLogger(__name__)
+
+
+def main(filename):
+    logger.info('Starting cleaning process')
+
+    df = _read_data(filename) #<- Leer los datos
+    newspaper_uid = _extract_newspaper_uid(filename) #<- Extraer
+    df = _add_newspaper_uid_column(df, newspaper_uid) #<- Añadirlo a la columna
+    df = _extract_host(df) # <- Extraer el host
+    df = _fill_missing_titles(df)
+    df = _generate_uids_for_rows(df) # <- Genera los uids
+    df = _remove_new_line_form_body(df)
+    df = _tokenize_title(df, 'title')
+    df = _tokenize_body(df, 'body')
+    return df
+
+def _read_data(filename):
+    logger.info('Reading file {}'.format(filename))
+
+    return pd.read_csv(filename)
+
+def _extract_newspaper_uid(filename):
+    logger.info('Extracting newspaper uid')
+    newspaper_uid = filename.split('_')[0]
+
+    logger.info('Newspaper uid detected: {}'.format(newspaper_uid))
+    return newspaper_uid
+
+def _add_newspaper_uid_column(df, newspaper_uid):
+    logger.info('Filling newspaper_uid column with {}'.format(newspaper_uid))
+    df['newspaper_uid'] = newspaper_uid
+
+    return df
+
+def _extract_host(df):
+    logger.info('Extracting host from urls')
+    df['host'] = df['url'].apply(lambda url: urlparse(url).netloc)
+
+    return df
+
+def _fill_missing_titles(df):
+    logger.info('Filling missing titles')
+    missing_titles_mask = df['title'].isna()
+
+    missing_titles = (df[missing_titles_mask]['url'].str.extract(r'(?P<missing_titles>[^/]+)$'))
+    missing_titles = ((missing_titles['missing_titles'].str.split('-')).str.join(' '))
+    missing_titles = missing_titles.to_frame()
+
+    df.loc[missing_titles_mask, 'title'] = missing_titles.loc[:, 'missing_titles']
+
+    return df
+
+def _generate_uids_for_rows(df):
+    logger.info('Generating uids for each row')
+    uids = (df
+            .apply(lambda row: hashlib.md5(bytes(row['url'].encode())), axis=1)
+            .apply(lambda hash_object: hash_object.hexdigest())
+            )
+
+    df['uid'] = uids
+
+    return df.set_index('uid')
+
+def _remove_new_line_form_body(df):
+    logger.info('Remove new lines from body')
+
+    stripped_body = (df.apply(lambda row: row['body'], axis=1))
+
+    stripped_body = stripped_body.str.replace('\n','')
+    stripped_body = stripped_body.str.replace('\r','')
+    df['body'] = stripped_body.to_frame()
+
+    return df
+
+def _tokenize_title(df, column_name):
+    stop_words = set(stopwords.words('spanish'))
+
+    n_tokens_titles = (df
+            .dropna()
+            .apply(lambda row: nltk.word_tokenize(row[column_name]), axis=1)
+            .apply(lambda tokens: list(filter(lambda token: token.isalpha(), tokens)))
+            .apply(lambda tokens: list(map(lambda token: token.lower(), tokens)))
+            .apply(lambda word_list: list(filter(lambda word: word not in stop_words, word_list)))
+            .apply(lambda valid_word_list: len(valid_word_list))
+            )
+    
+    df['n_tokens_title'] = n_tokens_titles
+
+    return df
+
+def _tokenize_body(df, column_name):
+    stop_words = set(stopwords.words('spanish'))
+
+    n_tokens_bodys = (df
+            .dropna()
+            .apply(lambda row: nltk.word_tokenize(row[column_name]), axis=1)
+            .apply(lambda tokens: list(filter(lambda token: token.isalpha(), tokens)))
+            .apply(lambda tokens: list(map(lambda token: token.lower(), tokens)))
+            .apply(lambda word_list: list(filter(lambda word: word not in stop_words, word_list)))
+            .apply(lambda valid_word_list: len(valid_word_list))
+            )
+
+    df['n_tokens_body'] = n_tokens_bodys
+
+    return df
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('filename', help='The path to the dirty data', type=str)
+
+    args = parser.parse_args()
+    df = main(args.filename)
+    print(df)
+```
