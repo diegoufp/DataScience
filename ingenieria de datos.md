@@ -862,3 +862,19 @@ if __name__ == '__main__':
 
     main(args.filename)
 ```
+
+## ¿Por qué usar la nube?
+
+La **nube** nos da un poder de cómputo casi inimaginable, nos permite procesar terabytes de datos en segundos. La **nube** se puede usar en dos grandes ocasiones. Cuando los datos ya no caben en tu computadora loca o cuando el tiempo de procesamiento esta siendo muy extenso, es en ese momento donde deberías usar la nube.
+
+Si estas en un entorno de producción, si estas trabajando en una empresa y los datos de esa empresa ya viven en la nube, lo lógico es realizar el trabajo en la nube. Automatizar los scripts en ese mismo ambiente.
+
+Diversas nubes ya ofrecen paquetes completos para el ciclo de datos, como Google Cloud:
+
+- Dataflow
+- Pub/Sub
+- Cloud Storage
+- Datalab
+- BigQuery
+- Dataproc
+- Firestore
