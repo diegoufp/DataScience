@@ -614,3 +614,174 @@ if __name__ == '__main__':
     df = main(args.filename)
     print(df)
 ```
+
+## Valores duplicados en Jupyter
+
+Estos valores duplicados es importantes identificarlos y removerlos de nuestro datasets para que esos valores no generen un peso no justificado dentro del análisis a realizar dentro de nuestro Pipelines.
+
+Pandas nos otorga la función `drop_duplicates` para eliminar estos valores duplicados.
+
+Lo primero que tenemos que hacer para ver duplicados es tratar de entender donde deberias tener valores duplicados y donde no.
+
+```python
+import pandas as pd
+
+el_universal = pd.read_csv("web/web_scrapper_curso_data_eng/eluniversal_2019_06_07_articles.csv")
+# si vamos a 'el_universal' y damos la funcion 'value_counts'
+# Vamos a ver que en 'url' todas son diferentes lo mismo si fueramos a 'body'
+el_universal['url'].value_counts()
+```
+
+Sin embargo cuado corremos el 'title' podremos ver que hay titulos que se repiten
+
+```python
+import pandas as pd
+
+el_universal = pd.read_csv("web/web_scrapper_curso_data_eng/eluniversal_2019_06_07_articles.csv")
+# si vamos a 'el_universal' y damos la funcion 'value_counts'
+# Vamos a ver que en 'url' todas son diferentes lo mismo si fueramos a 'body'
+el_universal['title'].value_counts()
+```
+
+Pandas nos da una facilidad para poder eliminar este tipo de valores duplicados con la funcion `drop_duplicates`
+```python
+# En keep se puede elegir entre el primero o el ultimo
+el_universal.drop_duplicates(subset=['title'], keep='first', inplace=True)
+```
+
+### Integrar el codigo al programa
+
+
+```
+vim newspaper_receipe.py
+```
+```python
+import argparse
+import hashlib
+import logging
+logging.basicConfig(level=logging.INFO)
+from urllib.parse import urlparse
+import pandas as pd
+import nltk
+from nltk.corpus import stopwords 
+
+logger = logging.getLogger(__name__)
+
+
+def main(filename):
+    logger.info('Starting cleaning process')
+
+    df = _read_data(filename) #<- Leer los datos
+    newspaper_uid = _extract_newspaper_uid(filename) #<- Extraer
+    df = _add_newspaper_uid_column(df, newspaper_uid) #<- Añadirlo a la columna
+    df = _extract_host(df) # <- Extraer el host
+    df = _fill_missing_titles(df)
+    df = _generate_uids_for_rows(df) # <- Genera los uids
+    df = _remove_new_line_form_body(df)
+    df = _tokenize_column(df, 'title')
+    df = _tokenize_column(df, 'body')
+    df = _remove_duplicate_entries(df, 'title')
+    df = _drop_rows_with_missing_values(df)
+    _save_data(df, filename)
+
+    return df
+
+def _read_data(filename):
+    logger.info('Reading file {}'.format(filename))
+
+    return pd.read_csv(filename)
+
+def _extract_newspaper_uid(filename):
+    logger.info('Extracting newspaper uid')
+    newspaper_uid = filename.split('_')[0]
+
+    logger.info('Newspaper uid detected: {}'.format(newspaper_uid))
+    return newspaper_uid
+
+def _add_newspaper_uid_column(df, newspaper_uid):
+    logger.info('Filling newspaper_uid column with {}'.format(newspaper_uid))
+    df['newspaper_uid'] = newspaper_uid
+
+    return df
+
+def _extract_host(df):
+    logger.info('Extracting host from urls')
+    df['host'] = df['url'].apply(lambda url: urlparse(url).netloc)
+
+    return df
+
+def _fill_missing_titles(df):
+    logger.info('Filling missing titles')
+    missing_titles_mask = df['title'].isna()
+
+    missing_titles = (df[missing_titles_mask]['url'].str.extract(r'(?P<missing_titles>[^/]+)$'))
+    missing_titles = ((missing_titles['missing_titles'].str.split('-')).str.join(' '))
+    missing_titles = missing_titles.to_frame()
+
+    df.loc[missing_titles_mask, 'title'] = missing_titles.loc[:, 'missing_titles']
+
+    return df
+
+def _generate_uids_for_rows(df):
+    logger.info('Generating uids for each row')
+    uids = (df
+            .apply(lambda row: hashlib.md5(bytes(row['url'].encode())), axis=1)
+            .apply(lambda hash_object: hash_object.hexdigest())
+            )
+
+    df['uid'] = uids
+
+    return df.set_index('uid')
+
+def _remove_new_line_form_body(df):
+    logger.info('Remove new lines from body')
+
+    stripped_body = (df.apply(lambda row: row['body'], axis=1))
+
+    stripped_body = stripped_body.str.replace('\n','')
+    stripped_body = stripped_body.str.replace('\r','')
+    df['body'] = stripped_body.to_frame()
+
+    return df
+
+def _tokenize_column(df, column_name):
+    logger.info('Calculating the number of unique tokes in {}'.format(column_name))
+    stop_words = set(stopwords.words('spanish'))
+
+    n_tokens = (df
+            .dropna()
+            .apply(lambda row: nltk.word_tokenize(row[column_name]), axis=1)
+            .apply(lambda tokens: list(filter(lambda token: token.isalpha(), tokens)))
+            .apply(lambda tokens: list(map(lambda token: token.lower(), tokens)))
+            .apply(lambda word_list: list(filter(lambda word: word not in stop_words, word_list)))
+            .apply(lambda valid_word_list: len(valid_word_list))
+            )
+
+    df['n_tokens_' + column_name] = n_tokens
+
+    return df
+
+def _remove_duplicate_entries(df, column_name):
+    logger.info('Removing duplicate entries')
+    df.drop_duplicates(subset=[column_name], keep='first', inplace=True)
+
+    return df
+
+def _drop_rows_with_missing_values(df):
+    logger.info('Dropping rows with missing values')
+    # dropna() -> Elimina las filas que no tiene valores
+    return df.dropna()
+
+def _save_data(df, filename):
+    clean_filename = 'clean_{}'.format(filename)
+    logger.info('Saving data at location: {}'.format(clean_filename))
+    df.to_csv(clean_filename, encoding = 'utf-8-sig')
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('filename', help='The path to the dirty data', type=str)
+
+    args = parser.parse_args()
+    df = main(args.filename)
+    print(df)
+```
