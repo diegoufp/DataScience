@@ -86,3 +86,36 @@ p12.request.method
 # Esto es util a la hora de redireccionamientos
 p12.request.url
 ```
+
+## Parseando HTML con BeautifulSoup
+
+Extraer de todo ese codigo HTML la informacion que para nosotros es importante.
+
+```python
+# Esto nos va a permitir parsear el codigo HTML
+# Es decir que nos va a permitir tomar todo ese texto y poder indentificar distintas partes en las que va a estar la informacion de nuestro interes
+from bs4 import BeautifulSoup
+
+#beatifulsoup no pide que indiquemos un parser
+# El parser es el pedazo de codigo que corre detras de esta funcion y separa el texto largo en partes mas cortas que sean ams faciles de indentificar y manejar
+s = BeautifulSoup(p12.text, 'lxml')
+
+# Si vemos el tipo podremos ver que es una BeautifulSoup
+type(s)
+
+# Te lo muestra mas ordenado que con 'print(p12.text)'
+print(s.prettify())
+
+# Obtener el tag o etiqueta
+# En este caso estamos buscnado un el tag "ul class='hot-sections'"
+# si solo lo buscamos por ul saldra el primero con ese tag y puede no ser el que buscamos
+s.find('ul')
+
+#podemos ser mas especificos agregandole atributos 'attrs'
+s.find('ul', attrs={'class':'hot-sections'})
+
+# Dentro de este nuevo tag lo que debemos obtener son todos los nombres de las secciones
+# como esta vez queremos buscar varios tags usamos '.find_all'
+#Esto nos dara una lista
+s.find('ul', attrs={'class':'hot-sections'}).find_all('li')
+```
