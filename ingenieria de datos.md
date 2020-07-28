@@ -738,3 +738,127 @@ if __name__ == "__main__":
     args = parsert.parse_args()
     _news_scraper(args.news_site)
 ```
+
+## Pandas
+
+[**PANDAS**](https://github.com/diegoufp/DataScience/blob/master/pandas.md#pandas "PANDAS")
+
+## Introducción a los sistemas de datos
+
+Los sistemas de datos vienen en muchos sabores y colores, SQL, NoSQL, especializados en procesamiento en bloque, chorro y streaming. Este tipo de sistema nos permite realizar queries sofisticadas y compartir nuestro trabajo con otros miembros del equipo.
+
+- **Procesamiento de bloque**: Estamos hablando de datos históricos, qué sucedió ayer, en el trimestre pasado, cuáles fueron las ventas del año anterior o de los últimos cinco años. Nos permite realizar el procesamiento de manera eficiente.
+
+- **Procesamiento en chorro**: Significa que estamos procesando los datos conforme van llegando, las transformaciones se realizan en tiempo real, Este tipo de sistema nos sirven para cuando queremos realizar decisiones en donde la importancia del tiempo es fundamental.
+
+El criterio principal a tener en cuenta: El tiempo que tienes. Si bien los sistemas open source son gratis, para poderlos implementar necesitas tener conocimientos de cloud, debes poder saber trabajar y mantener máquinas.
+
+**SQL vs NoSQL**
+
+- La discusión más relevante en el mundo de las aplicaciones web y móvil, donde dependiendo de la aplicación, la decisión puede ser fundamental para el crecimiento de la app.
+- La verdad es que para los profesionales de los datos, especialmente los profesionales de los datos. Es necesario saber ambos.
+
+```
+touch base.py
+vim base.py
+```
+```python
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
+engine = create_engine('sqlite:///newspaper.db')
+
+Session = sessionmaker(bind=engine)
+
+Base = declarative_base()
+```
+---------------------------------------------------------
+```
+touch article.py
+vim article.py
+```
+```python
+from sqlalchemy import Column, String, Integer
+
+from base import Base
+
+class Article(Base):
+    __tablename__ = 'articles'
+
+    id = Column(String, primary_key=True)
+    body = Column(String)
+    host = Column(String)
+    title = Column(String)
+    newspaper_uid = Column(String)
+    n_tokens_body = Column(Integer)
+    n_tokens_title = Column(Integer)
+    url = Column(String, unique=True)
+
+    def __init__(self,
+                uid,
+                body,
+                host,
+                newspaper_uid,
+                n_tokens_body,
+                n_tokens_title,
+                title,
+                url
+                ):
+        self.id = uid
+        self.body = body
+        self.host = host
+        self.newspaper_uid = newspaper_uid
+        self.n_tokens_body = n_tokens_body
+        self.n_tokens_title = n_tokens_title
+        self.title = title
+        self.url = url
+```
+-----------------------------------------------------
+```
+touch main.py
+vim main.py
+```
+```python
+import argparse
+import logging
+logging.basicConfig(level=logging.INFO)
+
+import pandas as pd
+
+from article import Article
+from base import Base, engine, Session
+
+logger = logging.getLogger(__name__)
+
+def main(filename):
+    Base.metadata.create_all(engine) #<- Genera nuestro esquema(como en sql)
+    session = Session()
+    articles = pd.read_csv(filename)
+    # iterrows nos permite generar un loop adentro de cada una de nuestras filas de nuestro dataframe
+    for index, row in articles.iterrows():
+        logger.info('Loading article uid {} into DB'.format(row['uid']))
+        article = Article(row['uid'],
+                            row['body'],
+                            row['host'],
+                            row['newspaper_uid'],
+                            row['n_tokens_body'],
+                            row['n_tokens_title'],
+                            row['title'],
+                            row['url'])
+
+        session.add(article) #<- Estro ya nos estaria poniendo nuestro articulo dentro de la base de datos
+
+    session.commit()
+    session.close()
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('filename',
+                        help='The file you want to load into the db',
+                        type=str)
+
+    args = parser.parse_args()
+
+    main(args.filename)
+```
