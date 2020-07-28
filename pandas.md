@@ -785,3 +785,54 @@ if __name__ == '__main__':
     df = main(args.filename)
     print(df)
 ```
+
+## Visualización de datos
+
+Pandas tambien es un gran aliado a la hora de hacer analisis descriptivo de nuestros datos, es decir, poder entender y visualizar como se componen nuestros datos. Para eso lo mejor es entrar en nuestro `jupyter notebook` y comenzar a ejecutar los metodos descriptivo que nos ofrece pandas.
+
+### Descriptive analysis en jupyter
+
+LO primero que tenemos que hacer es leer nuestros archivos csv que contienen nuestros datos limpios.
+```python
+import pandas as pd
+clean_eluniversal = pd.read_csv('web_scrapper_curso_data_eng/clean_eluniversal_2020_02_23_articles.csv')
+clean_elpais = pd.read_csv('web_scrapper_curso_data_eng/clean_elpais.csv')
+```
+- Metodo describe:
+
+El metodo describe lo que nos otroga es una serie de **valores estadisticos** que nos permiten entender las distribuciones de nuestros datos.
+```python
+clean_eluniversal.describe()
+```
+
+- Visualización de la información donde el token de una columna es mínimo
+Mascara booleana:
+```python
+clean_eluniversal.loc[clean_eluniversal['n_tokens_title'] == 1]
+```
+
+- Gráficas por distinción en puntos de diferentes colores para diferentes variables o diferentes Data Frame:
+```python
+# %matplotlib inline <- Nos permite generar graficos directamente en jupyter notebook
+%matplotlib inline
+clean_eluniversal['n_tokens_title'].plot(style = 'k.')
+clean_eluniversal['n_tokens_body'].plot(style = 'r.')
+```
+
+- Elaboración de histogramas para dos o más variable o dos o mas Data Sets:
+```python
+# .concat nos permite juntar dos diferentes dataframes
+all_newspaper =pd.concat([clean_eluniversal])
+# Los agruparemos por su newspaper_uid
+grouped = all_newspaper.groupby('newspaper_uid')
+# Comparar atraves de un histograma
+grouped.hist()
+# Grafica de lineas
+grouped.plot()
+```
+
+- Visualización de valores mínimos, medios y maximos de uno o mas Data Sets:
+```python
+# .agg <- agregacion
+grouped['n_tokens_body'].agg(['min', 'mean', 'max'])
+```
