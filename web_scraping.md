@@ -249,3 +249,38 @@ except Exception as e :
     print('\n')
 # y asi no interrumpe la ejecucion de condigo
 ```
+
+## Descargando contenido
+
+En este tema vamos a descargar el contenido de cada nota(titulo, texto, volanta, fecha, autor, etc.)
+
+```python
+url_nota = 'https://www.pagina12.com.ar/281448-causa-peajes-procesaron-al-ex-ministro-nicolas-dujovne'
+
+try:
+    nota = requests.get(url_nota)
+    if nota.status_code == 200:
+        s_nota = BeautifulSoup(nota.text, 'lxml')
+        # Extraer el titulo
+        titulo = s_nota.find('h1', attrs={'class':'article-title'})
+        print(titulo.text)
+        # Extraer la fecha del articulo
+        fecha = s_nota.find('span', attrs={'pubdate':'pubdate'}).get('datetime')
+        print(fecha)
+        # Extraer el cuerpo
+        cuerpo = s_nota.find('div', attrs={'article-text'})
+        print(cuerpo.text)
+        # Extraer la volanta 
+        volanta = s_nota.find('h2', attrs={'class':'article-prefix'})
+        print(volanta.text)
+        # Extraer el copete
+        copete = s_nota.find('div', attrs={'class':'article-summary'})
+        print(copete.text)
+        # Extraer autor
+        autor = s_nota.find('div', attrs={'class':'article-author'}).a
+        print(autor.text)
+except Exception as e:
+    print('Error:')
+    print(e)
+    print('\n')
+```
