@@ -186,5 +186,66 @@ list_articles = links_the_article(article_lists)
 list_articles.append(promotion)
 #Lista con todos los links junto con el promocionado
 list_articles
+```
 
+## Manejo de errores
+
+Funcion que recibe un objeto de BeautifulSoup de una pagina de una seccion y devuelve una lista de URLs a las notas de esa seccion.
+
+```python
+def obtener_notas(soup):
+    lista_nota = []
+
+    # Obtengo el articulo promocionado
+    # En este caso usamos find en lugar de get
+    # si find no encuentra lo que estamos buscando retorna un None y no produce ningun error
+    featured_article = soup.find('div', attrs={'class':'featured-article__container'})
+    if featured_article:
+        lista_nota.append(featured_article.a.get('href'))
+
+    # Obtengo el listado de articulos
+    article_list = soup.find('ul', attrs={'class':'article-list'})
+    for article in article_list.find_all('li'):
+        if article.a:
+            lista_nota.append(article.a.get('href'))
+    
+    return lista_nota
+```
+- **Manejo de errores**
+```python
+# Cuando hacemos los request
+r = requests.get(url)
+# Una cosa que podemos verificar simplemente es status code
+r.status_code
+# 200 significa que salio todo bien
+# Una forma muy simple de verificar si estamos listos para parsear el contenido de la respuesta es siemplemente verificar si el status es 200
+
+if r.status_code == 200:
+    # Procesamos la respuesta
+else:
+    # informamos el error
+```
+
+Para notros obtener un status code distinto de 200 tiene que haber un servidor web que haya recibido nuestra solicitud, la haya procesado, haya encontrado algun error en ese procesamiento entonces nos devuelve el codigo de error.
+
+Puede pasar que en funciones como la que hicimos anteriormente nos encontremos con algun link que conduzca a una pagina que este caida o siemplemente que el servidos estaba fuera de servicio en ese momento entonces no podemos procesar la respuesta.
+
+En este caso cuando hagamos un request a una url mala va a arrojar un error.
+
+```python
+url_mala = 'https://www.pagina13.com.ar/'
+requests.get(url_mala)
+```
+- **Que es lo que podemos hacer?**
+
+```python
+# Lo podemos encapzular dentro de un bloque try , except
+try:
+    requests.get(url_mala)
+# Podemos guardar la excepcion e imprimirla para saber que typo de error fue
+except Exception as e :
+    print('error en la request')
+    print(e)
+    print('\n')
+# y asi no interrumpe la ejecucion de condigo
 ```
