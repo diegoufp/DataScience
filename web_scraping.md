@@ -305,3 +305,179 @@ img_req.status_code
 from IPython.display import Image
 Image(img_req.content)
  ```
+
+## Unificado el scraper
+
+- Intento:
+```python
+import requests
+from bs4 import BeautifulSoup
+
+def extractor(link):
+
+    try:
+        nota = requests.get(link)
+        if nota.status_code == 200:
+            s_nota = BeautifulSoup(nota.text, 'lxml')
+            # Extraer el titulo
+            titulo = s_nota.find('h1', attrs={'class':'article-title'})
+            print(titulo.text)
+            # Extraer la fecha del articulo
+            fecha = s_nota.find('span', attrs={'pubdate':'pubdate'}).get('datetime')
+            print(fecha)
+            # Extraer el cuerpo
+            cuerpo = s_nota.find('div', attrs={'article-text'})
+            print(cuerpo.text)
+            # Extraer la volanta 
+            volanta = s_nota.find('h2', attrs={'class':'article-prefix'})
+            print(volanta.text)
+            # Extraer el copete
+            copete = s_nota.find('div', attrs={'class':'article-summary'})
+            print(copete.text)
+            # Extraer autor
+            autor = s_nota.find('div', attrs={'class':'article-author'}).a
+            print(autor.text)
+            # Extraer imagen
+            media = s_nota.find('div', attrs={'class':'article-main-media-image'}).find_all('img')
+
+            if len(media) == 0:
+                print('no se encontraron imagenes')
+            else:
+                imagen = media[-1]
+                img_src = imagen.get('data-src')
+                print(img_src)
+    except Exception as e:
+        print('Error:')
+        print(e)
+        print('\n')
+```
+
+- Verdadero:
+
+```python
+import requests
+from bs4 import BeautifulSoup
+
+def obtener_info(s_nota):
+
+    #Creamos un diccionario vacio para poblarlo con la informacion
+    ret_dict = {}
+
+    # Extraemos la fecha
+    fecha = s_nota.find('span', attrs={'pubdate':'pubdate'})
+    if fecha:
+        ret_dict['fecha'] = fecha.get('datetime')
+    else:
+        ret_dict['fecha'] = None
+
+    # Extraemos el titulo
+    titulo = s_nota.find('h1', attrs={'class':'article-title'})
+    if titulo:
+        ret_dict['titulo'] = titulo.text
+    else:
+        ret_dict['titulo'] = None
+
+    # Extraemos la volanta
+    volanta = s_nota.find('h2', attrs={'class':'article-prefix'})
+    if volanta:
+        ret_dict['volanta'] = volanta.get_text()
+    else:
+        ret_dict['volanta'] = None
+
+    # Extraemos el copete 
+    copete = s_nota.find('div', attrs={'class':'article-summary'})
+    if copete:
+        ret_dict['copete'] = copete.get_text()
+    else:
+        ret_dict['copete'] = None
+
+    # Extraemos el autor
+    autor = s_nota.find('div', attrs={'class':'article-author'})
+    if autor:
+        ret_dict['autor'] = autor.a.get_text()
+    else:
+        ret_dict['autor'] = None
+
+    # Extraemos la imagen
+    media = s_nota.find('div', attrs={'class':'article-main-media-image'})
+    if media:
+        imagenes = media.find_all('img')
+        if len(imagenes) == 0:
+            print('no se encontraron imagenes')
+        else:
+            imagen = imagen[-1]
+            img_src = imagen.get('data-src')
+            try:
+                img_req = requests.get(img_src)
+                if img_req.status_code == 200:
+                    ret_dict['imagen'] = img_req.content
+                else:
+                    ret_dict['imagen'] = None
+            except:
+                print('No se pudo obtener la imagem')
+
+    else:
+        print('No se encontro media')
+
+    # Extraemos el cuerpo de la nota
+    cuerpo = s_nota.find('div', attrs={'article-text'})
+    if cuerpo:
+        ret_dict['texto'] = cuerpo.get_text()
+    else:
+        ret_dict['texto'] = None
+
+    return ret_dict
+```
+```python
+def scrape_nota(url):
+    try:
+        nota = requests.get(url)
+    except Exception as e:
+        print('Error scrapeando URL', url)
+        print(e)
+        return None
+
+    if nota.status_Code != 200:
+        print(f'Error obteniendo nota {url}')
+        print(f'stuts Code = {nota.status_code}')
+        return None
+
+    s_nota = BeautifulSoup(nota.text, 'lxml')
+
+    ret_dict = obtener_info(s_nota)
+    ret_dict['url'] = url
+
+    return ret_dict
+```
+```python
+    notas = []
+    for link in links_secciones:
+        try:
+            r = requests.get(link)
+            if r.status_code == 200:
+                soup = Beaurifulsoup(r.text, 'lxml')
+                notas.extend(obtener_notas(soup))
+            else:
+                print('No se pudo obtener la seccion: ', link)
+        except:
+            print('No se pudo obtener la seccion: ', link )
+```
+```python
+data = []
+for i, nota in enumerate(notas)
+    print(f'Scrapeando nota{i}/{len(notas)}')
+    data.append(scrape_nota(nota))
+```
+
+Despues de ejecutar el codigo vamos a crear un DataFrame
+```python
+import pandas as pd
+
+df = pd.DataFrame(data)
+df.head()
+```
+
+Lo ultimo seria guardar el DataFrame en un archivo
+```python
+df.to_csv('Notas_Pagina12.csv')
+```
