@@ -117,5 +117,74 @@ s.find('ul', attrs={'class':'hot-sections'})
 # Dentro de este nuevo tag lo que debemos obtener son todos los nombres de las secciones
 # como esta vez queremos buscar varios tags usamos '.find_all'
 #Esto nos dara una lista
-s.find('ul', attrs={'class':'hot-sections'}).find_all('li')
+secciones = s.find('ul', attrs={'class':'hot-sections'}).find_all('li')
+secciones
+```
+
+## Extrayendo informacion
+
+```python
+# Para demostrar como funciona nos quedaremos solo con el primer elemento
+seccion = secciones[0]
+seccion
+
+# Una manera equivalente de usar el metodo '.find' es:
+seccion.find('a')
+# Otra manera que tiene bs4 de acceder al primer tag hijo
+seccion.a
+#En los dos el resultado es el mismo : <a href="https://www.pagina12.com.ar/secciones/el-pais">El país</a>
+
+# Con cualquiera de estos dos podemos obtener en forma de staring el texto del atributo href
+seccion.find('a').get('href')
+seccion.a.get('href')
+# El resultado de cualquiera de los dos es este: 'https://www.pagina12.com.ar/secciones/el-pais'
+
+# Para obtener el texto del tag a : >El país</a>
+seccion.a.get_text()
+# El resultado es este: 'El país'
+
+# Este proceso lo replicaremos para todas la paginas
+links_secciones = [seccion.a.get('href') for seccion in secciones]
+links_secciones
+
+# Ahora con estos links podemos hacer un nuevo requests.get
+sec = requests.get(links_secciones[0])
+
+# 200 nos indica que todo salio bien
+sec.status_code
+
+# A esto se le llama ahcer una sopa
+s_seccion = BeautifulSoup(sec.text, 'lxml')
+print(s_seccion.prettify())
+
+featureds_article = s_seccion.find('div', attrs={'class':'featured-article__container'})
+featureds_article
+
+# Link del articulo promocionado
+primotion = featureds_article.a.get('href')
+
+article_list = s_seccion.find('ul', attrs={'class':'article-list'})
+
+# Funcion para encontrar los otros links
+def links_the_article(article_lists):
+    
+    count = len(article_lists)
+    i = 0
+    list_articles = []
+    while i < count:
+        article_list = article_lists[i]
+        if len(article_list) != 0:
+            link_article = article_list.a.get('href')
+            list_articles.append(link_article)
+            i += 1
+        else:
+            i += 1
+    return list_articles
+
+list_articles = links_the_article(article_lists)
+#Lista con todos los links menos el promocionado
+list_articles.append(promotion)
+#Lista con todos los links junto con el promocionado
+list_articles
+
 ```
