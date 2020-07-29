@@ -284,3 +284,24 @@ except Exception as e:
     print(e)
     print('\n')
 ```
+
+## Contenido multimedia
+ 
+Para descargar contenido multimedia
+```python
+media = s_nota.find('div', attrs={'class':'article-main-media-image'}).find_all('img')
+
+if len(media) == 0:
+    print('no se encontraron imagenes')
+else:
+    imagen = media[-1]
+    img_src = imagen.get('data-src')
+    print(img_src)
+
+img_req = requests.get(img_src)
+img_req.status_code
+
+#Para poder visualizar la imagen:
+from IPython.display import Image
+Image(img_req.content)
+ ```
