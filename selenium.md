@@ -48,3 +48,55 @@ Este servicio es un complemento.
 - Se utiliza junto a Selenium RC
 - Permite correr pruebas en paralelo
 - Conveniente para ahorrar tiempo
+
+
+## Otras herramientas de testing y automatizacion
+
+### Puppeteer
+- Pros:
+    - Soporte por parte de Goople
+    - Datos del Performance Analysis de Chrome
+    - Mayor control de Chorme
+    - No requiere de drivers externos
+
+- Contras:
+    - Funciona solo en Chrome y con JavaScript
+    - Comunidad pequeña
+
+### Cypress.io
+- Pros:
+    - Comunidad emergente
+    - Buena documentacion con ejemplos
+    - Bastante agil en pruebas E2E
+    - Orientado a desarrolladores
+    - Excelente manejo de asincronismo
+
+- Contras:
+    - Funciona solo en Chrome y con JavaScript
+    - Pruebas en paralelo solo en version pago
+
+### Cual es la mejor opcion?
+Para responder esta pregunta se tienen que tomar en cuenta factores como el lenguaje de programacion que conoces tu y tu equipo de trabajo, el proyecto en el que se va a trabajar require de grandes llamadas de asincronismo o no, si solo quieres automatizar una tarea que es repetitiva.
+
+## Instalacion 
+
+```
+sudo apt update
+apt install python3-pip
+pip3 --version
+pip3 install selenium
+pip3 install pyunitreport
+```
+
+## Conceptos
+
+### Unittest (PyTest)
+Una libreria de python con la cual vamos a realizar pruebas unitarias para obtener la informacion de lo que ocurre con nuestras automatizaciones. En otras palabras va a preparar el entorno de nuestra automatizacion y despues realizara una serie de acciones para cuando termine el caso de prueba que se esta realizando.
+
+**El caso de prueba** Es una unidad de codigo con el cual estaremos indicando a selenium que queremos que haga o en su defecto alguna funcion que queramos probar.
+
+- **Test Fixture**: preparaciones para antes y despues de la prueba.
+- **Test Case**: unidad de codigo a provar.
+- **Test Suite**: coleccion de Test Cases.
+- **Test Runner**: orquestador de la ejecucion.
+- **Test Report**: resumen de resultados.
