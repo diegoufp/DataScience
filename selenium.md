@@ -283,6 +283,26 @@ if __name__ == "__main__":
 
 - **Test suites**: Coleccion de test unificados en una sola prueba, permitiendo tener resultados grupales e individuales. 
 
+### Metodos 
+
+**Metodo** | **Condicion que verifica** | **Ejemplo** 
+-----------|----------------------------|-------------
+assertEqual(a,b) | a == b | Verifica que 'a' y 'b' sean iguales. Util para verificar valores, por ejemplo: assertEqual(element.text, "100") 
+assertNoEqual(a,b) | a != b | Verifica que 'a' y 'b' sean diferentes. Util para verificar valores, por ejemplo: assertNotEqual(element.text, "100") 
+assertTrue(x) | bool(x) is True | Verifica que la expresion evaluada tenga como resultado 'True' o 'False'. Por ejemplo, que un elemento se este mostrando, activo o disponible para interactuar: assertTrue(element.is_dispalyed()) 
+assertFalse(x) | bool(x) is False | Verifica que la expresion evaluada tenga como resultado 'True' o 'False'. Por ejemplo, que un elemento se este mostrando, activo o disponible para interactuar: assertFalse(element.is_dispalyed()) 
+assertNot(x) | a is a not b | Verifica que la expresion evaluada tenga como resultado 'True' o 'False'. Por ejemplo, que un elemento se este mostrando, activo o disponible para interactuar: assertNot(element.is_dispalyed()) 
+assertAlmostEqual(a, b) | round(a-b, 7) == 0 | Estos metodos verifican especificamente valores numericos y redondean su valor para buscar igualdad. Utiles al validar resultados con numeros flotantes
+assertNotAlmostEqual(a, b) | round(a-b, 7) != 0 | Estos metodos verifican especificamente valores numericos y redondean su valor para buscar igualdad. Utiles al validar resultados con numeros flotantes
+assertGreater(a, b) | a > b | Funcionan igual que assertEqual, pero con condiciones logicas de comparacion
+assertGreaterEqual(a, b) | a >= b | Funcionan igual que assertEqual, pero con condiciones logicas de comparacion
+assertLess(a, b) | a < b | Funcionan igual que assertEqual, pero con condiciones logicas de comparacion
+assertLessEqual(a, b) | a <= b | Funcionan igual que assertEqual, pero con condiciones logicas de comparacion
+assertRegexpMatches(s, r) | r.search(s) | Verifica si la busqueda de una expresion regular coincide con el string indicado
+assertNotRegexpMatches(s, r) | not.r.search(s) | Verifica si la busqueda de una expresion regular coincide con el string indicado
+asserListEqual(a, b) | assertListEqual(lista_a, lista_b) | Valida que los elementos de las listas coinciden. Util para validar las opciones de un dropdown
+fail() || Hace fallar una prueba incondicionalmente.
+
 ## prueba de assertions y tests suites
 
 - archivo donde esta el test suites
@@ -305,7 +325,7 @@ kwargs = {
 runner = HTMLTestRunner(**kwargs)
 runner.run(smoke_test)
 ```
----------------------------------------------------------------
+------------
 
 - El archivos assertions.py
 
@@ -349,7 +369,7 @@ class AssertionsTest(unittest.TestCase):
 if __name__ == "__main__":
     unittest.main(verbosity = 2)
 ```
-------------------------------------------------------------------
+------------
 
 - El archivo searchtests.py
 
