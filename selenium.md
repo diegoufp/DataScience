@@ -305,6 +305,7 @@ kwargs = {
 runner = HTMLTestRunner(**kwargs)
 runner.run(smoke_test)
 ```
+---------------------------------------------------------------
 
 - El archivos assertions.py
 
@@ -348,6 +349,7 @@ class AssertionsTest(unittest.TestCase):
 if __name__ == "__main__":
     unittest.main(verbosity = 2)
 ```
+------------------------------------------------------------------
 
 - El archivo searchtests.py
 
@@ -378,8 +380,8 @@ class SearchTests(unittest.TestCase):
     def test_search_salt_shaker(self):
         driver = self.driver
         search_field = driver.find_element_by_name('q')
-
-        search_field.send_key('salt shaker')
+        # Es send_keys no send_key
+        search_field.send_keys('salt shaker')
         search_field.submit()
         # find_element != find_elements
         products = driver.find_elements_by_xpath('/html/body/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/ul/li[2]/a')
