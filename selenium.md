@@ -100,3 +100,65 @@ Una libreria de python con la cual vamos a realizar pruebas unitarias para obten
 - **Test Suite**: coleccion de Test Cases.
 - **Test Runner**: orquestador de la ejecucion.
 - **Test Report**: resumen de resultados.
+
+## Caso de prueba
+
+```python
+# <- nos servira para traer todas nuestras pruebas
+import unittest
+# <- Nos ayudara a orquestar cada una de nuestra pruebas que estemos ejecutando junto con los reportes
+from pyunitreport import HTMLTestRunner 
+#  Para comunicarnos con el navegador
+from selenium import webdriver
+
+class HelloWorld(unittest.TestCase):
+    # Debe ser asi tal y como indica la sintaxis
+    def setUp(self): # va a ejecutar todo lo necesario antes de hacer un prueba(unittest)
+        self.driver = webdriver.Chrome(executable_path= r'./chromedriver') # en windows es r'c://Documents/selenium/chromedriver.exe
+        driver = self.driver
+        driver.implicitly_wait(10) #Tiempo de espera
+
+    def test_hello_word(self): # <- caso de prueba
+        driver = self.driver
+        driver.get('https://www.platzi.com')
+
+
+    def tearDown(self): # Dara salida a lo que estes escribiendo
+        self.driver.quit() # <- se vana cerrar las ventanas cuando se hagan las pruebas
+
+if __name__ == "__main__":
+    unittest.main(verbosity = 2, testRunner = HTMLTestRunner(output = 'reportes', report_name = 'hello-world-report'))
+    # Lo que va ahacer este script es abrir el navegador y direccionar ala pagina de platzi y despues cerrara la ventana.
+```
+- Para que se visite los 2 sitios sin cerrar completamente el navegador.
+```python
+# <- nos servira para traer todas nuestras pruebas
+import unittest
+# <- Nos ayudara a orquestar cada una de nuestra pruebas que estemos ejecutando junto con los reportes
+from pyunitreport import HTMLTestRunner 
+#  Para comunicarnos con el navegador
+from selenium import webdriver
+
+class HelloWorld(unittest.TestCase):
+    # Debe ser asi tal y como indica la sintaxis
+    @classmethod #<- para que no se cierren las ventanas y se corran los dos en una sola
+    def setUpClass(cls): # va a ejecutar todo lo necesario antes de hacer un prueba(unittest)
+        cls.driver = webdriver.Chrome(executable_path= r'./chromedriver') # en windows es r'c://Documents/selenium/chromedriver.exe
+        driver = cls.driver
+        driver.implicitly_wait(10) #Tiempo de espera
+
+    def test_hello_word(self): # <- caso de prueba
+        driver = self.driver
+        driver.get('https://www.platzi.com')
+
+    def test_hello_world(self):
+        self.driver.get('https://es.wikipedia.org/wiki/Wikipedia:Portada')
+
+    @classmethod
+    def tearDownClass(cls): # Dara salida a lo que estes escribiendo
+        cls.driver.quit() # <- se vana cerrar las ventanas cuando se hagan las pruebas
+
+if __name__ == "__main__":
+    unittest.main(verbosity = 2, testRunner = HTMLTestRunner(output = 'reportes', report_name = 'hello-world-report'))
+    # Lo que va ahacer este script es abrir el navegador y direccionar ala pagina de platzi y despues cerrara la ventana.
+```
