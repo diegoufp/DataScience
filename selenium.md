@@ -76,7 +76,7 @@ Este servicio es un complemento.
     - Pruebas en paralelo solo en version pago
 
 ### Cual es la mejor opcion?
-Para responder esta pregunta se tienen que tomar en cuenta factores como el lenguaje de programacion que conoces tu y tu equipo de trabajo, el proyecto en el que se va a trabajar require de grandes llamadas de asincronismo o no, si solo quieres automatizar una tarea que es repetitiva.
+Para responder esta pregunta se tienen que tomar en cuenta factores como el lenguaje de programacion que conoces tu y tu equipo de trabajo, el proyecto en el que se va a trabajar, si require de grandes llamadas de asincronismo o no, si solo quieres automatizar una tarea que es repetitiva, etc.
 
 ## Instalacion 
 
@@ -275,3 +275,122 @@ class HomePageTests(unittest.TestCase):
 if __name__ == "__main__":
     unittest.main(verbosity = 2)
 ```
+
+## assertions y test suites
+
+- **Assertions**: Metodos que permiten validar el valor esperado en la ejecucion del test. Si el resultado es verdadero el test continua, en caso contrario "falla" y termina.
+    - **Ejemplo**: assertEqual(price.text, "300")
+
+- **Test suites**: Coleccion de test unificados en una sola prueba, permitiendo tener resultados grupales e individuales. 
+
+## prueba de assertions y tests suites
+
+- archivo donde esta el test suites
+
+```python
+from unittest import TestLoader, TestSuite
+from pyunitreport import HTMLTestRunner
+from assertions import AssertionsTest
+from searchtests import SearchTests
+
+assertions_test = TestLoader().loadTestsFromTestCase(AssertionsTest)
+search_test = TestLoader().loadTestsFromTestCase(SearchTests)
+
+smoke_test = TestSuite([assertions_test, search_test])
+
+kwargs = {
+    "output": 'smoke-repot'
+}
+
+runner = HTMLTestRunner(**kwargs)
+runner.run(smoke_test)
+```
+
+- El archivos assertions.py
+
+```python
+import unittest
+from selenium import webdriver
+# Nos servira como una excepcion para nuestros assertions cuando queramos validar la presencia de un elemento
+from selenium.common.exceptions import NoSuchElementException
+# Nos ayudara a llamar a las excepciones que queremos validar.
+from selenium.webdriver.common.by import By 
+
+class AssertionsTest(unittest.TestCase):
+
+    def setUp(self):
+        self.driver = webdriver.Chrome(executable_path = r'./chromedriver')
+        driver = self.driver
+        driver.implicitly_wait(30) # añadir una pausa de 30 segundos
+        driver.maximize_window() # Maximise la ventana por si hay elementos que cambien su ubicacion u orden dependiendo del tamaño de la vista.
+        driver.get('https://demo.cart2quote.com/')
+
+    def test_search_field(self):
+        self.assertTrue(self.is_element_present(By.NAME, 'q'))
+
+    def test_search_option(self):
+        self.assertTrue(self.is_element_present(By.ID, 'search'))
+
+    def tearDown(self):
+        self.driver.quit()
+
+    def is_element_present(self, how, what):
+    # Es una fguncion de utilidad para identificar cuando un elemento esta presente de acuerdo a los paramentros.
+        # how nos va a indicar el tipo de selector
+        # what el valor que tienen
+        try:
+            self.driver.find_element(by = how, value = what)
+        except NoSuchElementException as variable:
+            return False
+        return True
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity = 2)
+```
+
+- El archivo searchtests.py
+
+```python
+import unittest
+from selenium import webdriver
+from selenium.webdriver.common.by import By 
+
+class SearchTests(unittest.TestCase):
+
+    def setUp(self):
+        self.driver = webdriver.Chrome(executable_path = r'./chromedriver')
+        driver = self.driver
+        driver.implicitly_wait(30) # añadir una pausa de 30 segundos
+        driver.maximize_window() # Maximise la ventana por si hay elementos que cambien su ubicacion u orden dependiendo del tamaño de la vista.
+        driver.get('https://demo.cart2quote.com/')
+
+    def test_search_tee(self):
+        driver = self.driver
+        search_field = driver.find_element_by_name('q')
+        # Va a limpiar el campo de busqueda en dado caso que haya algun texto
+        search_field.clear()
+        # En viar una serie de teclas con send_keys
+        search_field.send_keys('tee')
+        # submit <- que envia los datos
+        search_field.submit()
+
+    def test_search_salt_shaker(self):
+        driver = self.driver
+        search_field = driver.find_element_by_name('q')
+
+        search_field.send_key('salt shaker')
+        search_field.submit()
+        # find_element != find_elements
+        products = driver.find_elements_by_xpath('/html/body/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/ul/li[2]/a')
+        # La forma rapida de obtener la lista delos elementos es atravez del xpath
+        # el assert va a identificar si la cantidad de productos es una o no
+        self.assertEqual(1, len(products))
+
+    def tearDown(self):
+        self.driver.quit()
+
+if __name__ == "__main__":
+    unittest.main(verbosity = 2)
+```
+
