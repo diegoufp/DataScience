@@ -131,7 +131,7 @@ get_attribute(name) | Obtiene el valor del atributo de un elemento | submit_butt
 is_displayed() | Verifica si el elemento está a la vista al usuario | banner.is_displayed()
 is_enabled() | Verifica si el elemento está habilitado | radio_button.is_enabled()
 is_selected() | Verifica si el elemento está seleccionado, para el caso de checkbox o radio button | checkbox.is_selected()
-send_keys(value) | Simula escribir o presionar teclas en un elemento | email_field.send_keys(‘team@platzi.com’)
+send_keys(value) | Simula escribir o presionar teclas en un elemento | email_field.send_keys(`‘team@platzi.com’`)
 submit() | Envía un formulario o confirmación en un text area | search_field.submit()
 value_of_css_property(property_name) | Obtiene el valor de una propiedad CSS del elemento | header.value_of_css_property(‘background-color’)
 
