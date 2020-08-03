@@ -603,3 +603,6 @@ deselect_by_visible_text(text) | Deselecciona todas las opciones que coincidan c
 select_by_index(index) | Selecciona las opciones en el indice indicado del dropdown o lista) | select_element.select_by_index
 select_by_value(value) | Selecciona todas las opciones que coincidan con el valor del argumento dado en el dropdown o lista | select_element.select_by_value('gratis')
 select_by_visible_text(text) | Selecciona todas las opciones que coincidan con el texto del argumento dado en el dropdown o lista | select_element.select_by_visible_text('gratis')
+
+
+## alert y pop-up
