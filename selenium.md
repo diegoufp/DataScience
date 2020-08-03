@@ -351,7 +351,7 @@ assertNotRegexpMatches(s, r) | not.r.search(s) | Verifica si la busqueda de una 
 asserListEqual(a, b) | assertListEqual(lista_a, lista_b) | Valida que los elementos de las listas coinciden. Util para validar las opciones de un dropdown
 fail() || Hace fallar una prueba incondicionalmente.
 
-## prueba de assertions y tests suites
+### prueba de assertions y tests suites
 
 - archivo donde esta el test suites
 
@@ -464,3 +464,142 @@ if __name__ == "__main__":
     unittest.main(verbosity = 2)
 ```
 
+## for, textbox, checkbox y radio button
+
+En este tema automatizaremos todo el proceso de la creacion de una nueva cuenta dentro del sitio.
+
+Con esto podremos crear automatizaciones para interactuar con campos de texto botones y checks box para amrcarlos, esto en conjunto con los assertions nos permite validar que la automatizacion esta funcionando, que elementos estan disponibles y visibles para el usuario.
+
+### Pruebas 
+
+```python
+import unittest
+from selenium import webdriver 
+
+class RegisterNewUser(unittest.TestCase):
+
+    def setUp(self):
+        self.driver = webdriver.Chrome(executable_path = r'./chromedriver')
+        driver = self.driver
+        driver.implicitly_wait(30) # añadir una pausa de 30 segundos
+        driver.maximize_window() # Maximise la ventana por si hay elementos que cambien su ubicacion u orden dependiendo del tamaño de la vista.
+        driver.get('https://demo.cart2quote.com/')
+
+    def test_new_user(self):
+        driver = self.driver
+        s = driver.find_element_by_xpath('/html/body/div/div[2]/header/div/div[2]/div/a/span[2]') # se hara un click para que se despliegen las opciones
+        s.click()
+        m = driver.find_element_by_link_text('Log In')
+        m.click()
+
+        create_account_button = driver.find_element_by_xpath('/html/body/div/div[2]/div[2]/div/div/div/form/div/div[1]/div[2]/a/span/span')
+        # Vamos a validar que ese boton este habilitado con un assertion (que este visible al usuario y se pueda interactuar con el)
+        self.assertTrue(create_account_button.is_displayed() and create_account_button.is_enabled())
+        create_account_button.click()
+        # para verificar si estamos en la pagina correcta    
+        self.assertEqual('Create New Customer Account', driver.title)
+
+        first_name = driver.find_element_by_id('firstname')
+        last_name = driver.find_element_by_id('lastname')
+        email_address = driver.find_element_by_id('email_address')
+        news_letter_subscription = driver.find_element_by_id('is_subscribed')
+        password = driver.find_element_by_id('password')
+        confirm_password = driver.find_element_by_id('confirmation')
+        submit_button = driver.find_element_by_xpath('/html/body/div/div[2]/div[2]/div/div/div/form/div[2]/button')
+        # para verificar que esten habilitados con assert
+        self.assertTrue(first_name.is_enabled()
+        and last_name.is_enabled()
+        and email_address.is_enabled()
+        and news_letter_subscription.is_enabled()
+        and password.is_enabled()
+        and confirm_password.is_enabled()
+        and submit_button.is_enabled())
+        # Para enviar datos a cada una de estas variables con send_keys
+        first_name.send_keys('Test')
+        driver.implicitly_wait(1) # pausa de 1 segundo
+        last_name.send_keys('Test')
+        driver.implicitly_wait(1)
+        email_address.send_keys('Test@gmail.com')
+        driver.implicitly_wait(1)
+        password.send_keys('Test')
+        driver.implicitly_wait(1)
+        confirm_password.send_keys('Test')
+        driver.implicitly_wait(1)
+        submit_button.click()
+
+    def tearDown(self):
+        self.driver.implicitly_wait(3)
+        self.driver.close()
+
+if __name__ == "__main__":
+    unittest.main(verbosity = 2)
+```
+
+## Dropdown y listas
+
+Interactuar con Dropdown y listas 
+
+```python
+import unittest
+from selenium import webdriver
+from selenium.webdriver.support.ui import Select # Para poder manipular un drop down
+
+class LanguageOptions(unittest.TestCase):
+
+    def setUp(self):
+        self.driver = webdriver.Chrome(executable_path = r'./chromedriver')
+        driver = self.driver
+        driver.implicitly_wait(30) # añadir una pausa de 30 segundos
+        driver.maximize_window() # Maximise la ventana por si hay elementos que cambien su ubicacion u orden dependiendo del tamaño de la vista.
+        driver.get('https://demo.cart2quote.com/')
+
+    def test_select_language(self):
+        exp_options = ['English', 'French', 'German']
+        act_options = [] # Aqui se almacenaran las opciones que elijamos
+        # Pra acceder a las opciones del drop down
+        select_language = Select(self.driver.find_element_by_id('select-language'))
+        # Validar que el drop down tenga 3 opciones
+        self.assertEqual(3, len(select_language.options))
+        # iterar por cada opcion que tenga el drop down
+        for option in select_language.options:
+            act_options.append(option.text)
+        # conparar listas con assertListEqual
+        self.assertListEqual(exp_options, act_options)
+        # Verificar si el idioma ingles esta por defecto
+        self.assertEqual('English', select_language.first_selected_option.text)
+        # Ahora seleccionaremos un idioma
+        select_language.select_by_visible_text('German')
+        # Verificar que se cambio a aleman 
+        self.assertTrue('store=german' in self.driver.current_url)
+
+        select_language = Select(self.driver.find_element_by_id('select-language'))
+        select_language.select_by_index(0) # valor 0 para que vuelva a ingles
+    
+    def tearDown(self):
+        self.driver.implicitly_wait(3)
+
+if __name__ == "__main__":
+    unittest.main(verbosity = 2)
+```
+
+## Clase Select
+
+### Propiedades
+
+Propiedad/Atributo | Descripcion | Ejemplo
+-------------------|-------------|----------
+all_selected_options | Obtiene una lista de todas las opciones seleccionadas que pertenecen al dropdown o list | select_element.all_selected_options
+first_selected_option | Obtiene el primer elemento seleccionado o el elemento actualmente seleccionado de un dropdown o lista | select_element.first_selected_option
+options | Obtiene una lista de todas las opciones disponibles del dropdown o lista | select_element.options
+
+### Metodos
+
+Metodo/Atributo | Descripcion | Ejemplo
+----------------|-------------|------------
+deselect_all() | Limpia todas las opciones seleccionadas de un dropdown o lista de seleccion multiple | select_elemet.deselect_all()
+deselect_by_index(index) | Deselecciona la opcion en el indice dado del dropdown o lista | select_element.deselect_by_index(1)
+deselect_by_value(value) | Deselecciona todas las opciones que coincidan con el valor del argumento dado en el dropdown o lista | select_element.deselect_by_value('gratis')
+deselect_by_visible_text(text) | Deselecciona todas las opciones que coincidan con el texto del argumento dado en el dropdown o lista | select_element.deselect_by_visible_text('gratis')
+select_by_index(index) | Selecciona las opciones en el indice indicado del dropdown o lista) | select_element.select_by_index
+select_by_value(value) | Selecciona todas las opciones que coincidan con el valor del argumento dado en el dropdown o lista | select_element.select_by_value('gratis')
+select_by_visible_text(text) | Selecciona todas las opciones que coincidan con el texto del argumento dado en el dropdown o lista | select_element.select_by_visible_text('gratis')
