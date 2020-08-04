@@ -606,3 +606,55 @@ select_by_visible_text(text) | Selecciona todas las opciones que coincidan con e
 
 
 ## alert y pop-up
+
+### Metodos de la clase Alert
+
+Metodo/Atributo | Descripcion | Ejemplo
+----------------|-------------|----------
+accept() | Acepta el mensaje enviado por alert haciando clic en el boton 'Aceptar' | alert.accept()
+dismiss() | Rechaza el mensaje enviado por el alert, haciendo clic en el boton 'Cancelar' | alert.dismiss()
+send_keys(value) | Simula escibir o presionar teclas en un elemento | alert.send_keys('Platzi')
+
+### Prueba de alert
+
+```python
+import unittest
+from selenium import webdriver
+
+class CompareProducts(unittest.TestCase):
+
+    def setUp(self):
+        self.driver = webdriver.Chrome(executable_path = r'./chromedriver')
+        driver = self.driver
+        driver.implicitly_wait(200) # añadir una pausa de 30 segundos
+        driver.maximize_window() # Maximise la ventana por si hay elementos que cambien su ubicacion u orden dependiendo del tamaño de la vista.
+        driver.get('https://demo.cart2quote.com/')
+    
+    def test_compare_products_renoval_alert(self):
+        driver = self.driver
+        search_field = driver.find_element_by_name('q')
+        # como una buena practica siempre debemos de limpiar el texto que haya en la area de busqueda
+        search_field.clear()
+
+        search_field.send_keys('tee')
+        search_field.submit()
+
+        drvier.find_elemento_by_class_name('link-compare').click()
+        driver.find_element_by_link_text('Clear All').click()
+
+        # Interactuar con el alert
+        alert = driver.switch_to_alert() # Cambiar la atencion del navegador se encuente en el aler
+        alert_text = alert.text # Extraer el texto que muestra
+        # Para aregurarnos de que el texto que muestra es el mismo que el de la variable usaremos assert
+        self.assertEqual('Are you sure you would link to remove all products from your comparison?', alert_text)
+        # simular un click en el boton aceptar del alert.
+        alert.accept()
+
+
+    def tearDown(self):
+        self.driver.close()
+        
+
+if __name__ == "__main__":
+    unittest.main(verbosity = 2)
+```
