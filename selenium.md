@@ -728,3 +728,49 @@ if __name__ == "__main__":
     unittest.main(verbosity = 2)
 ```
 
+## Demora implícita y explícita
+
+Las pausas se pueden usar para forzar que selenium se detenga antes de continuar con las acciones que hay escritas. Sin embargo, las pausas no solamente sirven para eso, tambien nos ayudan a manejar el asincronismo, una de las debilidades que tiene selenium, y podemos encontrarlas en dos formas:
+
+- **Imprisitas**: Busca uno o varios elementos en el DOM si no se encuentran disponibles por la cantidad de tiempo asignado.
+
+- **Explicita**: Utiliza condiciones de espera determinadas y continua hasta que se cumplan.
+
+### prueba [condiciones esperadas](https://github.com/diegoufp/DataScience/blob/master/selenium.md#condicionales-esperadas "condiciones esperadas") y demoras
+
+```python
+import unittest
+from selenium import webdriver
+#By nos ayuda a hacer referencia a un elemento del sitio web a travez de sus selectores, no para identificarlo sino para interactuar, distico a como lo hace driver
+from selenium.webdriver.common.by import By 
+# WebDriverWait nos ayudara a hacer las espected conditions junto con las esperas explicitas
+from selenium.webdriver.support.ui import WebDriverWait
+# Esperas explicitas 
+from selenium.webdriver.support import expected_conditions as EC
+
+
+class ExplicitWaitTests(unittest.TestCase):
+
+    def setUp(self):
+        self.driver = webdriver.Chrome(executable_path = r'./chromedriver')
+        driver = self.driver
+        driver.get('https://www.google.com/')
+
+    def test_account_link(self):
+        #until <- hasta que se cumpla la condicion esperada
+        WebDriverWait(self.driver, 10).until(lambda s: s.find_element_by_id('select-language').get_attribute('length') == '3' ) 
+
+        account = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.LINK_TEXT, 'ACCOUNT')))
+        account.click()
+
+    def test_create_new_customer(self):
+        self.driver.find_element_by_link_text('ACCOUNT').click()
+
+        my_account = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.LINK_TEXT, 'My Account')))
+        my_account.click()
+
+        create_account_button = WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable((By.LINK_TEXT, 'CREATE AN ACCOUNT')))
+        create_account_button.click()
+
+        WebDriverWait(self.driver, 10).until(EC.title_contains('Create New Customer Account'))
+```
