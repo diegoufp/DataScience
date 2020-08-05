@@ -109,6 +109,21 @@ orientation | Obtiene la orientación actual del dispositivo móvil | driver.ori
 page_source | Obtiene el código fuente de disponible del sitio web | driver.page_source
 title | Obtiene el valor de la etiqueta `<title>` del sitio web | driver.title
 
+- Metodos de la clase WebDriver
+Estas son las mas comunes para interactuar con la ventana del navegador , los sitios web y elementos de los sitios.
+
+Metodo/Atributo | Descripcion | Ejemplo
+----------------|-------------|-----------
+back() | Va una pagina atras en el historial de navegacion de la sesion actual | driver.back()
+close() | Cierra la ventana actual | driver.close()
+forward() | Va una pagina adelante en el historial de navegacion de la sesion actual | driver.forward()
+get(url) | Navega hacia y carga la url indicada | driver.get('https://www.platzi.com')
+maximize_window() | Maximiza la ventana del navegador | driver.maximize_window()
+quit() | Cierra el driver de navegacion y todas las ventanas asociadas al mismo | driver.quit()
+refresh() | Actualiza el sitio mostrado por el navegador en ese momento | driver.refresh()
+switch_to.active_element() | Retorna el elemento donde se encuentra el focus del navegador | dirver.switch_to.active_element()
+switch_to_alert() | Cambia el focus del navegador al alert de JS que se este mostrando | driver.switch_to_alert()
+
 ### Clase WebElement
 
 Esta clase nos permite interactuar específicamente con elementos de los sitios web como textbox, text area, button, radio button, checkbox, etc.
@@ -658,3 +673,44 @@ class CompareProducts(unittest.TestCase):
 if __name__ == "__main__":
     unittest.main(verbosity = 2)
 ```
+
+## Automatizar navegacion
+
+[**Propiedades de WebDriver y WebElement**](https://github.com/diegoufp/DataScience/blob/master/selenium.md#webdriver-y-webelement "Propiedades de WebDriver y WebElement")
+
+### prueba automatizar navegacion
+
+```python
+import unittest
+from selenium import webdriver
+#from time import sleep
+class NavigationTest(unittest.TestCase):
+
+    def setUp(self):
+        self.driver = webdriver.Chrome(executable_path = r'./chromedriver')
+        driver = self.driver
+        driver.implicitly_wait(200) # añadir una pausa de 30 segundos
+        driver.maximize_window() # Maximise la ventana por si hay elementos que cambien su ubicacion u orden dependiendo del tamaño de la vista.
+        driver.get('https://www.google.com/')
+
+    def test_browser_navigator(self):
+        driver = self.driver
+
+        search_field = driver.find_element_by_name('q') # Buscador
+        search_field.clear()
+        search_field.send_keys('Platzi')
+        search_field.submit()
+
+        driver.back() # Retroceder
+        # sleep(3) <- Este tipo de pausas agregan segundos a la ejecucion de la prueba
+        driver.forward() # Avanzar
+        driver.refresh() # Refescar
+
+    def tearDown(self):
+        self.driver.close()
+        
+
+if __name__ == "__main__":
+    unittest.main(verbosity = 2)
+```
+
