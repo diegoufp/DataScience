@@ -150,6 +150,20 @@ send_keys(value) | Simula escribir o presionar teclas en un elemento | email_fie
 submit() | Envía un formulario o confirmación en un text area | search_field.submit()
 value_of_css_property(property_name) | Obtiene el valor de una propiedad CSS del elemento | header.value_of_css_property(‘background-color’)
 
+## Condicionales esperadas 
+
+Expected Condition | Descripcion | Ejemplo
+-------------------|-------------|-----------
+element_to_be_clickable(locator) | Espera a que el elemento sea visible y habilitado para hacer clic en el mismo | WebDriverWait(self.driver, 10).until(espected_conditions.element_to_be_clickable(By.NAME, "accept_button"))
+elemte_to_be_selected(element) | Espera a que un elemento sea seleccionado | subscription = self.driver.find_element_by_name('terms') WebDriverWait(self.driver, 10).until(expected_conditions.element_to_be_selected(terms))
+invisibility_of_element_located(locator) | Espera a que un elemento no sea visible o no se encuentre presente en el DOM | WebDriverWait(self.driver, 10).until(expected_conditions.invisibility_of_element_located(By.ID, "loading_banner"))
+presence_of_all_elements_located(locator) | Espera a que por lo menos uno de los elementos que se indican coincida con los presentes en el sitio | WebDriverWait(self.driver, 10).until(expected_conditions.presence_of_all_elements_located(By.CLASS_NAME, "input-text"))
+presence_of_element_located(locator) | Espera a que un elemento sea visible se encuentre presente en el DOM | WebDriverWait(self.driver, 10).until(expected_conditions.presence_of_element_located(By.ID, "search-bar"))
+text_to_be_present_in_element(locator, text) | Espera a que un elemento con texto indicado se encuentre presente | WebDriverWait(self.driver, 10).until(expected_conditions.text_to_be_present_in_element(By.ID, "select_order"), "high")
+title_contains(title) | Espera a que la pagina contenga en el titulo exactamente como es indicado | WebDriverWait(self.driver, 10).until(expected_conditions.title_contains("Welcome"))
+title_is(tile) | Espera a que la pagina tenga un titulo identico a como es indicado | WebDriverWait(self.driver, 10).until(expected_conditions.title_is("Welcome_to_Platzi"))
+visibility_of(element) | Espera a que el elemento indicado este en el DOM, sea visible, su alto y ancho sean mayores a cero | first_name = self.driver.find_element_by_id("firstname") WebDriverWait(self.driver,10).until(expected_conditions.visibility_of(first_name))
+visibility_of_element_located(locator) | Espera a que el elemento indicado por su selector este en el DOM, sea visible y que su alto y ancho sean mayores a cero | WebDriverWait(self.driver, 10).until(expected_conditions.visibility_of_element_located(By.ID, "firstname"))
 
 ## Conceptos
 
