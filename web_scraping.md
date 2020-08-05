@@ -481,3 +481,69 @@ Lo ultimo seria guardar el DataFrame en un archivo
 ```python
 df.to_csv('Notas_Pagina12.csv')
 ```
+
+## Sitios dinamicos y Selenium
+
+## LATAM Airlines
+
+Vamos a scrapear el sitio de Latam para averiguar datos de vuelos en funcion el origen y destino, fecha y cabina. La informacion que esperamos obtener de cada vuelo es:
+
+- Precio(s) disponibles
+- Horas de salida y llegada (duracion)
+- Informacion de las escalas
+
+```python
+import requests
+from bs4 import BeautifulSoup
+
+url ='https://www.edestinos.com.mx/flights/select/roundtrip/ap/mex/ap/cun?departureDate=2020-08-28&returnDate=2020-09-30&pa=1&py=0&pc=0&pi=0&sc=economy'
+
+r = requests.get(url)
+
+r.status_code
+
+s = BeautifulSoup(r.text, 'lxml')
+
+print(s.prettify()) # Imprimir mas lindo el HTML
+
+# Python no sabe como procesar JS, asi que esta estrategia de descargar el HTML no va a funcionar.
+# Es por ello que usaremos Selenium
+```
+
+### Selenium
+
+Selenium es una herramienta que nos permitira controlar un navegador y podremos utilizar las funcionalidades del motor de JavaScript para cargar el contenido que no viene en el HTML de la pagina. Para esto necesitamos el modulo webdriver.
+
+```python
+from selenium import webdriver
+```
+#### Instanciar un diver del navegador
+
+```python
+# instanciar un dirver
+driver = webdriver.Chrome(executable_path='./selenium/chromedriver')
+# Al instanciar el driver se abre una pesta;a de chrom que nosotros lo vamos a poder ir controlando desde el codigo
+
+url ='https://www.edestinos.com.mx/flights/select/roundtrip/ap/mex/ap/cun?departureDate=2020-08-28&returnDate=2020-09-30&pa=1&py=0&pc=0&pi=0&sc=economy'
+```
+
+#### Hacer que el navegador carge la pagina web.
+
+```python
+driver.get(url)
+```
+
+#### Cerrar el navegador
+
+```python
+driver.close()
+```
+
+#### Abrir navegador en modo incognito
+
+```python
+options = webdriver.ChromeOptions()
+options.add_argument('--incognito')
+driver = webdriver.Chrome(executable_path='./selenium/chromedriver', options=options)
+```
+
