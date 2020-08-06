@@ -547,3 +547,36 @@ options.add_argument('--incognito')
 driver = webdriver.Chrome(executable_path='./selenium/chromedriver', options=options)
 ```
 
+## Seleccion de elementos con selenium
+
+En este tema veremos como seleccionar los elementos que estan en este navegador automatizado que generamos utilizando selenium.
+
+para hacer eso vamos a utilizar algo que se llama xpath(la ruta xml), que nos va a permitir identificar donde se encuentran cada uno de los elementos que necesitamops extraer atavez de los tags y sus atributos.
+
+A diferencia de como se hacia en BeautifulSoup, que lo que haciamos era buscar directamente el nombre del tag y filtrar por algun atributo, aqui lo que vamos a hacer directamente es generar una ruta que apunte a ese elemento en particular y en esa ruta va a estar toda la informacion necesaria para identificar ese elemento, armando un unico xpath.
+
+En la pagina que vamos a utilizar presionamos `F12` (inspeccionar elementos).
+Estas paginas reconocen cual es la resolucion del navegador que estamos utilizando y acomodan el contenido en funcion de esto.
+La recomendacion es **separar** el inspecto de elementos para que la navegacion tenga el mismo tama;o que uno esperaria normalmente
+
+### Extraer la informacion de la pagina
+
+```python
+from selenium import webdriver 
+driver = webdriver.Chrome(executable_path='./selenium/chromedriver')
+url ='https://www.edestinos.com.mx/flights/select/roundtrip/ap/mex/ap/cun?departureDate=2020-08-28&returnDate=2020-09-30&pa=1&py=0&pc=0&pi=0&sc=economy'
+driver.get(url)
+
+# Hay find_element y find_elements en este caso usaremos el plural ya que queremos seleccionar varios a la vez
+# con la doble barra '//' en el xpath significa que tiene que buscar elementos en todo el arbol independientemente si son hijos directos o hijos de sus hijos
+vuelos = driver.find_elements_by_xpath('//li[@class="ng-star-inserted"]')
+
+vuelo = vuelos[5]
+
+vuelo
+# <selenium.webdriver.remote.webelement.WebElement (session="20271800ded395bee0774c025840bc39", element="d575aa92-d7ab-4fdf-aaa7-f7bd0ecd26cf")>
+
+# con el punto '.' en el xpath lo que indicamos es que tenemos que buscar de esta rama en aprticular hacia abajo, si no ponemos el punto va a buscar en todo el arbol de l apgina web
+# con una sola barra '/' en el xpath indicamos que es un hijo directo
+vuelo.find_element_by_xpath('.//div[@class="leg-info"]/span[1]').text
+```
