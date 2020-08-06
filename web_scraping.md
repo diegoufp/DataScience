@@ -580,3 +580,16 @@ vuelo
 # con una sola barra '/' en el xpath indicamos que es un hijo directo
 vuelo.find_element_by_xpath('.//div[@class="leg-info"]/span[1]').text
 ```
+
+### Interactuando con los elementos con selenium
+
+obtendremos el numero de escalas haciando click en los detalles del vuelo.
+
+```python
+boton_escalas = vuelo.find_element_by_xpath('.//div[@class="leg-info"]//a[1]')
+boton_escalas.click()
+
+segmentos = vuelo.find_elements_by_xpath('.//div[@class="content"]/leg-details/segment')
+escalas = len(segmentos) - 1
+escalas
+```
