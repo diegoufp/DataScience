@@ -593,3 +593,7 @@ segmentos = vuelo.find_elements_by_xpath('.//div[@class="content"]/leg-details/s
 escalas = len(segmentos) - 1
 escalas
 ```
+
+### Scrapeando escalas y tarifas
+
+
