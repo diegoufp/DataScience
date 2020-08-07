@@ -594,6 +594,90 @@ escalas = len(segmentos) - 1
 escalas
 ```
 
-### Scrapeando escalas y tarifas
+## Scrapeando escalas y tarifas
+
+```python
+from selenium import webdriver 
+driver = webdriver.Chrome(executable_path='./selenium/chromedriver')
+url ='https://www.edestinos.com.mx/flights/select/roundtrip/ap/mex/mp/tyo?departureDate=2020-08-28&returnDate=2020-09-30&pa=1&py=0&pc=0&pi=0&sc=economy'
+driver.get(url)
+
+# Hay find_element y find_elements en este caso usaremos el plural ya que queremos seleccionar varios a la vez
+# con la doble barra '//' en el xpath significa que tiene que buscar elementos en todo el arbol independientemente si son hijos directos o hijos de sus hijos
+vuelos = driver.find_elements_by_xpath('//li[@class="ng-star-inserted"]')
+
+vuelo = vuelos[5]
+
+vuelo
+# <selenium.webdriver.remote.webelement.WebElement (session="20271800ded395bee0774c025840bc39", element="d575aa92-d7ab-4fdf-aaa7-f7bd0ecd26cf")>
+
+# con el punto '.' en el xpath lo que indicamos es que tenemos que buscar de esta rama en aprticular hacia abajo, si no ponemos el punto va a buscar en todo el arbol de l apgina web
+# con una sola barra '/' en el xpath indicamos que es un hijo directo
+vuelo.find_element_by_xpath('.//div[@class="leg-info"]/span[1]').text
+
+boton_escalas = vuelo.find_element_by_xpath('.//div[@class="leg-info"]//a[1]')
+boton_escalas.click()
+
+segmentos = vuelo.find_elements_by_xpath('.//div[@class="content"]/leg-details/segment')
+escalas = len(segmentos) - 1
+escalas
+
+# scrapeando escalas y tarifas
+
+
+segmento = segmentos[0]
+segmento
+
+inicial = segmento.find_element_by_xpath('.//p[@class="airport"]/span[@class="airport-name"]/span[@class="airport-title"]').text
+
+inicial_salida = segmento.find_element_by_xpath('.//p[@class="airport"]/span[@class="time"]/span[2]').text
+
+llegada_escala = segmento.find_element_by_xpath('./div[@class="segment"]/p[@class="airport"]/span[@class="airport-name"]')
+llegada_escala.text
+
+hora_llegada_escala = segmento.find_element_by_xpath('./div[@class="segment"]/p[@class="airport"]/span[@class="time"]')
+hora_llegada_escala.text
+
+segmento = segmentos[1]
+segmento
+
+salida_escala = segmento.find_element_by_xpath('.//p[@class="airport"]/span[@class="airport-name"]/span[@class="airport-title"]')
+salida_escala.text
+
+hora_salida_escala = segmento.find_element_by_xpath('.//p[@class="airport"]/span[@class="time"]/span[2]')
+hora_salida_escala.text
+
+destino_final = segmento.find_element_by_xpath('./div[@class="segment"]/p[@class="airport"]/span[@class="airport-name"]')
+destino_final.text
+
+hora_destino_final = segmento.find_element_by_xpath('./div[@class="segment"]/p[@class="airport"]/span[@class="time"]')
+hora_destino_final.text
+
+# Cerrar el modal 
+driver.find_element_by_xpath('//div[@class="custom-dialog"]/div[1]').click()
+
+# Elegir el vuelo(ver tarifas)
+elegir = vuelo.find_element_by_xpath('.//span[@class="transaction-text"]')
+elegir.click()
+
+# con contains() se puede agregar una palabra que sea contante en multiples direcciones xpath
+tarifas = driver.find_elements_by_xpath('//div[@class="insurance-options"]/div[contains(@class, "insurance-")]')
+
+tarifas # del 0 al 3 son las tarifas
+
+tarifa_1 = tarifas[0]
+tarifa_2 = tarifas[1]
+tarifa_3 = tarifas[2]
+tarifa_4 = tarifas[3]
+
+precio_1 = tarifa_1.find_element_by_xpath('./div[contains(@class, "wrapper")]/div[@class="details"]//span[@class="price "]')
+precio_1.text
+
+precio_2 = tarifa_2.find_element_by_xpath('./div[contains(@class, "wrapper")]/div[@class="details"]//span[@class="price "]')
+precio_2.text
+
+precio_3 = tarifa_3.find_element_by_xpath('./div[contains(@class, "wrapper")]/div[@class="details"]//span[@class="price "]')
+precio_3.text
+```
 
 
