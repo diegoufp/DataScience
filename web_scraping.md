@@ -680,4 +680,60 @@ precio_3 = tarifa_3.find_element_by_xpath('./div[contains(@class, "wrapper")]/di
 precio_3.text
 ```
 
+## Construyendo funciones
+
+```python
+def obtener_precios(vuelo):
+    '''
+    Funcion que retorna una lista de diccionarios con las distintas tarifas
+    '''
+    tarifas = driver.find_elements_by_xpath('//div[@class="insurance-options"]/div[contains(@class, "insurance-")]')
+    tarifas = tarifas[0:3]
+    precios = []
+    for tarifa in tarifas:
+        nombre = tarifa.find_element_by_xpath('./div[contains(@class, "wrapper")]/div[@class="content"]/div[@class="description"]/span[@class="unchecked"]').text
+        valor = tarifa.find_element_by_xpath('./div[contains(@class, "wrapper")]/div[@class="details"]//span[@class="price "]').text
+        dict_tarifa = {nombre:valor}
+        precios.append(dict_tarifa)
+        print(dict_tarifa)
+    return precios
+```
+
+```python
+def obtener_datos_escalas(vuelo):
+    '''
+    Funcion que retorna una lista de diccionarios con la informacion de las escalas de cada vuelo
+    '''
+    segmentos = vuelo.find_elements_by_xpath('.//div[@class="content"]/leg-details/segment')
+    info_escalas = []
+    for segmento in segmentos:
+        # Origen
+        origen = segmento.find_element_by_xpath('.//p[@class="airport"]/span[@class="airport-name"]/span[@class="airport-title"]').text
+        # Hora de salida
+        dep_time = segmento.find_element_by_xpath('.//p[@class="airport"]/span[@class="time"]/span[2]').text
+        # Destino
+        destino = segmento.find_element_by_xpath('./div[@class="segment"]/p[@class="airport"]/span[@class="airport-name"]').text
+        # Hora de llegada
+        arr_time = segmento.find_element_by_xpath('.//p[@class="airport"]/span[@class="time"]/span[2]').text
+        # Duracion total del vuelo
+        duracion_vuelo = vuelo.find_element_by_xpath('.//div[@class="content"]/leg-details/leg-details/div[@class="connections-wrapper"]/div[@class="connection-attributes"]/div[1]/div[2]/span[1]').text
+        # Numero del vuelo
+        numero_vuelo = segmento.find_element_by_xpath('.//div[@class="flight-info"]/strong[@class="flight-number"]').text
+        # Modelo del avion
+        modelo_avion = segmento.find_element_by_xpath('.//div[@class="info-header"]//span[@class="name"]').text
+        # Duracion de la escala
+        duracion_escala = segmento.find_element_by_xpath('.//div[@class="info-header"]//span[@class="time"]').text
+        data_dict = {
+            'origen': origen,
+            'dep_time': dep_time,
+            'destino': destino,
+            'arr_time': arr_time,
+            'numero del vuelo': numero_vuelo,
+            'modelo del avion': modelo_avion,
+            'duracion de cada escala': duracion_escala,
+            'duracion total del viaje': duracion_vuelo
+        }
+        info_escalas.append(data_dict)
+    return info_escalas
+```
 
