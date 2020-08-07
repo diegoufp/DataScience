@@ -788,3 +788,59 @@ Como mencioné antes, las APIs son diseñadas por las mismas empresas que tienen
 ### JSON
 
 Json significa JavaScript Object Notation y es un formato para describir objetos que ganó tanta popularidad en su uso que ahora se lo considera independiente del lenguaje. De hecho, lo utilizaremos en este proyecto por más que estemos trabajando en Python, porque es la forma en la que obtendremos las respuestas a las solicitudes que realicemos utilizando las APIs. Para nosotros, no será ni más ni menos que un diccionario con algunas particularidades que iremos viendo a lo largo del curso.
+
+## Utilizando APIs
+
+[Artists de spotify](https://developer.spotify.com/documentation/web-api/reference/artists/ "Artists de spotify")
+
+### Construir una URL
+
+Para empezar veamos que hay una `Base URL` que es la base de todas las URL que vamos a tener que usar para usar estas APIs.
+
+Luego tenemos distindos `endpoints` en funcion de lo que querramos obtener, en este caso, como lo que nosotros queremos obtener es un artista vamos a estar trabajando con el primer endpoints (`/v1/artists/{id} `).
+
+Un **endpoints** es un lugar de llegada (hacia donde queremos ir), dependiendo al lugar de llegada al que le hagamos la solicitud vamos a tener distintos timpos de informacion y por lo tanto la solicitud la vamos a tener que hacer de manera distinta.
+
+- Primer paso:
+Copiar la URL base y el endpoint
+
+```python
+url_base = 'https://api.spotify.com/v1'
+# Como en el url base finaliza con 'v1' entonces en el endpoint no lo vamos a agregar
+ep_artist = '/artists/{artist_id}'
+```
+- Paso 2:
+Buscar el id del artista
+```python
+id_im = '6mdiAmATAx73kdxrNrnlao'
+```
+
+- Paso 3:
+Constuir la url completa
+```python
+url_base+ep_artist.format(aritst_id = id_im)
+```
+
+- Paso 3:
+Hacer la solicirud al servidor de spotify por medio de la url
+```python
+import requests
+
+r = requests.get(url_base+ep_artist.format(aritst_id = id_im))
+```
+
+- Paso 4:
+Revistar el status_code
+```python
+r.status_code
+# Si sale 401 quiere decir que no estamos autorizados a acceder a ese recurso
+```
+
+- Paso 5:
+Acceder a Json
+Ya no estas trabajando con una pagina HTML asi que lo que nos entrego en un archivo Json
+```python
+r.json()
+# si te salio 401 te saldra con error y te dira que no tenemos un token
+```
+
