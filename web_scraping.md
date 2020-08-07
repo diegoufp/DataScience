@@ -737,3 +737,34 @@ def obtener_datos_escalas(vuelo):
     return info_escalas
 ```
 
+## Demoras dinamicas
+
+Se le tiene que dar tiempo al navegador para pargar toda la informacion.
+
+Veremos como introducir peque;as demoras que el den tiempo al navegador a cargar la informacion.
+
+La forma mas facil de poner demoras es:
+```python
+# Esta funcion introduce una demora estatica, es decir, para cada pagina que cargemos vamos a esperar 10 segundos(algunas veces no son suficientes o necesarios)
+# Introducir una demora
+import time
+time.sleep(10) 
+# Se hara un demora de 10 segundos antes de empezar a obtener la informacion con nuestra funcion
+```
+
+Selenium nos da algunas herramientas para generar demoras dinamicas que son un poco mas inteligentes que esperan antes de seguir avanzando con el resto del codigo.
+```python
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+from selenium.common.exceptions import TimeoutException
+# Este delay es un maximo de timepo, si se umple la condicion (until) se inicia antes.
+delay = 10
+# Introducir demora inteligente
+try:
+    vuelo = WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.XPATH, '//li[@class="flight])))
+    print('La pagina termino de cargar')
+except TimeoutException
+    print('La pagina tardo demasiado en cargar')
+driver.close()
+```
