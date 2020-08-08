@@ -773,6 +773,8 @@ driver.close()
 
 En este módulo utilizaremos APIs para obtener información sobre artistas, discos y tracks disponibles en Spotify.
 
+Es muy importante siempre leer la documentacion de las APIs que se vayan a usar.
+
 ### ¿Qué es una API?
 
 Por sus siglas en inglés, una API es una interfaz para programar aplicaciones (Application Programming Interface). Es decir que es un conjunto de funciones, métodos, reglas y definiciones que nos permitirán desarrollar aplicaciones (en este caso un scraper) que se comuniquen con los servidores de Spotify. Las APIs son diseñadas y desarrolladas por las empresas que tienen interés en que se desarrollen aplicaciones (públicas o privadas) que utilicen sus servicios. Spotify tiene APIs públicas y bien documentadas que estaremos usando en el desarrollo de este proyecto.
@@ -1023,4 +1025,144 @@ albums_im.status_code
 albums_im.json()['items']
 ```
 
+### Obteniendo los albums
 
+
+```python
+albumes = albums_im.json()['items']
+lista_albums = [(album['id'], album['name']) for album in albums_im.json()['items']]
+
+
+def extract_id_albums(albums):
+    albums_im_id = []
+    for album in albums:
+        albums_im_id.append(album['id'])
+    return albums_im_id
+
+albums_im_id = extract_id_albums(albumes)
+
+get_album = requests.get('https://api.spotify.com/v1/albums/{album_id}'.format(album_id=albums_im_id[0]), headers=header, params=params)
+
+get_album.status_code
+
+get_album.json()
+```
+### Obteniendo los albums con tracks
+
+```python
+album_ep = '/albums/{album_id}/tracks'
+album_params = {'market':'MX'}
+bnw_id = '1hDF0QPIHVTnSJtxyQVguB'
+
+bnw = requests.get('https://api.spotify.com/v1/albums/{album_id}/tracks'.format(album_id=bnw_id), headers=header, params=album_params)
+
+bnw.json()['items']
+
+tracks = [(track['id'], track['name']) for track in bnw.json()['items']]
+```
+
+### Funcion para obtener la discografia completa
+
+
+Si ejecutamos:
+```
+albums_im.json()
+```
+y vamos hasta abajo nos muestra cierta informacion
+```
+'limit': 20,
+'next': 'https://api.spotify.com/v1/artists/6mdiAmATAx73kdxrNrnlao/albums?offset=20&limit=20&include_groups=album,single,compilation,appears_on&market=MX',
+'offset': 0,
+'previous': None,
+'total': 44}
+```
+
+En esta informacion dice que trajo un `limit` de 20 desde el inicio, pero en `total` aparecen 44, eso quiere decir que faltan mas albumes que no estamos viendo en esta respuesta.
+
+Crearemos una funcion para obtener la discografia completa
+
+```python
+def obtener_discografia(artist_id, token, return_name = False, page_limit = 50, country = None):
+    url = 'https://api.spotify.com/v1/artists/{artist_id}/albums'
+    header = {'authorization': f'Bearer {token}'}
+    params = {'limit': page_limit, 'offset': 0, 'country': country}
+    lista = []
+    r = requests.get(url.format(artist_id=artist_id), params=params, headers=header)
+
+    if r.status_code != 200:
+        print('Error en la request.', r.json())
+        return None
+    
+    if return_name:
+        lista += [(item['id'], item['name']) for item in r.json()['items']]
+    else:
+        lista += [(item['id']) for item in r.json()['items']]
+
+    while r.json()['next']:
+        r = requests.get(r.json()['next'], headers=header)
+        if r.status_code != 200:
+            print('Error en la request.', r.json())
+            return None
+
+        if return_name:
+            lista += [(item['id'], item['name']) for item in r.json()['items']]
+        else:
+            lista += [(item['id']) for item in r.json()['items']]
+
+    return lista
+``` 
+
+obtener el track de cada album
+
+```python
+def obtener_canciones(album_id, token, return_name = False, page_limit=50, market= None):
+    url = 'https://api.spotify.com/v1/albums/{album_id}/tracks'
+    header = {'authorization': f'Bearer {token}'}
+    params = {'limit': page_limit, 'offset': 0, 'market': market}
+    lista = []
+
+    r = requests.get(url.format(album_id=album_id), headers=header, params=params)
+
+    if r.status_code != 200:
+        print('Error en la request.', r.json())
+        return None
+
+    if return_name:
+        lista += [(item['id'], item['name']) for item in r.json()['items']]
+    else:
+        lista += [(item['id']) for item in r.json()['items']]
+
+    while r.json()['next']:
+        r = requests.get(r.json()['next'], headers=header)
+        if r.status_code != 200:
+            print('Error en la request.', r.json())
+            return None
+
+        if return_name:
+            lista += [(item['id'], item['name']) for item in r.json()['items']]
+        else:
+            lista += [(item['id']) for item in r.json()['items']]
+
+    return lista
+```
+
+### Utilizando las dos funciones
+
+```python
+for album in obtener_discografia(id_im, token, return_name=True, country='MX'):
+    print(album[1])
+    for track in obtener_tracks(album[0], token, return_name=True, market='MX'):
+        print('\t', track[1])
+```
+
+### Escuchar la cancion
+
+```python
+import IPython.display as ipd
+
+preview_url = 'https://p.scdn.co/mp3-preview/69c63a844f61f0073d8c37052cef53ce028e151d?cid=5514337feef84f87acb618a965f3870b'
+
+preview = requests.get(preview_url)
+
+ipd.Audio(preview.content)
+```
