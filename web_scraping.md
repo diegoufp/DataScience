@@ -958,3 +958,69 @@ Si queremos quedarnos solo con el id filtramos la columna id
 df.sort_values(by='popularity', ascending=False).iloc[0]['id']
 ```
 
+### Obteniendo discografia
+
+Para codificar a base64 en python usamos una libreria base64
+```python
+import base64
+import requests
+
+def get_token(client_id, client_secret):
+    encoded = base64.b64encode(bytes(client_id+':'+client_secret, 'utf-8'))
+    params = {'grant_type':'client_credentials'}
+    header = {'Authorization':'Basic '+ str(encoded, 'utf-8')}
+    r= requests.post('https://accounts.spotify.com/api/token', headers=header, data=params)
+    if r.status_code != 200:
+        print('Error en la request.', r.json())
+        return None
+    else:
+        print('Token valido por {} segundos'.format(r.json()['expires_in']))
+        return r.json()['access_token']
+```
+
+Guardamos los client_id y client_secret para usar la funcion.
+
+```python
+client_id = '5514337feef84f87acb618a965f3870b'
+client_secret = 'f58a6e3883094ca18d49c21c1f47e623'
+
+```
+
+Y lo probamos
+```python
+token = get_token(client_id, client_secret)
+```
+
+Esto lo vamos a usar para generar un nuevo header
+
+```python
+header = {'Authorization': 'Bearer {}'.format(token)}
+```
+
+Con este y con id de airon maiden vamos a obtener los albumes
+```python
+id_im = '6mdiAmATAx73kdxrNrnlao'
+url_base = 'https://api.spotify.com/v1'
+params = {'country':'MX'}
+```
+
+Buscaremos los endpoints de [albums](https://developer.spotify.com/documentation/web-api/reference/albums/ "albums")
+
+En la informacion dice que es necesario el id del album.
+
+Apara esto volveremos al endpoint de [artists] el cual dice como obtenerlos.`/v1/artists/{id}/albums`
+
+```python
+ep_albums = 'artists/{}/albums'
+```
+
+y se tiene que contruir la url apartir de esto
+```python
+albums_im = requests.get(url+ep_albums.format(im_id), headers=header, params)
+```
+```python
+albums_im.status_code
+albums_im.json()['items']
+```
+
+
