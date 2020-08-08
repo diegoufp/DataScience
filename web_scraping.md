@@ -844,3 +844,117 @@ r.json()
 # si te salio 401 te saldra con error y te dira que no tenemos un token
 ```
 
+### Tokens
+
+Tuvimos un error de autorizacion al tratar de acceder a las APIs de spotify.
+Esto es por que spotify necesita y nos pide que registremos una aplicacion para poder utilizar sus APIs.
+
+Para resolver eso tenermos que ir a este [link](https://developer.spotify.com/dashboard/ "link") que nos mandara a la pgina para registar una aplicacion en spotify.
+
+Tendremos que tener una cuenta y crear una aplicacion en el mismo enlace.
+
+Vamos a tener un `Client ID` y un `Client Secret`.
+
+Si volvemos a la documentacion de las [APIs de spotify](https://developer.spotify.com/documentation/web-api/reference/artists/ "APIs de spotify") y clickeamos sobre el endpoint `/v1/artists/{id}` nos va a decir que tenemos que agregarle el un *header* a la solicitud que es requerido y que necitamos un token de acceso que sea valido.
+
+[Link Autorization Guide](https://developer.spotify.com/documentation/general/guides/authorization-guide/ "Link Autorization Guide")
+
+En este caso vamos a tener que utilizar una autorizacion bastante simple y simplemente nos provee un access token para que podamos usarlo.
+
+Vamos a tener que acceder a un token url
+```python
+token_url = 'https://accounts.spotify.com/api/token'
+```
+Luego nos pide que creemos unos parametros, que esos paramentros se los vamoa tener que pasar a la riquests en el momento en que la ejecutemos.
+```python
+params = {'grant_type':'client_credentials'}
+```
+Aparte de estos parametros vamos a tenr que ponerle un encabezado y ese encabezado va a ser otro diccionario donde vamos a poner `Authorization` y `Basic`.
+Despues de eso pasarle nuestro `Client ID` y nuestro `Client Secret` codificados en `Bases64`, en este [link](https://www.base64encode.org/ "link") se puede hacer. Tiene que tener la siguiente estructura:
+`Client ID`:`Client Secret` y despues todo junto lo tenemos que convertir a formato Base64.
+
+```python
+# Es Basic espacio y el string codificado
+headers = {'Authorization': 'Basic NTUxNDMzN2ZlZWY4NGY4N2FjYjYxOGE5NjVmMzg3MGI6ZjU4YTZlMzg4MzA5NGNhMThkNDljMjFjMWY0N2U2MjM='}
+```
+#### Sacar el token
+Ya despues haremos un requests pero con un post en lugar del get
+```python
+r = requests.post(token_url, data=params, headers=headers)
+```
+
+Despues de generar esta solicitud deberiamos tener un status_code de 200(osea que se ejecuto correctamente)
+```
+r.status_code
+```
+
+Si checamos ej Json podemos ver el token, el tipo de token y cuanto dura el token (los tokens tiene un vencimiento)
+Para acceder al token podemos simplemente usar:
+```python
+token = r.json()['access_token']
+```
+
+Despues haremos creamos un nuevo encabezado y hacemos la solicitud con get
+```python
+header = {'Authorization': 'Bearer {}'.format(token)}
+r = requests.get(url_base+ep_artist+id_im, headers=header)
+```
+
+y revisar si el status_code es igual a 200
+```
+r.status_code
+```
+y ver la infomacion en el Json
+```
+r.json()
+```
+
+### Busquedas
+
+En esta pagina puedes encontrar el endpoint para hacer busquedas. [Link](https://developer.spotify.com/documentation/web-api/reference/search/search/ "Link")
+
+Este endpoind de busquedas nos va a permitir hacer alguna query a la base de datos de spotify con algun string (en esta caso de iron maiden), para poder obtener el id de ese artista sin la necesidad de tener que cargar la url a mano.
+
+```python
+url_busqueda = 'https://api.spotify.com/v1/search'
+```
+
+La estructura es la siguiente:
+
+```python
+# De tercer parametro (market) es opcional
+# Spotify dependiendo de en que lugar estamos haciando la solicitud o donde estemos usando la aplicacion vamos s tener resusltado diferentes por cuestiones de derechos.
+search_params = {'q':"Iron+Maiden", 'type':'artist', 'market':'MX'}
+```
+
+Despues hacemos la solicitud
+```python
+busqueda = requests.get(url_busqueda, headers=header, params=search_params)
+```
+```
+busqueda.status_code
+```
+```
+busqueda.json()
+```
+
+Vamos a tener varias bandas que se llamen iron maiden.
+Es por ello que crearemos un DataFrame.
+
+```python
+import pandas as pd
+df = pd.DataFrame(busqueda.json()['artists']['items'])
+df.head()
+```
+
+Como sabemos que la banda original tendra mas popularidad que las otras, lo que haremos es ordenar el dataframe por la popularidad y nos quedaremos solo con el primer resultado.
+
+```python
+df.sort_values(by='popularity', ascending=False).iloc[0]
+```
+
+Si queremos quedarnos solo con el id filtramos la columna id
+```python
+df.sort_values(by='popularity', ascending=False).iloc[0]['id']
+```
+
