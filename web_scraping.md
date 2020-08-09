@@ -1166,3 +1166,50 @@ preview = requests.get(preview_url)
 
 ipd.Audio(preview.content)
 ```
+
+## [Scrapy](https://docs.scrapy.org/en/latest/ "Documentacion de scrapy")
+
+Scrapy es un framework de scraping y crawling de código abierto, escrito en Python. Con este framework nos permite generar requests en paralelo, podemos trabajar con xpath, limitar la cantidad de requests, setear demoras, limitar los dominios.
+
+```python
+import scrapy
+
+# scrapy nos pide que trabajemos definiciendo clases
+class Spider12(scrapy.Spider):
+    name = 'spider12'
+    # Para definir que dominio queremos scrapear y cuales no.
+    # Se le puede pasar una lista
+    allowed_domains = ['pagina12.com.ar'] # Le estamos diciendo que solamente queremos scrapear dominios que esten dentro de pagina12.com.ar
+    # Configurar el tipo de archivo de salida
+    custom_settings = {'FEED_FORMAT':'json',
+                      'FEED_URI':'resultados.json'}
+    start_url = ['https://www.pagina12.com.ar/281434-espinoza-lo-que-no-hicieron-en-4-anos-lo-hicimos-en-tres-mes',
+ 'https://www.pagina12.com.ar/281424-reforma-judicial-juntos-por-el-cambio-no-quiere-que-se-ampli',
+ 'https://www.pagina12.com.ar/281419-cinco-claves-sobre-el-flamante-registro-de-trabajadores-de-l',
+ 'https://www.pagina12.com.ar/281341-alberto-fernandez-inauguro-el-hospital-favaloro-en-la-matanz',
+ 'https://www.pagina12.com.ar/281127-plan-condor-argentina-es-el-pais-que-mas-avanzo-en-el-juzgam',
+ 'https://www.pagina12.com.ar/281289-se-viene-el-informe-en-diputados',
+ 'https://www.pagina12.com.ar/281132-causa-peajes-guillermo-dietrich-fue-procesado-por-administra',
+ 'https://www.pagina12.com.ar/281134-alberto-fernandez-inauguro-el-plenario-de-la-cta-y-convoco-a',
+ 'https://www.pagina12.com.ar/281139-daniel-gollan-si-se-disparan-los-casos-por-encima-de-un-nume',
+ 'https://www.pagina12.com.ar/281151-coronavirus-murieron-dos-represores-presos-contagiados',
+ 'https://www.pagina12.com.ar/281212-reforma-judicial-el-presidente-definio-los-11-nombres-que-in',
+ 'https://www.pagina12.com.ar/281243-alfredo-cornejo-lo-quiere-a-mauricio-macri-en-cambiemos-pero',
+ 'https://www.pagina12.com.ar/281266-la-crisis-del-poder-judicial-y-la-necesidad-de-su-reforma']
+    
+    # Definir un metodo que procese la respuesta de cada solicitud que se haga a cada una de las urls
+    def parse(self, response):
+        # Articulo promocionado
+        nota_promocionada = response.xpath('//div[@class="article-title "]/a/@href').get()
+        if nota_promocionada is not None:
+            yield response.follow(nota_promocionada, callback=self.parse_nota)
+    
+        # Listado de notas
+        respuesta = response.xpath('//div[@class="article-text"]/p').getall()
+            yield response.follow(nota, callback=self.parse_nota)
+    
+    def parse_nota(self, response):
+        
+        
+    
+```
