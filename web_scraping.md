@@ -47,7 +47,7 @@ Supongamos que queremos leer el diario por internet. Lo primero que hacemos es a
 3. El servidor envia la espuesta a la IP de la cual recibio la solicitud.
 4. Nuestro navegador recibe la espuesta y muestra **formateada** en pantalla.
 
-Para hacer un scraper debemos hacer un programa que replique este flujo de forma automatica y sistematica para luego extraer la informacion deseada de la respuesta. Utilizaremos `requests` para realizar peticiones y recibir las espuestas y `bs4` para parsear la espuesta y extraer la informacion.
+Para hacer un scraper debemos hacer un programa que replique este flujo de forma automatica y sistematica para luego extraer la informacion deseada de la respuesta. Utilizaremos `requests` para realizar peticiones y recibir las respuestas y `bs4` para parsear la respuesta y extraer la informacion.
 
 ```python
 import requests
@@ -1171,8 +1171,21 @@ ipd.Audio(preview.content)
 
 Scrapy es un framework de scraping y crawling de código abierto, escrito en Python. Con este framework nos permite generar requests en paralelo, podemos trabajar con xpath, limitar la cantidad de requests, setear demoras, limitar los dominios.
 
+En las ocaciones en que no encuentre la informacion no generara error ya que al encontrar un error sigue con las siguientes paginas, no se trava sin que nosotros tengamos que decirle explicitamente como es que queremos que procese los errores.
+
+- Intalar Scrapy
+
+```python
+pip3 install scrapy
+conda install -c conda-forge scrapy
+```
+
+- clase para scrapear
+
 ```python
 import scrapy
+# Esta biblioteca permite hacer webcrolling de manera recursiva
+from scrapy.crawler import CrawlerProcess
 
 # scrapy nos pide que trabajemos definiciendo clases
 class Spider12(scrapy.Spider):
@@ -1181,8 +1194,10 @@ class Spider12(scrapy.Spider):
     # Se le puede pasar una lista
     allowed_domains = ['pagina12.com.ar'] # Le estamos diciendo que solamente queremos scrapear dominios que esten dentro de pagina12.com.ar
     # Configurar el tipo de archivo de salida
+    # DEPTH_LIMIT es el limite para scrapear
     custom_settings = {'FEED_FORMAT':'json',
-                      'FEED_URI':'resultados.json'}
+                      'FEED_URI':'resultados.json',
+                      'DEPTH_LIMIT': 2}
     start_url = ['https://www.pagina12.com.ar/281434-espinoza-lo-que-no-hicieron-en-4-anos-lo-hicimos-en-tres-mes',
  'https://www.pagina12.com.ar/281424-reforma-judicial-juntos-por-el-cambio-no-quiere-que-se-ampli',
  'https://www.pagina12.com.ar/281419-cinco-claves-sobre-el-flamante-registro-de-trabajadores-de-l',
@@ -1205,11 +1220,30 @@ class Spider12(scrapy.Spider):
             yield response.follow(nota_promocionada, callback=self.parse_nota)
     
         # Listado de notas
-        respuesta = response.xpath('//div[@class="article-text"]/p').getall()
+        notas = response.xpath('//div[@class="article-footer"]//div[@id="cxense-read-more-widget-283845"]//a/@href').getall()
+        for nota in notas:
             yield response.follow(nota, callback=self.parse_nota)
+        
+        # Link a la sigueinte pagina
+        # por si hay algun boton
+        # next_page = response.xpath('')
+        # if next_page is not None:
+            # yield response.follow(next_page, callback=self.parse)
     
     def parse_nota(self, response):
-        
-        
-    
+        # Parseo de la nota
+        titulo = response.xpath('//div[@class="article-titles"]/h1[@class="article-title"]/text()').get()
+        cuerpo = ''.join(response.xpath('//div[@class="article-text"]/p/text()').getall())
+        # guaradr la informacion en el json que habiamos definido
+        yield {'url': response.url,
+                'titulo': titulo,
+                'cuerpo': cuerpo}      
+```
+
+- Ejecutando el scraper
+
+```python
+process = CrawlerProcess()
+process.crawl(Spider12)
+process.start()
 ```
