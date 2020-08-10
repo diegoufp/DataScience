@@ -30,3 +30,32 @@ Ingresa dentro de tu entorno virtual con el comando `source venv/bin/activate`. 
 Ahora, podemos instalar Scrapy sin ningún problema. Otro paquete que instalaremos en el camino es **autopep8**, que nos servirá para formatear automáticamente nuestro código Python siguiendo los lineamientos de [PEP 8](https://www.python.org/dev/peps/pep-0008/ "PEP 8"), la guía de estilos oficial del lenguaje. Ambos paquetes los instalamos con el comando `pip3 install autopep8 scrapy`
 
 Si todo salió bien, con el comando `scrapy version` y `pip freeze` tu terminal debería devolverte la versión del framework que acaba de instalarse. 
+
+## [Web Scraping Sandboox](http://toscrape.com/ "Web Scraping Sandboox")
+
+En Web Scraping Sandboox hay dos paginas para hacer practicas en esta ocacion iniciaremos con la de **Quotes**.
+
+El objetivo es crear un peque;o scrit que obtenga estas citas pero en su totalidad.
+
+Estando en nuestra carpeta de scrapy ejecutamos el siguiente comando en la terminal
+
+```
+scrapy startproject tutorial
+```
+
+y seguimos la instrucciones que nos da scrapy, en esta ocacion nos dice que entramos en la carpeta tutorial
+
+```
+You can start your first spider with:
+    cd tutorial
+    scrapy genspider example example.com
+
+```
+
+Y dentro de la carpeta buscamos otra carpeta que se llame spiders y entramos en ella para crear un archivo con el nombre que queramos. Y despues entramos en el para escribir el script.
+```
+cd spider/
+touch quotes_spider.py
+vim spider.py
+```
+

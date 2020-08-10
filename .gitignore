@@ -6,3 +6,4 @@ selenium/*
 Selenium.ipynb
 APIs.ipynb
 Scrapy.ipynb
+scrapy/*
