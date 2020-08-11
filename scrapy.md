@@ -174,3 +174,51 @@ response.xpath('//h1/a/text()').get()
 # getall nos permite traer una lista con los elementos buscados
 response.xpath('//span[@class="text" and @itemprop="text"]/text()').getall()
 ```
+
+## Primer proyecto
+
+### Estructura de carpetas
+
+Entrar al entorno virtual y crear un anueva carpeta
+```
+source venv/bin/activate
+mkdir quotes_scraper
+cd quotes_scraper/
+```
+
+Inicializar proyecto de scrapy
+```
+scrapy startproject quotes_scraper
+```
+
+Moverse a la carpeta del proyecto
+```
+cd quotes_scraper
+```
+
+Dentro de esta capteta hay varios archivos.
+
+- pipelines.py
+Es un archivo que nos permite modificar nuestros datos desde que entran a nuestros **spiders** hasta llegar al final.
+
+- middlewares.py
+Es un archivo que nos permite trabajar con un concepto denominado **señales**, es decir, podemos controlar eventos que suceden en algun momento de ese tiempo en el cual nosotros hacemos la requests, obtenemos la informacion y la traemos a nuestro programa.
+
+- items.py
+Dentro de este archivo tenemos una manera complejo de transformar y jugar con estos datos que a nostros nos envia la respuesta HTML para guardarlos de una manera estandar.
+
+- __init__.py
+Es el archivo que define que todo esto es una modulo de python 
+
+- settings.py
+Dentro de este achivo tenemos un monton de configuraciones interesantes.
+En **BOT_NAME** nosotro podemos definir el nombre del robot que va a usar scrapy para referirse a si mismo dentro de estas requests, en este caso es quotes_scraper.
+**ROBOTSTXT_OBEY** puedes habiliar o deshabilitar la opcion para obedecer al archivo robots.txt.
+**CONCURRENT_REQUESTS** cuantas peticiones puede hacer al mismo tiempo, por default son 16.
+**DOWNLOAD_DELAY** que tiempo espera scrapy entre descarga y descarga de el resultado de las requests
+**CONCURRENT_REQUESTS_PER_IP** las requests consecutivas que se pueden hacer por direccion IP.
+**DEFAULT_REQUEST_HEADERS** cambiar los header que va a tener esta peticion (las cabeceras http)
+**COOKIES_ENABLED** habilitar los cookies.
+
+- spider/
+Donde podremos nuestros scrips de python
