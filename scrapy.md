@@ -58,4 +58,119 @@ cd spider/
 touch quotes_spider.py
 vim spider.py
 ```
+```python
+import scrapy
 
+# Se creara una clase
+# En esta clase se define la logica para traer toda la informacion que queremos desde internet
+class QuotesSpider(scrapy.Spider):
+    name = 'quotes'
+    start_urls =[
+        'http://quotes.toscrape.com/'
+    ]
+
+    # self hace referencia a la instancia posterior de la clase
+    # response hace referencia a la respuesta http 
+    def parse(self, response):
+        # Este metodo es el que define la logica apartir de la cual nosotros extraemos informacion
+        # con with open abrimos un archivo 
+        # w -> modo escritura
+        with open('resultados.html', 'w', encoding='utf-8') as f:
+            # Escribir en esta archivo el contenido de la respuesta html
+            f.write(response.text)
+```
+
+Para ejecutar se ingresa en comando especial de scrapy
+```
+scrapy crawl quotes
+```
+Para salir del entorno virtual se ejecuta el codigo 
+```
+deactivate
+```
+
+## Generadores e iteradores
+
+- Iteradores
+```python
+
+my_list = [1,2,3,4,5]
+# Esta variable lo que va hacer es contener a esta lista my_list(es un iterable convertido en iterador que es lo que python pude recorrer por debajo)
+my_iter = iter(my_list)
+# Si inprimimos my_iter con type nos mostrara que es un list_iterator y no una lista 
+#print(type(my_iter))
+# Extraer los elementos
+print(next(my_iter)) # Como respuesta sale 1
+# Si imprimimos 3 veces
+print(next(my_iter)) # Como respuesta sale 1
+print(next(my_iter)) # Como respuesta sale 2
+print(next(my_iter)) # Como respuesta sale 3
+# esto es lo que hace un siclo for por dentro
+# Cuando encuentra el error StopIteration es ciclo para
+```
+
+- Generadores 
+En python existen formas faciles de crear iteradores las cuales son llamadas generadores.
+
+Una **funcion** normal cuando hacer `return` de un elemento corta la ejecucion de la funcion. En un **generador** cuando hacer un return python guarda el estado de la funcion y continua la ejecucion donde lo dejaste para que cuando vuelvas a llamar a a funcion ese estado lo tengas disponible otra vez
+
+```python
+def my_func():
+    a = 1
+    return a
+
+    a = 2
+    return a
+
+    a = 3
+    return a
+
+print(my_func())
+print(my_func())
+print(my_func())
+```
+Si imprimimos esta script de resultado imprimiran solo el numero 1. Por que cuando python encuentra un `return` dentro de la funcion significa que ahi termina y todo lo que hay debajo no importa.
+
+UN generador es una funcion que puede recordar estados. Este seria un ejemplo de un generador:
+
+```python
+def my_gen():
+
+    # yield lo que hace es hacer un return parcial.
+    a = 1
+    yield a
+
+    a = 2
+    yield a
+
+    a = 3
+    yield a
+
+    # Un generador es una manera facil de crear un iterador 
+    # Cuando asignamos la funcion a una variable lo que estamos indicandole a python es que
+    # retorne un iterador y que lo guarde dentro de la variable 
+    my_first_gen = my_gen()
+    # Si nosotros ejecutamos con el metodo next 3  veces saldran 1 , 2, 3 por que guarda los estados.
+    print(next(my_firsr_gen))
+    print(next(my_firsr_gen))
+    print(next(my_firsr_gen))
+```
+
+## Scrapy Shell
+
+Usar la consola interactiva de scrapy
+Entramos al entorno virtual y ejecutamos en la terminal de comandos
+```
+scrapy shell "http://quotes.toscrape.com/"
+```
+Si no ocurrio ningun error abrira una cosola de python y ya podemos empezar a usar una serie de objetos que nos provee scrapy.
+
+E esta ocacion llamaremos al metodo response.xpath
+```python
+# get da la indicacion a python de traer un solo elemento
+response.xpath('//h1/a/text()').get()
+```
+```python
+# getall nos permite traer una lista con los elementos buscados
+response.xpath('//span[@class="text" and @itemprop="text"]/text()').getall()
+```
