@@ -222,3 +222,44 @@ En **BOT_NAME** nosotro podemos definir el nombre del robot que va a usar scrapy
 
 - spider/
 Donde podremos nuestros scrips de python
+
+### Spiders
+
+Un spider es una clase de python en la cual nosotros definimos la logica necesaria para extraer informacion.
+
+Para crear un spider entramos a la carpeta spiders y creamos un archivo
+```
+cd spiders
+touch quotes.py
+vim quotes.py
+```
+```python
+import scrapy
+
+class QuotesSpider(scrapy.Spider):
+    # name es el nombre unico con el que scrapy se va a referir a este spider dentro del proyecto
+    # Es un nombre que no es repetible 
+    # Es decir si nosotros tenemos en el futuro otros spider no podemos ponerle el mismo nombre 
+    name = 'quotes'
+    # lista de urls a las cuales vamos a hacer la peticion http
+    start_urls = [
+        'http://quotes.toscrape.com/'
+    ]
+
+    # Metodo obligatorio dentro del spider
+    # parse significa analizar un archivo para extraer informacion valiosa a partir de el
+    # el metodo parse analizara las respuestas http que nos envia la peticion de esta pagina
+    # y apartir de esa respuesta traer toda la informacion.
+    # respose es la respuesta http que surge despues de hacer una peticion
+    def parse(self, response):
+        print('*' * 10)
+        print('\n\n')
+        print(response.status, response.headers)
+        print('*' * 10)
+        print('\n\n')
+```
+
+Para ejecutar el spider ejecutamos `scrapy crawl quotes`, en este caso `quotes` es el name que se le puso dentro del script
+```
+scrapy crawl quotes
+```
