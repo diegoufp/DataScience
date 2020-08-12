@@ -1247,3 +1247,78 @@ process = CrawlerProcess()
 process.crawl(Spider12)
 process.start()
 ```
+
+## Proxies 
+
+Hacer un scraper consiste en programar un programa que sistematice consultas a distintas paginas web o a una sola. 
+
+Todas esas solicitudes que estan saliendo de manera automatica van a salir con la misma IP de origen. Un servidor web que detecte que todas estas solicitudes vienen todas juntas y bastante rapido una tras de la otra de la misma IP puede llegar a detectar que en realidad se trata de un scraper y no de una persona fisica, entonces puede tomar la desicion de bloquear esa IP para proteger su informacion y no saturar ni generar demaciado trafico.
+
+Es por eso que muchas veces es util esconder o enmascarar la IP desde la cual hacemos este tipo de solicitudes y para esto es necesario usar un proxy.
+
+un **Proxy** es como un intermediario entre nosotros y el servidor web que queremos scrapear, nosotros hariamos esta solicitud al servidor web pero en vez de que el trafico vaya directamente hacia el servidor pasaria primero por un proxy y del proxy seguiria hacia ese servidor, de esta manera logramos que el servidor web vea la IP del proxy y no la nuestra.
+
+Nostros podemos configurar el programa para que utilice distintos proxies y los vaya alternando de manera que el servidor web vea que las solicitudes provienen de distintas direcciones IP y asi es una estrategia que podemos usar para evitar que nuestro scrapy sea bloqueado 
+
+El sitio [mi ip](http://www.cualesmiip.com/ "mi ip") te permite ver cual es la IP saliente de tu red. Si estas en una LAN, seguramente tu IP local sea algo como 192.18.x.x, pero la IP con la que sales al mundo, la IP de tu router asignada por tu ISP, sera diferente.
+Links utiles:
+[Free Proxy List](https://free-proxy-list.net/ "proxy")
+[PySocks](https://pypi.org/project/PySocks/ "PySocks")
+
+- Funcion para scrapear ese sitio web para obtener la IP
+```python
+import requests
+import re
+
+def get_my_ip(url='http://www.cualesmiip.com/', proxies=None):
+    try:
+        r = requests.get(url=url, proxies=proxies)
+    except Exception as e:
+        print('Error haciendo la request', e)
+        return None
+
+    if r.status_code != 200:
+        print("Status Code:", r.status_code)
+        return None
+
+    regex = re.compile(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
+    my_ip = regex.findall(r.text)
+    return my_ip[0] if my_ip else None
+
+if __name__ == "__main__":
+    print(get_my_ip())
+```
+
+[Free Proxy List](https://free-proxy-list.net/ "proxy") es una web en la que tenemos distintas direcciones de servidores proxies que nosotros podemos utilizar de manera gratuita. Al ser gratuitos no estan garantizados su funcionamiento y puede ser un poco mas lento, incluso tampoco esta garantizado que el servidor proxy no este tratando se ver el trafico atravez del proxy.
+
+La recomedacion es utilizar los proxies que tengas `https`.
+
+Crearemos un diccionario en el que pondremos la direccion de los proxy
+```python
+proxy_dict = {
+    'http': 'http://217.219.35.1:8080',
+    'https': 'https://217.219.35.1:8080'
+}
+```
+
+y lo ejecutamos
+```
+get_my_ip(proxies=proxy_dict)
+```
+
+Si queremos usar proxys socks que funcionan a mas bajo nivel(hacia nivel tcp) lo que tenemos que hacer es crear otro diccionario:
+
+La biblioteca que tenemos que utilizar para poder hacer uso de proxies socks [PySocks](https://pypi.org/project/PySocks/ "PySocks"), solamente puede trabajar con proxies socks 4.
+
+En esta ocacion usaremos socks 4 e iremos a la pagina de proxies [Free Socks Proxy List](https://www.socks-proxy.net/ "Free Socks Proxy List")
+```python
+# Hay varias versiones de socks, en este caso trabajaremos son socks 4 pero existe socks 5
+socks_proxy_dict = {
+    'http':'socks4':'//41.205.13.126:4145',
+    'https':'socks4':'//41.205.13.126:4145'
+}
+```
+y lo ejecutamos
+```
+get_my_ip(proxies=socks_proxy_dict)
+```
