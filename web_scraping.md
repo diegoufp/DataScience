@@ -1322,3 +1322,125 @@ y lo ejecutamos
 ```
 get_my_ip(proxies=socks_proxy_dict)
 ```
+
+## [Tesseract](https://pypi.org/project/tesserocr/ "Tesseract")
+
+**OCR** reconocimiento optico de caracteres.
+**Tesseract ocr** una bibleoteca que nos permite utilizar software que ya esta preentrenado para hacer este tipo de reconocimiento. Es decir que partiremos una imagen que tiene texto para extraer el texto en formato de string para que despues lo podamos trabajar mejor.
+
+```python
+import tesserocr # Para hacer OCR
+import numpy as np # Para hacer manipulacion basica de imagenes
+# Para trabajar mas a fondo con imagenes usar la bilbioteca open cb que ya esta preparada especificamente para eso
+import matplotlib.pyplot # Para cambiar el formato de archivos
+from PIL import Image # Para cambiar el formato de archivos
+# Si estas en una jupyter notebook tienes que ejcutar el comando:
+#%matplotlib inline
+# que lo que hace es permitir que mostremos la imagenes dentro de la misma jupyter 
+
+texto_largo = plt.imread('texto_largo.png')
+plt.figure(figsize=(15,5))
+plt.imshow(texto_largo)
+plt.axis(False);
+```
+Te deberia aprecer una imagen. Despues usaremos la funciones de tesserocr para extraer el texto de esta imagen y pasarlo a un string
+```python
+# Se le va a pasar la ruta a la imagen y no la variable con la ruta
+# usaremos spanish pero tiene soporte para varios idiomas
+texto_ocr = tesserocr.file_to_text('texto_largo.png', lang='spa')
+# Si vemos el tiempo de dato de texto_ocr deberia ser un str
+type(texto_ocr)
+# Y si lo imprimimos deberia de ser el texto de la iamgen
+print(texto_ocr)
+```
+
+- Otro ejemplo
+```python
+img = plt.imread('imagen de prueba.png')
+plt.imshow(img)
+
+texto_ocr = tesserocr.file_to_text('imagen de prueba.png', lang='spa')
+print(texto_ocr)
+```
+Si imprimimos este script lo mas probable es que falle, que el texto no sea el correcto.
+
+Este error ocurre por que el fondo esta en oscuro y las letras estan en blanco y que aparte de eso estan difusos los bordes de las letras con el fondo. Ahi es cuando la bibleoteca empieza a tener algunos problemas para ahcer este reconocimiento. No lanza ningun error pero el resultado no es el esperado. 
+
+Para resolver eso  se tiene que hacer una peque;a minipulacion sobre esta imagen antes de pasarla al osc.
+
+Veamos primero cuales son las dimenciones de esta imagen 
+```python
+img.shape
+# (62, 228, 4)
+```
+Al parecer esta imagen tiene 4 canales (r, g, b ,alfa(canal de transparencia)), que en este caso como no lo estamos utilizando simplemento lo vamos a descartar y generar una nueva imagen que sea solamente en rgb(los tres canales)
+```python
+img_rgb = img[:,:,:3]
+```
+Ahora el shape de esta imagen deberia ser con tres canales 
+```python
+img_rgb.shape
+# (62, 228, 3)
+```
+Si visualizamos la imagen de nuevo no a cambiado nada
+```
+plt.imshow(img)
+```
+Y efectivamente no cambio nada por que al sacar el canal de transparencia que estabamos utilizando la imagen sigue siendo la misma.
+
+Lo que debemos hacer ahora es invertir los tonos de la imagen para que queden las letras oscuras sobre un fondo claro.
+
+Para esto tenemos que ver como esta codiciador los pixeles.
+Nos quedaremos con el primer pixel
+```python
+# Nos quedaremos con el primer pixel
+img_rgb[0,0,0]
+# 0.1764706
+```
+
+Hay dos formatos posibles en los que pueden venir la informacion de los pixeles, uno de ellos es que se aun numero de numero flotante que vaya de 0 a 1(que es este caso), si no tambien existe la posibilidad de que sea un entero que va de 0 a 255 dependiendo de cual se la codificacion o en que formato vengan la imagen tenemos que realizar distintas operaciones.
+
+En este caso si queremos invertir la imagen en este caso tenermos que:
+
+```
+img_inv = 1-img_rgb
+``` 
+Lo que logramos es invertir los colores de esta imagen
+```
+plt.imshow(img_inv)
+```
+Se invirtieron los colores. Tenemos un fondo mas claro con letras obscuras.
+
+Otra cosa que podemos hacer es pasarla a escala de grises, por que en muchos casos tener demaciada informacion(tener las 3 escalas) no aporta deciado y con la imagen en escala de grises ya es suficiente.
+```python
+# calculamos la media de cada pixel con axis 2
+img_gr = img_inv.mean(axis=2)
+```
+En esta imagen en escala de gruses lo que vamos a obtener es un unico pixel para cada canal y lo vamos a hacer es tener el promedio del canal rgb.
+
+Si mostramos esta imagen en escala de grises.
+```
+plt.imshow(img_gr, cmap='Greys_r')
+```
+Vamos a pasar el formato de pixeles que va de 0 a 1 en punto flotante a 255 y como para representar una byt que va de 0 a 255 solo necesitamos 8bys vamos a utilizar uint8
+```python
+img_pil = Image.fromarray(np.uint8(img_gr*255))
+```
+Si vemos el tipo de dato de esta imagen deberia de ser de tipo image
+```
+type(img_pil)
+```
+
+Unar tesserocr
+```python
+# En esta ocacion usamos image_to_text en lugar de file_to_text por que le estamos pasando directamente el objeto de la imagen
+print(tesserocr.image_to_text(img_pil, lang='spa'))
+``` 
+
+Si esta opcion sabe imperfecta podemos probar con 3 escalas
+```
+img_pil_inv = Image.fromarray(np.uint8(img_inv*255))
+```
+```python
+print(tesserocr.image_to_text(img_pil_inv, lang='spa'))
+``` 
