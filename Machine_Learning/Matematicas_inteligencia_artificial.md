@@ -158,3 +158,71 @@ Y asi sucesivamente hasta completarlo, el resultado seria:
     -2 -5  14
                 ]
 ```
+
+### Algebra lineal
+
+El algebra lineal era una herramienta muy economica para resolver sistemas complejos, es decir, que a la maquina no le cueste tanto trabajo esos calculos que le costara realizar.
+
+- Fundamentos:
+**sistema matricial** el producto de 2 matrices
+
+En este caso ejemplo solo conocemos la primera matriz, la segunda amtriz no sabemos cual es.
+
+```
+# Primera matriz
+
+[
+    1 -3  2
+    5  6 -1
+    4 -1  3
+                ]
+```
+```
+# Segunda matriz (matriz vector)
+# Lo que la maquina necesitara averiguar
+[
+    x
+    y
+    z
+        ]
+```
+
+Se van a multiplicar las dos matrices:
+```
+x -3y + 2z = -3
+5x + 6y -z = 13
+4x - y + 3z = 8
+```
+```
+[ 
+    -3
+    13
+     8
+        ]
+```
+
+- Soluciones que podemos esperar de este sistema:
+Un sistema de ecuaciones asi puede suceder que sea un **Sistema compatible determinado**, un **Sistema compatible indeterminado** o un **Sistema incompatible**. Esto tiene una interpretacion geometrica.
+
+Si pensamos en las ecuaciones de antes como en rectas o planos, esos planos van a poder coincidir o no.
+
+Si tenemos un **Sistema compatible determinado** los 3 planos coincidiran en un punto, un punto que tiene 3 coordenadas, por lo tanto seria la x , y , z un punto determinado que seria la unica solucion.
+
+Si tenemos un **Sistema compatible indeterminado** esto quiere decir que no es un punto, puede ser una recta o puede ser un plano. Lo que ocurriria es que las soluciones pueden ser infinitas.
+
+Si tenemos un **Sistema incompatible** quiere decir que no tiene una solucion, no existe solucion. Puede ocurrir que dos de las ecuaciones coinciden pero la tercera no.
+
+#### Resolver estos sistemas con python
+[Documentacion de numpy](https://numpy.org/doc/stable/reference/generated/numpy.matrix.html "Documentacion de numpy")
+
+```python
+#Definimos la matriz y la matriz resultado
+matriz = np.array([[1,-3,2],[5,6,-1],[4,-1,3]])
+matriz_resultado= np.array([[-3],[13],[8]])
+#Calculamos la inversa de la matriz
+matriz_inv = np.linalg.inv(matriz)
+#Realizamos el produto entre la matriz inversa y la matriz resultado
+matriz_solucion= matriz_inv.dot(matriz_resultado)
+#pd: no olvidar importar numpy
+import numpy as np
+```
