@@ -263,3 +263,72 @@ Para ejecutar el spider ejecutamos `scrapy crawl quotes`, en este caso `quotes` 
 ```
 scrapy crawl quotes
 ```
+
+### Usando Xpath para extraer datos
+
+Recuerda siempre verificar que el entorno virtual este activado y que estemos dentro de la carpeta del proyecto
+
+```
+scrapy shell 'http://quotes.toscrape.com/'
+```
+```python
+response.xpath('//div[@class="row"]/div[contains(@class, "tags-box")]/span[@class="tag-item"]/a/text()').getall()
+```
+Cerramos scrapy
+```
+exit()
+```
+
+Abrimos el archivo del anterior subtema
+```
+vim quotes.py
+```
+```python
+import scrapy
+
+# Titulo = //h1/a/text()
+# Citas = //span[@class="text" and @itemprop="text"]/text()
+# Top ten tags = //div[@class="row"]/div[contains(@class, "tags-box")]/span[@class="tag-item"]/a/text()
+
+class QuotesSpider(scrapy.Spider):
+    # name es el nombre unico con el que scrapy se va a referir a este spider dentro del proyecto
+    # Es un nombre que no es repetible 
+    # Es decir si nosotros tenemos en el futuro otros spider no podemos ponerle el mismo nombre 
+    name = 'quotes'
+    # lista de urls a las cuales vamos a hacer la peticion http
+    start_urls = [
+        'http://quotes.toscrape.com/'
+    ]
+
+    # Metodo obligatorio dentro del spider
+    # parse significa analizar un archivo para extraer informacion valiosa a partir de el
+    # el metodo parse analizara las respuestas http que nos envia la peticion de esta pagina
+    # y apartir de esa respuesta traer toda la informacion.
+    # respose es la respuesta http que surge despues de hacer una peticion
+    def parse(self, response):
+        print('*' * 10)
+        print('\n\n')
+        
+        title = response.xpath('//h1/a/text()').get()
+        print(f'Titulo: {title}')
+        print('\n\n')
+
+        quotes = response.xpath('//span[@class="text" and @itemprop="text"]/text()').getall()
+        print('Citas: ')
+        for quote in quotes:
+            print(f'- {quote}')
+        print('\n\n')
+
+        top_ten_tags = response.xpath('//div[@class="row"]/div[contains(@class, "tags-box")]/span[@class="tag-item"]/a/text()').getall()
+        for tag in top_ten_tags:
+            print(f'- {tag}')
+        print('\n\n')
+
+        print('*' * 10)
+        print('\n\n')
+```
+
+Y lo ejecutamos 
+```
+scrapy crawl quotes
+```
