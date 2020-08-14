@@ -479,3 +479,13 @@ Por eso son tan complicadas por que esta casi en el terreno de la especulacion.
 
 - Limites de integracion 
 Se esta integrando entre pos puntos del dominio de tu funcion.
+
+### Teoremas
+
+- Teorema de Bolzano
+
+Si una función `f(x)` es continua en un intervalo [a,b], cuyos valores extremos `f(a)` y `f(b)` tienen distinto signo, la función cortará al eje (y por tanto devolverá el valor 0) en algún punto del intervalo.
+
+- Teorema de los Valores Intermedios
+
+En el mismo caso y condiciones explicitadas en el teorema de Bolzano, la función alcanzará cualquier valor intermedio comprendido entre `f(a)` y f(b)]. Como puedes ver, no es más que una generalización del teorema de Bolzano.
