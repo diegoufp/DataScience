@@ -319,3 +319,73 @@ y = 50/10 = 5
 ```
 x = -2
 ``` 
+
+### Funciones elementales
+
+Una funcion es una aplicacion, es decir, que a la funcion le entran una serie de datos de entrada y la funcion devuelve una serie de datos de salida. A la entrada la llamamos la **variable independiente** y a la salida la **variable dependiente**.
+
+Toda funcion lleva asociada una grafica y esa grafica es muy importante por que nos dice como se comporta la funcion tambien nos dice si es continua, si se va al infinito, si no se va al infinito.
+
+Una manera muy util de traducir la expresion a una grafica es dar una tabla de valores
+```
+    x | f(x) = x∧2
+    1 | 1
+    2 | 4
+    3 | 9
+```
+No es el metodo mas optimo, hay metodos mucho mas elegantes que te dan muchas mas informacion sobre la funcion, pero esta bien.
+
+**Tipos de funciones**:
+
+- **Funciones Lineales**
+La `n` implica el punto donde corta la funcion al eje `y` se llama **ordenada en el origen**. 
+
+```
+f(x) = mx + n
+```
+
+- **Funcion cubica**
+```
+f(x) = x∧3
+```
+
+- **Funcion exponencial**
+Es una funcion que siempre crece hacia el infinito
+```
+f(x) = e∧x
+```
+
+- **Funcion de raiz de equis**
+```
+f(x) = (x)**0.5
+```
+
+- **Funcion logaritmica**
+La funcion logaritmica y la funcion exponencial son inversas la una de la otra.
+```
+f(x) = log x
+```
+
+- **Funciones trigonometricas**
+```
+f(x) = sen x
+f(x) = cos x
+```
+```
+f(x) = tg x
+f(x) = cotg x
+```
+```
+f(x) = sec x
+f(x) = cosec x
+```
+
+- **Funciones hiperbolicas**
+```
+f(x) = senh x
+f(x) = cosh x
+f(x) = tgh x
+f(X) = ctgh x
+f(x) = sech x
+f(x) = csech x
+```
