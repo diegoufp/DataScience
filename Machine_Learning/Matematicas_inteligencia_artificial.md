@@ -328,7 +328,7 @@ Toda funcion lleva asociada una grafica y esa grafica es muy importante por que 
 
 Una manera muy util de traducir la expresion a una grafica es dar una tabla de valores
 ```
-    x | f(x) = x∧2
+    x | f(x) = x**2
     1 | 1
     2 | 4
     3 | 9
@@ -336,6 +336,7 @@ Una manera muy util de traducir la expresion a una grafica es dar una tabla de v
 No es el metodo mas optimo, hay metodos mucho mas elegantes que te dan muchas mas informacion sobre la funcion, pero esta bien.
 
 **Tipos de funciones**:
+Hay funciones que van muchos mas rapido que otras al infinito. Por ejemplo la funcion lineal tiene una velocidad normal pero sin embargo una funcion como la cuadratica iria mucho mas rapido a infinito(crece con mas velocidad)
 
 - **Funciones Lineales**
 La `n` implica el punto donde corta la funcion al eje `y` se llama **ordenada en el origen**. 
@@ -346,13 +347,13 @@ f(x) = mx + n
 
 - **Funcion cubica**
 ```
-f(x) = x∧3
+f(x) = x**3
 ```
 
 - **Funcion exponencial**
 Es una funcion que siempre crece hacia el infinito
 ```
-f(x) = e∧x
+f(x) = e**x
 ```
 
 - **Funcion de raiz de equis**
@@ -388,4 +389,30 @@ f(x) = tgh x
 f(X) = ctgh x
 f(x) = sech x
 f(x) = csech x
+```
+
+### Limites
+
+El limite lo unico que hace es evaluar la funcion en un punto dado.
+
+Ejemplo:
+Vamos a calcular el limite cuando `x` tiende a 0. Lo unico que tendrias que evaluar seria el 0 donde esta la x.
+```
+# Seria 0 al cubo que es igual a 0
+lim f(x) = 0**3 = 0
+x->0
+```
+El limite de `x` cuando tiende a 1 es igual a 1.
+```
+lim f(x) = 1**3 = 1
+x->1
+```
+
+- **Asintota vetrical**
+Lo que ocurre en `x=0` es una cosa que se llama asintota vertical, que es cuando la funcion llega hasta un punto y se encuentra una especia de linea invisible de la cual no puede pasar y esta tiende a infinito(en una grafica).
+
+En estos caso lo que tendriamos que hacer es evaluar la cercania de esa asintota vertical.
+```
+f(x) = 1/x
+x=0
 ```
