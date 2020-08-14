@@ -488,4 +488,4 @@ Si una función `f(x)` es continua en un intervalo [a,b], cuyos valores extremos
 
 - Teorema de los Valores Intermedios
 
-En el mismo caso y condiciones explicitadas en el teorema de Bolzano, la función alcanzará cualquier valor intermedio comprendido entre `f(a)` y f(b)]. Como puedes ver, no es más que una generalización del teorema de Bolzano.
+En el mismo caso y condiciones explicitadas en el teorema de Bolzano, la función alcanzará cualquier valor intermedio comprendido entre `f(a)` y `f(b)`. Como puedes ver, no es más que una generalización del teorema de Bolzano.
