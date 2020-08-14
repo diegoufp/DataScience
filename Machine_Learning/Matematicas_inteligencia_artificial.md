@@ -462,3 +462,20 @@ En el caso de `f(x,y,z) = (cos x/ (y)**3) + 2(z)**2` se tiene que derivar asi:
 ∂f/∂y = - (3 cos x) / (y)**4
 ∂f/∂z = 4z
 ```
+
+### Integrales
+
+La integral de igual forma que la derivada que lleva de `f(x) --> f'(X)`, las integrales es el proceso inverso `f(x) <-- f'(x)`.
+
+```
+∫f(x)dx
+```
+Cuando derivas una funcion estas perdiendo informacion, por eso se tienen los **limites de integracion** para compensar de alguna manera esa perdida de constantes a esto se le llama **integral definida**. Si no se define ese intervalo, si solamente te limitas a la integracion de la funcion al final estas obligado a poner `+C`, es decir, mas una constante que no sabes cual es.
+```
+f(x) + C
+```
+
+Por eso son tan complicadas por que esta casi en el terreno de la especulacion.
+
+- Limites de integracion 
+Se esta integrando entre pos puntos del dominio de tu funcion.
