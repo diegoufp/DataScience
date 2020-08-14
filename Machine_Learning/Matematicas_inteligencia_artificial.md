@@ -226,3 +226,96 @@ matriz_solucion= matriz_inv.dot(matriz_resultado)
 #pd: no olvidar importar numpy
 import numpy as np
 ```
+
+### Metodo de Gauss
+
+Las matrices
+```
+[                   [                [
+    1 -3  2             x               -3
+    5  6 -1             y       =       13
+    4 -1  3             z                8
+            ]              ]                ]
+```
+Se simplificaran a:
+```
+[               |
+    1 -3  2     |   -3
+    5  6 -1     |   13
+    4 -1  3     |    8
+                |           ]
+```
+
+- Procedimiento de Metodo de Gauss
+Primero vamos a triangular nuestra matriz, es decir, que los 3 numero que estan en la parte inferior izquierda los queremos convertir en 0.
+```
+[               |
+    1 -3  2     |   -3
+    0  6 -1     |   13
+    0  0  3     |    8
+                |           ]
+```
+Pero no simplemento los vamos a remplazar con 0, vamos a hacer operaciones para que se conviertan en 0.
+```
+[               |
+    1 -3  2     |   -3          F1
+    5  6 -1     |   13          F2
+    4 -1  3     |    8          F3
+                |           ]
+```
+La fila numero 2(F2) y la fila numero 3 (F3) al operar entre ellas. Si yo a la **F2** le resto la **F3** la que va a cambiar va a ser la **F2**(**F2**-**F3**).
+```
+[               |
+    1 -3  2     |   -3          F1
+    1  7 -4     |    5          F2
+    4 -1  3     |    8          F3
+                |           ]
+```
+Si ahora a la **F2** le restamos la **F1** entonces logramos convertir el primer objetivo a 0 (**F2**-**F1**).
+```
+[               |
+    1 -3  2     |   -3          F1
+    0 10 -6     |    8          F2
+    4 -1  3     |    8          F3
+                |           ]
+```
+Si ahora a la **F3** le restamos la **F1** multiplicada por 4 consiguiriamos convertir otro objetivo a 0 (**F3**-4***F1**).
+```
+[               |
+    1 -3  2     |   -3          F1
+    0 10 -6     |    8          F2
+    0 11 -5     |   -4          F3
+                |           ]
+```
+Si ahora a la **F3** le restamos 1/10 de **F2** lograremos convertir el ultimo objetivo a 0 (**F3**-1/10**F2**)
+```
+[               |
+    1 -3  2     |   -3          F1
+    0 10 -6     |    8          F2
+    0  0 16     |  112          F3
+                |           ]
+```
+
+Ahora al pasarlo a manera de fraccion podremos saber cuanto valen las incognitas mas facilmente.
+```
+[                   [                [
+    1 -3  2             x               -3
+    0 10 -6             y       =        8
+    0  0 16             z              112
+            ]              ]                ]
+```
+```
+x - 3y + 2z =  -3
+   10y - 6z =   8
+        16z = 112
+```
+```
+z = 112/16 = 7
+```
+Y asi ir resolviendo las otras incognitas.
+```
+y = 50/10 = 5
+```
+```
+x = -2
+``` 
