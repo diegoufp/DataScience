@@ -416,3 +416,49 @@ En estos caso lo que tendriamos que hacer es evaluar la cercania de esa asintota
 f(x) = 1/x
 x=0
 ```
+
+### Derivadas
+Las derivadas son una serie de reglas que se aplican a la funciones.
+Una derivada de una funcion es otra funcion.
+La primera funcion de la que partimos se llama primitiva y la segunda se llama derivada
+```
+f(x) ------->  f'(x)
+Primitiva ---> Derivada
+```
+
+#### Reglas de como una funcion va a derivarse
+```
+f(x) = K --> f'(x) = 0
+
+f(x) = K * x --> f'(x) = K
+
+f(x) = K * (x)**n --> f'(X) = K * n * (x)**n-1
+
+(d/dx)K * f(x) = K(d/dx)f(x)
+
+(d/dx)f(x)**n = n * f(x)n-1(df/dx)
+
+(d/dx)(f(x) + g(x) + ...) = (df/dx) + (dg/dx) + ...
+
+(d/dx)(f(x) * g(x)) = f(x) * (dg/dx) + g(x) * (df/dx)
+
+(d/dx)(f(x)/g(x)) = (f(x) * (dg/dx) - g(x) * (df/dx)) * +(1/g(x)**2)
+```
+
+#### Utiles de las derivadas
+
+- Regla de la cadena
+Para los casos en que la funcion es muy poco intuitiva y no sabes como derivarla.
+```
+(df/dx) = (df/dg) * (dg/dx) 
+```
+
+- Derivadas parciales
+Si quieres derivar una funcion de varias variables necesitas las derivadas parciales.
+
+En el caso de `f(x,y,z) = (cos x/ (y)**3) + 2(z)**2` se tiene que derivar asi:
+```
+∂f/∂x = - (sen x) / (y)**3
+∂f/∂y = - (3 cos x) / (y)**4
+∂f/∂z = 4z
+```
