@@ -65,7 +65,7 @@ La derivada parcial nos va a servir para entontrar el gradiente que nos va a dec
 - Al calcular el error(loss), el gradiente nos ayuda a buscar el mínimo
 - Es necesario calibrar el valor de learning rate
 
-## Pytorch
+## [Pytorch](https://pytorch.org/tutorials/beginner/pytorch_with_examples.html "Pythorch")
 
 PyTorch es un framework, va a ser nuestro apoyo con características importantes como múltiples funciones que nos ayudan en la construcción de nuestro modelo. Implementaremos una regresión lineal y otras aproximaciones de modelos de clasificación, para cada uno de estos casos utilizaremos módulos del framework.
 
@@ -163,6 +163,8 @@ torch.from_numpy(numpyArray)
 
 ## Representando datasets con tensores
 
+Para entender mas sobre las dimecionalidades leer este [articulo](https://towardsdatascience.com/understanding-dimensions-in-pytorch-6edf9972d3be "articulo")
+
 ```python
 import torch
 import numpy as np
@@ -229,11 +231,17 @@ data, data.shape
 target = players[:, 0]
 target, target.shape
 ```
-En esta ocacion pueden existir jugadores que no tengan cierta informacion, para evitar que en las operaciones te pueda salir un 'Nan' vamos a hacer lo siguiente:
+En esta ocacion pueden existir jugadores que no tengan cierta informacion, para evitar que en las operaciones te pueda salir un 'Nan' vamos a utilizar [dropna](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.dropna.html?highlight=dropna#pandas.DataFrame.dropna "dropna")
 ```python
 # Vamos a regresar a donde creamos el subset
 # Agregamos que elimine los valores en el eje de las filas cuando cualquiera sea null o no exista
-# Esto se hace con dropna
+# Esto se hace con dropna que es un metodo de pandas
+# axis recibe cómo parametro un 1 y un 0.
+# 0 indica que se borrará la fila donde encontremos valores faltantes
+# 1 se borrará la columna donde se encuentre un valor faltante.
+# how recibe cómo parametro ‘any’ y ‘all’
+# ‘any’ significa que si encuentra al menos una columna con dato faltante, la elimine (en este caso, lo que haría sería ver el parametro axis para ver que acción debe tomar)
+# ‘all’  significa que debe eliminar la fila donde todos sus datos estén vacíos. además puede recibir otros parámetros.
 subset = dataframe[['Overall', 'Age', 'International Reputation', 'Weak Foot', 'Skill Moves']].dropna(axis=0, how='any')
 ```
 Ahora si calculamos la media y desviacion estandar todos los valores estaran llenos
@@ -253,6 +261,7 @@ norm
 - Aproximaciones intuitivas
 ```python
 # vamos a traer los buenos jugadores
+# torch.ge() --> ge = GreaterEqual (>=)
 godd = data[torch.ge(target, 85)]
 average = data[torch.gt(target, 70) & torch.lt(target, 85)]
 notSoGood = data[torch.le(target, 70)]
@@ -267,3 +276,71 @@ notSoGoodMean = torch.mean(notSoGood, dim=0)
 # Vamos a iterar un indice y los argumentos
 for i, args in enumerate(zip(columns, goodMean, averageMean, notSoGoodMean)):
     print('{:25} {:6.2f} {:6.2f} {:6.2f}'.format(*args))
+```
+
+## Implementación de regresión lineal
+```python
+import torch
+import numpy as np
+import torch.nn as nn # para implementar la regresion lineal(de redes neuronales)
+import torch.optim as optim # es de optimizaciones para calculas los gradientes y hacer un Backpropagation
+import matplotlib.pyplot as plt # para graficar
+```
+```python
+car_prices = [5, 6, 7, 8, 9, 10]
+units_sold = [5.5, 8, 7.5, 7.0, 6.5, 6.0]
+# lo graficamos
+plt.scatter(car_prices, units_sold)
+```
+```python
+# Convertiremos este arreglo de python a un arreglo de numpy
+# la intencion de esta conversion (python -> numpy -> tensor) es que se aclare el proceso de conversion de datos
+prices_array = np.array(car_prices).reshape(-1, 1)
+# el arreglo que se tenia antes ahora tiene un formato distinto 
+prices_array
+# Esto va a servir para cuando se envia a pytorch y convertirlo en un tensor
+```
+```python
+# Se convertiran en tensores los dos casos
+# del metodo requires_grad_(True) el ultimo guiob bajo '_' va a modificar el arreglo que vamos a usar para convertir a un tensor
+# y el tensor es el que sufre esta modificacion, por lo tanto va quedar de una vez con los gradientes activados 
+prices = torch.from_numpy(prices_array).float().requires_grad_(True)
+# Las units no necesitan los gradientes por que son el target a explicar
+units = torch.from_numpy(units_array).float()
+prices, prices.shape
+```
+```python
+# Nuestro modelo es un modelo lineal
+model = nn.Linear(1, 1)
+# luego se tiene que definir la perdida
+loss_function = nn.MSELoss()
+# y por ultimo definir el optimizador
+# Stochastic Gradient Descent(SGD) es decir que no se trabajo con el dataset completo ni con un solo dato, se ultiliza un puto intermedio
+# El learning rate (lr) son los pasos que se ban dando en busca de minimizar el loss atravez des gradiente(es uno de los hiperparametros que se pueden calibrar)
+optimizer = optim.SGD(model.parameters(), lr=0.015)
+losses = []
+iterations = 2000 #es algo que puede calibrarse
+# Se graficaran los loss vs numero de iteraciones
+for i in range(iterations):
+  pred = model(prices)
+  # en el loss se le envia la prediccion junto con el taget(cuanto estoy adivinando y cuanto es en realidad)
+  loss = loss_function(pred, units)
+  losses.append(loss.data)
+  # se van a reiniciar los gradientes 
+  # La razon es que pytorch acumula, si no hacemos esto el resultado no va a ser el que buscamos por que los gradientes se siguen acumulando por cada iteracion
+  optimizer.zero_grad()
+  # backpropagation
+  loss.backward()
+  # Despues vamos a ahcer un step, es decir, en base a los gradientes que se calcularon me muevo un poco en direccion del minimo
+  optimizer.step()
+  # Esto seria nuestro tranding loop (estamos entrenado el modelo)
+
+print(float(loss))
+plt.plot(range(iterations), losses)
+```
+```
+# Cuando un modelo ya a sido entrenado ahora deberia de poder predecir 
+x = torch.Tensor([[4.0]])
+p = model(x)
+p
+```
