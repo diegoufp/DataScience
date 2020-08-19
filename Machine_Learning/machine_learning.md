@@ -161,3 +161,109 @@ numpyArray = np.random.randn(2,2)
 torch.from_numpy(numpyArray)
 ```
 
+## Representando datasets con tensores
+
+```python
+import torch
+import numpy as np
+numpyArray = np.random.randn(2,2)
+# Se puede crear un tensor nuevo apartir de este arreglo
+from_numpy = torch.from_numpy(numpyArray)
+```
+
+- Media
+```python
+# El resultado sera la media del tensor pero sera un solo numero.
+torch.mean(from_numpy)
+# Tambien se puede calcular atravez de dimenciones
+torch.mean(from_numpy, dim=0) # dimencion 0
+torch.mean(from_numpy, dim=1) # dimencion 1
+```
+
+- Desviacion estandar
+```python
+torch.std(from_numpy, dim=1)
+```
+
+- Guardar el tensor
+```python
+torch.save(from_numpy, 'tensor.t')
+```
+
+- Cargar tensor
+```python
+load = torch.load('tensor.t')
+```
+
+En este [url](https://raw.githubusercontent.com/amanthedorkknight/fifa18-all-player-statistics/master/2019/data.csv 'url') es un dataset.
+
+Usaremos un metodo de pandas para que todo ese contenido se carge a una variable.
+
+```python
+import pandas as pd
+# DataFrame es una representacion de filas y columnas
+url = 'https://raw.githubusercontent.com/amanthedorkknight/fifa18-all-player-statistics/master/2019/data.csv'
+dataframe = pd.read_csv(url)
+dataframe
+```
+```python
+# Para ver cuales son las columnas
+dataframe.columns
+```
+```python
+subset = dataframe[['Overall', 'Age', 'International Reputation', 'Weak Foot', 'Skill Moves']]
+columns = subset.columns[1:]
+# La informacion de los jugadores se pasa a un tensor 
+# Especificando de este subset los valores y convertirlo a flotante para que sea mas facil es calculo de operaciones
+players = torch.tensor(subset.values).float()
+# El shape me va a dar el tama;o
+players.shape, players.type()
+```
+```python
+# Vamos a mostrar las columnas de interes
+data = players[:, 1:]
+data, data.shape
+```
+```python
+# Vamos a mostrar la primera columna
+target = players[:, 0]
+target, target.shape
+```
+En esta ocacion pueden existir jugadores que no tengan cierta informacion, para evitar que en las operaciones te pueda salir un 'Nan' vamos a hacer lo siguiente:
+```python
+# Vamos a regresar a donde creamos el subset
+# Agregamos que elimine los valores en el eje de las filas cuando cualquiera sea null o no exista
+# Esto se hace con dropna
+subset = dataframe[['Overall', 'Age', 'International Reputation', 'Weak Foot', 'Skill Moves']].dropna(axis=0, how='any')
+```
+Ahora si calculamos la media y desviacion estandar todos los valores estaran llenos
+```python
+mean= torch.mean(data, dim=0)
+std = torch.std(data, dim=0)
+```
+- Normalizar los datos
+```python
+# Los datos lo vamos a normalizar restandole a la media a cada elemento y luego dividiendo por el cuadrado de la desviacion estandar.
+# la funcion de cuadrado tambien esta presente en la biblioteca pytorch
+norm = (data - mean)/torch.sqrt(std)
+norm
+# Ahora ya todo estan en un mismo rango 
+```
+
+- Aproximaciones intuitivas
+```python
+# vamos a traer los buenos jugadores
+godd = data[torch.ge(target, 85)]
+average = data[torch.gt(target, 70) & torch.lt(target, 85)]
+notSoGood = data[torch.le(target, 70)]
+
+goodMean = torch.mean(good, dim=0)
+averageMean = torch.mean(average, dim=0)
+notSoGoodMean = torch.mean(notSoGood, dim=0)
+```
+```python
+# vamos a imprimirlo mas bonito con esta funcion
+# El zip une multiples variables y va a ser un argumento para enumerate(para iterar)
+# Vamos a iterar un indice y los argumentos
+for i, args in enumerate(zip(columns, goodMean, averageMean, notSoGoodMean)):
+    print('{:25} {:6.2f} {:6.2f} {:6.2f}'.format(*args))
