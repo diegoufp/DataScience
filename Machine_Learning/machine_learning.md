@@ -65,4 +65,99 @@ La derivada parcial nos va a servir para entontrar el gradiente que nos va a dec
 - Al calcular el error(loss), el gradiente nos ayuda a buscar el mínimo
 - Es necesario calibrar el valor de learning rate
 
+## Pytorch
+
+PyTorch es un framework, va a ser nuestro apoyo con características importantes como múltiples funciones que nos ayudan en la construcción de nuestro modelo. Implementaremos una regresión lineal y otras aproximaciones de modelos de clasificación, para cada uno de estos casos utilizaremos módulos del framework.
+
+Al trabajar con PyTorch o algún framework de ML nuestra herramienta principal son los tensores.
+
+Un tensor no es más que una generalización, no es más que una estructura de datos que nos permite representarlo de manera genérica
+
+[Google Collaboratory](https://colab.research.google.com/notebooks/intro.ipynb "Google Collaboratory") es una implementación de Jupyter Notebooks que esta en la nube. No requerimos configurar nada.
+
+**Proceso de aprendizaje**
+
+- Forward pass(prediccion)
+- Backpropagation(iterarcion)
+- Optimización
+
+## Trabajando con tensores
+
+[Google Collaboratory](https://colab.research.google.com/notebooks/intro.ipynb "Google Collaboratory") es una implementación de Jupyter Notebooks que esta en la nube. No requerimos configurar nada.
+
+Creamos una 'new notebook'
+
+```python
+import torch
+```
+```
+torch.__version__
+```
+```python
+tensor_a = torch.ones(2, 2)
+# V a dar de resultado un tensor de dimencion 2 x 2 que tiene unicamnete 1's
+tensor_a
+```
+```python
+# Podemos llamarlo tambien con un metodo llamato Tensor
+tensor_b = touch.Tensor(2, 2)
+# V a tener dos valores aleatorios
+print(tensor_b)
+# Vamos a hacer un metodo que uniforme de tal manera que los valores sean entre 0 y 1
+tensor_b.uniform_(0, 1)
+```
+```python
+# Podemos crear un tensor con valores aleatorios de otra amnera
+tensor_c = torch.rand(2, 2)
+# El metodo rand si lo genera entre 0 y 1
+tensor_c
+```
+```python
+# Tambien se pueden hacer operaciones
+result = tensor_b + tensor_c
+result
+```
+```python
+# Con el metodo shape se puede imprimir
+result.shape
+reshaped = result.view(4, 1)
+```
+```python
+# Vamos a crear un numero tensor ahora no sera aleatorio se creara con el metodo tensor con 't' minuscula
+points = torch.tensor([1.0, 2.0],[3.0, 4.0])
+print(points)
+# Para imprimir un solo valor se puede hacer lo mismo que una matriz
+points[0][1]
+# Y para modificar 
+points[0][1] = 2.5
+print(points)
+#Como se tienen multiples dimenciones esto se puede guardar de diferentes maneras
+# Si quieres sabe de que forma esta guardado se utiliza el metodo storage
+points.storage()
+```
+```python
+points, points.stride()
+```
+```python
+# SI lo trasponemos cambiara el stride
+p_t = points.t()
+p_t, p_t.stride()
+```
+```python
+# Podemos agregar dimeciones
+tensor_x = torch.tensor([1, 2, 3, 4])
+# Con el metodo unsqueeze se pueden agregar dimenciones
+torch.unsqueeze(tensor_x, 0)
+# Si en lugar de un 0 ponemos un 1 la forma en que se agrega la dimecion es vertical, esto nos va a servir cuando estemos manipulando imagenes
+torch.unsqueeze(tensor_x, 1)
+```
+
+- Interaccion con numpy
+
+```python
+import numpy as np
+numpyArray = np.random.randn(2,2)
+# Se puede crear un tensor nuevo apartir de este arreglo
+torch.from_numpy(numpyArray)
+```
 
