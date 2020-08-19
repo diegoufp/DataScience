@@ -47,3 +47,22 @@ Usar el modelo para realizar predicciones
 Para construir un modelo usamos las variables de entrada siendo necesario normalizar una para tener una representación numérica y construimos una ecuación.
 
 La diferencia que puede haber entre el resultado y el valor real debemos tratar de que no exista para que la predicción sea lo más cercana posible al valor real, no será al 100%, pero la diferencia o pérdida debe ser baja. Para llegar a eso debemos escoger el peso correcto.
+
+## Training &amp; Loss
+Hablaremos del proceso de entrenamiento y cómo minimizar la pérdida. Queremos que nuestro modelo quede de la mejor forma posible.
+
+Nuestro objetivo es minimizar la pérdida.
+
+Para calcular el error usamos una fórmula llamada MSE(Mean Squared Error). Para minimizar la diferencia usamos el **gradiente**, el gradiente es un vector por lo tanto tiene direccion y magnitud, y se va a calcular con una **derivada parcial**.
+
+La derivada parcial nos va a servir para entontrar el gradiente que nos va a decir en que direccion y cuanto debemos movernos. Eventualmente eso me va a dar un siguiente punto y se va a repetir el proceso hasta llegar al punto minimo. Cada paso va a tener un tama;o eso va a depender mucho de a algo llamado **learning rate**, la taza a la que el modelo va  aprender es un hiperparametro y ese hiperpasamegro va a decir que tan peque;os o grandes son los pasos que estamso dando. Este learning rate lo tenemos que definir de tal forma que llegemos de forma eficiente al minimo.
+
+**Stochastic Gradient Descent(SGD)**: Es estocástico porque será aleatorio y tenemos opciones para realizar el gradiente en busca del mínimo. ¿Deberíamos calcular el gradiente de todo el dataset? Puede ser más eficiente elegir ejemplos aleatorios. Un solo ejemplo es muy poco, trabajamos con un batch.
+
+**El proceso de aprendizaje** requiere iniciar los pesos de los valores para calcular la pérdida que estamos teniendo, con la ecuación vista tendremos una idea de qué tan lejos está nuestra predicción de lo real y así evaluar el desempeño de nuestro modelo. Repetimos utilizando el gradiente como referencia para acércanos al peso donde podemos minimizar la pérdida.
+
+- La fase de entrenamiento es un proceso iterativo
+- Al calcular el error(loss), el gradiente nos ayuda a buscar el mínimo
+- Es necesario calibrar el valor de learning rate
+
+
