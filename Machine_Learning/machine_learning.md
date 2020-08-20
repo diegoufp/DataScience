@@ -344,3 +344,23 @@ x = torch.Tensor([[4.0]])
 p = model(x)
 p
 ```
+
+## Regresion logica
+
+**Regresion logistica**
+Son un mecanismo eficiente para calcular probabilidades. El resultado puede utilizarse tal cual o convertirlo a una categoria binaria(para clasificar).
+
+**Garantizando resultado[0,1] entre cero y uno**
+Para una clasificacion bunaria, nos apoyamos en una funcion matematica llamada **Sigmoide**. Si en caso la clasificacion tuviera mas parametros, hariamos uso de la funcion **Softmax**.
+
+**Funcion Sigmoid**: y = 1/(1+(e)**-z)
+
+A la relacion lineal se le va  agregar este sigmoide que va a dar una probabilidad y asi se resuelve el problema de pasar de una regresion lineal(que esta en el dominio continuo) a una regresion(logistica que esta en el dominio discreto).
+
+Por este cambio el **MSE** ya no va a ser la mejor forma de calcular el **Loss**, asi que el loss function tambien debe cambiar. La aproximacion intuitiva es castigar cuando el valor es 0 y la prediccion resulta en 1 (o viceversa).  Esto se logra con el logaritmo porque nos permite modelarlo perfectamente y ahora nuestra función de pérdida o LOSS va a incluir logaritmos **Binary Cross Entropy** o **Log Loss**.
+
+- Para problemas de probabilidad, utilizamos una regresión logística
+- Para calcular el error(loss), nos basamos en la entropía pero el gradiente sigue siendo útil
+
+
+
