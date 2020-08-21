@@ -430,7 +430,7 @@ class QuotesSpider(scrapy.Spider):
             # 2.callback el cual es una funcion que se va a ejecutar luego de hacer la requests a ese link en esta ocacion es la misma que tenemos escrita 'parse'
             yield response.follow(next_page_button_link, callback=self.parse)
 ```
-Y finalmete lo ejecutamos de manera normal por que ya creamos la configuracion para que se guarde automaticamente dentro del spider
+Y finalmete lo ejecutamos
 ```
 scrapy crawl quotes -o quotes.json
 ```
