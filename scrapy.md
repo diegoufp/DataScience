@@ -332,3 +332,40 @@ Y lo ejecutamos
 ```
 scrapy crawl quotes
 ```
+
+## Guardando los datos 
+Para guardar los datos ya sea en formato csv, json u otro debo convertir al metodo parse en un generador haciendolo de la siguiente manera:
+```python
+import scrapy
+
+# Titulo = //h1/a/text()
+# Citas = //span[@class="text" and @itemprop="text"]/text()
+# Top ten tags = //div[@class="row"]/div[contains(@class, "tags-box")]/span[@class="tag-item"]/a/text()
+
+class QuotesSpider(scrapy.Spider):
+    name = 'quotes'
+    start_urls = [
+        'http://quotes.toscrape.com/'
+    ]
+
+    def parse(self, response):
+        title = response.xpath('//h1/a/text()').get()
+        quotes = response.xpath('//span[@class="text" and @itemprop="text"]/text()').getall()
+        top_ten_tags = response.xpath('//div[@class="row"]/div[contains(@class, "tags-box")]/span[@class="tag-item"]/a/text()').getall()
+    # con yield convertiremos esta funcion en un gerador 
+        yield {
+            'title': title,
+            'quotes': quotes,
+            'top_ten_tags': top_ten_tags
+        }
+```
+En la consola de comandos utilizaremos el mismo comando para llamar  auna spider `scrapy crawl quotes` pero esta vez se le hagregaran parametros adicionales para guardar la informacion en el formato que queramos:
+```
+scrapy crawl quotes -o quotes.json
+```
+Si quisieramos que el archivo se genere en csv:
+```
+scrapy crawl quotes -o quotes.csv
+```
+
+Si vuelvo a ejecutar el comando anterior ya existiendo ese archivo lo que realizara scrapy es un append al archivo existente, para solucionar este problema y no tener datos duplicados unicamente debo borrar el archivo antes de ejecutar el comando.
