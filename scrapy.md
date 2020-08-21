@@ -333,7 +333,8 @@ Y lo ejecutamos
 scrapy crawl quotes
 ```
 
-## Guardando los datos 
+## [Guardando los datos](https://translate.googleusercontent.com/translate_c?depth=1&hl=es&prev=search&pto=aue&rurl=translate.google.com&sl=en&sp=nmt4&u=https://docs.scrapy.org/en/latest/topics/feed-exports.html&usg=ALkJrhiBLXna-9v0gpyPNZg3zq9qvPgBeA#settings "Guardando los datos") 
+
 Para guardar los datos ya sea en formato csv, json u otro debo convertir al metodo parse en un generador haciendolo de la siguiente manera:
 ```python
 import scrapy
@@ -369,3 +370,68 @@ scrapy crawl quotes -o quotes.csv
 ```
 
 Si vuelvo a ejecutar el comando anterior ya existiendo ese archivo lo que realizara scrapy es un append al archivo existente, para solucionar este problema y no tener datos duplicados unicamente debo borrar el archivo antes de ejecutar el comando.
+
+## Seguir links: response.follow
+
+Si alguien busca una herramienta con la cual puedan dar “clicks” de forma automática o ingresar labels para enviar formularios, puede investigar la herramienta SELENIUM de Python.
+Es muy útil para extraer datos de esta manera. Tiene algunas cuantas limitaciones como la resolución de Captchas, por ejemplo.
+
+Aunque para mi, selenium es solo recomendable si se cumplen estas dos condiciones:
+
+- No existe el atributo href que te permita ir a la siguiente pagina.
+- La url es un desastre, es decir que tenemos que renegar mucho con expresiones regulares como para tener una lista de todas las urls.
+
+### Presionar botones con scrapy
+En la terminald e comandos
+```
+scrapy shell "http://quotes.toscrape.com/"
+```
+Cuando carge buscamos el boton con xpath
+```
+response.xpath('//ul[@class="pager"]/li[@class="next"]/a/@href').get()
+```
+Si todo resulto de manera correcta este deberia ser el resultado `'/page/2/'` lo cual infica que cambio de pagina.
+
+### Escribiendo el spider
+```python
+import scrapy
+
+# Titulo = //h1/a/text()
+# Citas = //span[@class="text" and @itemprop="text"]/text()
+# Top ten tags = //div[@class="row"]/div[contains(@class, "tags-box")]/span[@class="tag-item"]/a/text()
+# Next page button = //ul[@class="pager"]/li[@class="next"]/a/@href
+
+class QuotesSpider(scrapy.Spider):
+    name = 'quotes'
+    start_urls = [
+        'http://quotes.toscrape.com/'
+    ]
+
+    def parse(self, response):
+        # En esta ocacion modificaremos el metodo parse para inticarle a python que siga el link de next
+
+        title = response.xpath('//h1/a/text()').get()
+        quotes = response.xpath('//span[@class="text" and @itemprop="text"]/text()').getall()
+        top_ten_tags = response.xpath('//div[@class="row"]/div[contains(@class, "tags-box")]/span[@class="tag-item"]/a/text()').getall()
+    # con yield convertiremos esta funcion en un gerador 
+        yield {
+            'title': title,
+            'quotes': quotes,
+            'top_ten_tags': top_ten_tags
+        }
+
+        next_page_button_link = response.xpath('//ul[@class="pager"]/li[@class="next"]/a/@href').get()
+        # Agregaremos un if para saber si el boton existe
+        if next_page_button_link:
+            # el metodo follow del objeto response lo que hace es tomar la url absoluta
+            # y automaticamente a;adir lo que tenemos despues.
+            # este metodo follow lleva dos parametros
+            # 1.El link que nosotros vamos a seguir 
+            # 2.callback el cual es una funcion que se va a ejecutar luego de hacer la requests a ese link en esta ocacion es la misma que tenemos escrita 'parse'
+            yield response.follow(next_page_button_link, callback=self.parse)
+```
+Y finalmete lo ejecutamos de manera normal por que ya creamos la configuracion para que se guarde automaticamente dentro del spider
+```
+scrapy crawl quotes -o quotes.json
+```
+
