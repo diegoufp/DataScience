@@ -581,3 +581,37 @@ Y en la terminar de comandos se agregara el argumento
 ```
 rm quotes.json | scrapy crawl quotes -a top=3 -o quotes.json
 ```
+
+## Configuraciones utiles
+
+```python
+# CONCURRENT_REQUESTS nos permite establecer un numero entero apartir delcual scrapy va a iniciar una serie de peticiones teniendo en cuenta ese numero, es decir en esta ocacion le estamos diciendo a scrapy que realize 24 peticiones a la vez como maximo.
+
+# MEMUSAGE_LIMIT_MB La cantidad de memoria ram que le permitimos usar a scrapy para trabajar, muy util en servidores en la nube.
+
+# MEMUSAGE_NOTIFY_MAIL una lista de mails a los cuales notificara si la memoria ram llega a su limite o se pasa de el
+
+# ROBOTSTXT_OBEY Decirle si va a obedecer o no al archivo robots.txt True o False
+
+# USER_AGENT la cabecera http que esta en la peticion a la que le indicamos a sitio web quieres somo nosotros 
+custom_settings = {
+    'FEED_URI': 'quotes.json',
+    'FEED_FORMAT': 'json',
+    'CONCURRENT_REQUESTS': 24
+    'MEMUSAGE_LIMIT_MB': 2048, 
+    'MEMUSAGE_NOTIFY_MAIL': ['notiene@gmail.com'],
+    'ROBOTSTXT_OBEY': True,
+    'USER_AGENT': 'PepitoMartinez',
+    'FEED_EXPORT_ENCODING': 'utf-8'
+}
+```
+
+## Intelligence Agency
+
+[CIA](https://www.cia.gov/index.html "CIA")
+
+En la pagina de la [CIA](https://www.cia.gov/index.html "CIA") no hay una clausula donde diga que no se puede hacer web scrapyng y tampoco existe un archivo robots.txt. Asi que nada impide extraer archivos [clasificados](https://www.cia.gov/library/readingroom/historical-collections "clasificados")
+
+```
+response.xpath('//a[starts-with(@href, "collection") and (parent::h3|parent::h2)]/@href').getall()
+```
