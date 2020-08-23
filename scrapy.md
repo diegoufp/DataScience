@@ -435,3 +435,70 @@ Y finalmete lo ejecutamos
 scrapy crawl quotes -o quotes.json
 ```
 
+## Miltiples callbacks
+
+Se solucionara el error donde se repide informacion modificando el codigo del tema anterior.
+
+```python
+import scrapy
+
+# Titulo = //h1/a/text()
+# Citas = //span[@class="text" and @itemprop="text"]/text()
+# Top ten tags = //div[@class="row"]/div[contains(@class, "tags-box")]/span[@class="tag-item"]/a/text()
+# Next page button = //ul[@class="pager"]/li[@class="next"]/a/@href
+
+class QuotesSpider(scrapy.Spider):
+    name = 'quotes'
+    start_urls = [
+        'http://quotes.toscrape.com/'
+    ]
+
+    # Se creara un nuevo metodo de tipo parse
+    # Este metodo va a extraer exclusivamente las sitas no va a extraer los titulos no va a extraer las tags
+    # Se recibiran los kwars que se estan enviando al metodo response.follow
+
+    def parse_only_quotes(self, response, **kwargs):
+        new_quotes = response.xpath(
+            '//span[@class="text" and @itemprop="text"]/text()').getall()
+        kwargs["quotes"].extend(new_quotes)
+
+        next_page_button_link = response.xpath(
+            '//ul[@class="pager"]//li[@class="next"]/a/@href').get()
+        if next_page_button_link:
+            yield response.follow(
+                next_page_button_link,
+                callback=self.parse_only_quotes,
+                cb_kwargs=kwargs
+            )
+        else:
+            yield kwargs
+
+    def parse(self, response):
+        title = response.xpath('//h1/a/text()').get()
+
+        quotes = response.xpath(
+            '//span[@class="text" and @itemprop="text"]/text()').getall()
+
+        tags = response.xpath(
+            '//div[contains(@class, "tags-box")]/span[@class="tag-item"]/a/text()').getall()
+
+        next_page_button_link = response.xpath(
+            '//ul[@class="pager"]//li[@class="next"]/a/@href').get()
+         # el metodo follow del objeto response lo que hace es tomar la url absoluta
+            # y automaticamente a;adir lo que tenemos despues.
+            # este metodo follow lleva dos parametros
+            # 1.El link que nosotros vamos a seguir 
+            # 2.callback el cual es una funcion que se va a ejecutar luego de hacer la requests a ese link en esta ocacion es la misma que tenemos escrita 'parse'
+            # En esta ocacion se le puede agregar un nuevo metodo 
+            # A este nuevo argumento se le enviaran las citas de las primera pagina y se hace con el atributo cb_kwargs
+        if next_page_button_link:
+            yield response.follow(
+                next_page_button_link,
+                callback=self.parse_only_quotes,
+                cb_kwargs={
+                    "title": title,
+                    "quotes": quotes,
+                    "top_ten_tags": tags,
+                }
+            )
+```
