@@ -612,6 +612,64 @@ custom_settings = {
 
 En la pagina de la [CIA](https://www.cia.gov/index.html "CIA") no hay una clausula donde diga que no se puede hacer web scrapyng y tampoco existe un archivo robots.txt. Asi que nada impide extraer archivos [clasificados](https://www.cia.gov/library/readingroom/historical-collections "clasificados")
 
+Inicias scapy en la terminal de comandos
+```
+scrapy shell 'https://www.cia.gov/library/readingroom/historical-collections'
+```
 ```
 response.xpath('//a[starts-with(@href, "collection") and (parent::h3|parent::h2)]/@href').getall()
+```
+Para cambiar a otra url cuando ya se inicio scrapy en la terminal de comandos 
+```
+fetch('https://www.cia.gov/library/readingroom/collection/lunik-loan-space-age-spy-story')
+```
+```
+response.xpath('//h1[@class="documentFirstHeading"]/text()').get
+```
+```
+response.xpath('//div[@class="field-item even"]//p[not(@class)]/text()').get()
+```
+### Se escribe el spider de la CIA
+
+```python
+import scrapy
+
+# XPATH
+
+# links = //a[starts-with(@href, "collection") and (parent::h3|parent::h2)]/@href
+
+# title = //h1[@class="documentFirstHeading"]/text()
+
+# paragraph = //div[@class="field-item even"]//p[not(@class)]/text()
+
+class SpiderCIA(scrapy.Spider):
+    name = 'cia'
+    start_urls = [
+        'https://www.cia.gov/library/readingroom/historical-collections'
+    ]
+
+    custom_settings = {
+        'FEED_EXPORT_ENCODING': 'utf-8'
+    }
+
+    def parse(self, response):
+        links_desclassified = response.xpath('//a[starts-with(@href, "collection") and (parent::h3|parent::h2)]/@href').getall()
+        for link in links_desclassified:
+            # Lo que va a hacer response.urljoin es convinar la url absoluta de donde estaban los archivos desclasificados con la url relativa que nos da el 'link' del for
+            yield response.follow(link, callback=self.parse_link, cb_kwargs={'url': response.urljoin(link)})
+
+    def parse_link(self, response, **kwargs):
+        link = kwargs['url']
+        title = response.xpath('//h1[@class="documentFirstHeading"]/text()').get()
+        paragraph = response.xpath('//div[@class="field-item even"]//p[not(@class)]/text()').get()
+
+        yield{
+            'url': link,
+            'title': title,
+            'body': paragraph
+        }
+
+```
+```
+scrapy crawl cia -o cia.json
 ```
