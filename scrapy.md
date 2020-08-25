@@ -706,3 +706,19 @@ Para salir de la cuenta en la terminal de comandos logeada
 ```
 shub logout
 ```
+### automatizar procesos con la API
+
+Tambien se pueden [automatizar procesos con la API de scrapy](https://doc.scrapinghub.com/scrapy-cloud.html "API de scrapy") por terminal.
+
+curl verificara si esta revocado el certificado por este motivo puede dar error para evitarle se le agrega la bandera
+```
+--ssl-no-revoke
+```
+quedando asi para automatizar un proceso desde terminal.
+```
+curl -u KEY:https://app.scrapinghub.com/api/run.json -d project=PROJECT-d spider=cia --ssl-no-revoke
+```
+Para descargar la informacion capurada del spider
+```
+curl -u APIKEY: https://app.scrapinghub.com/items/PROYECT_ID/SPIDER_NUMER/JOB_NUMBER
+```
