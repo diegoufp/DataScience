@@ -171,3 +171,76 @@ print(np.mean(y_alterado))
 print(np.median(y))
 print(np.median(y_alterado))
 ```
+## Diagramas de frecuencia 
+
+Los Diagramas de freciencia o Histogramas son representaciones de las categorias y de los numero que puede tomar una variable aleatoria.
+
+### Variables para Histogramas
+- Variables categoricas: Tablas de frecuencia
+
+- Variables numericas: Percentiles, Deciles, Quintiles y Quartiles, outliers o valores extremos
+
+En este artículo les ayudara a entender el por qué se usar el 1.5 como factor de escalamiento del [IQR](https://medium.com/mytake/why-1-5-in-iqr-method-of-outlier-detection-5d07fdc82097 "IQR")
+
+```python
+import pandas as pd
+import numpy as np
+import scipy
+import scipy.stats
+import matplotlib.pyplot as plt # va a permitir graficar 
+
+df = pd.read_csv('nombre_del_archivo.csv')
+df.columns
+# frecuencias para variables categoricas
+ycat = df['una_columna']
+# Transformar la varibles en un valor categorico
+ycat = ycat.apply(lambda x: 'Cat-' + str(int(x)))
+# Encontrar las frecuencias asociadas a la primera varibale 
+valores, conteo_freq = np.unique(ycat, return_counts = True)
+valores, conteo_freq
+# Dise;ar una tabla con los valores encontrados 
+tabla_frecuencias = dict(zip(valores, conteo_freq))
+tabla_frecuencias
+
+# Variable numerica
+ynum = df['una_de_las_variables'].copy()
+np.min(ynum), np.max(ynum)
+# Identificar los valores que acumulan un x porciento de probabilidad en los datos
+np.percentile(ynum, q=100) # <- esto es igual a np.max(ynum)
+np.percentile(ynum, q=0) # <- esto es igual a np.min(ynum)
+np.percentile(ynum, q=50) # <- esto es igual a la mediana np.median(ynum)
+
+# Identificar los cuartiles
+# Los cuales son una medida muy similar a los percentiles pero cuando estamos parados en unos valores puntules acumulan cierta probabilidad 
+valores = [0,25,50,75,100]
+np.percentile(ynum, q= valores)
+
+# Podemos llamr quintiles a aquellos valores que dividen la varible en 5 grupos 
+valores = [0,20,40,60,80,100]
+np.percentile(ynum, q= valores)
+
+# Deciles
+valores = list(range(0,110,10))
+np.percentile(ynum, q= valores)
+
+# Valores atipicos estan muy asociados a los percentiles
+y = df['variable_de_interes']
+# describe es una funcion que permite en una sola linea ver la cuenta, media, desviacion estandar y los cuartiles
+y.describe()
+
+# outlier = valor atipico
+# todo todo valor que caiga por fuera del rango rega considerado un aoutlier
+Q1 = np.percentile(ynum, q = 25)
+Q3 = np.percentile(ynum, q = 75)
+
+RI = Q3 - Q1
+limit_inf = Q1-1.5*RI
+limit_sup = Q3+1.5*RI
+
+[limit_inf, limit_sup]
+
+# Para hacer un histograma haremos uso de la libreria matplotlib.pyplot
+%matplotlib inline
+plt.hist(y)
+
+```
