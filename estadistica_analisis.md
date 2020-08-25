@@ -71,6 +71,15 @@ continuos, porcentajes y enteros
 - Categorios 
 Categoricas ordinales(fechas) y clases sin sentido ordinal.
 
+### Medidas de terncencia central
+- Media o primedio geometrico y aritmetico
+- Mediana
+- Moda
+
+### Mediada de dispersion
+- Desviacion estandar
+Que tanto se alejan uno de los valores x y de su valor promedio.
+
 ### Variables
 
 - Deterministico
@@ -94,6 +103,8 @@ El calculo de probabilidad siempre debe estar dentro del rango de 0 o 1 nunca ma
 import numpy as np
 import datetime
 from datetime import date
+import scipy
+import scipy.stats
 from scipy.stats import bernoulli
 from scipy.stats import binom
 import pandas as pd
@@ -117,4 +128,46 @@ pd.Series(binom.rvs(p=p_cara, n = 10, size= 100))
 pd.Series(binom.rvs(p=p_cara, n = 10, size= 100)).value_counts()
 # Y si los queremos convertirlos a probabilidad simplemente los tenemos que dividir sobre el total de casos 
 pd.Series(binom.rvs(p=p_cara, n = 10, size= 100)).value_counts()/100
+
+# Medidas de tendencia central
+
+df = pd.read_csv('nombre_del_archivo.csv')
+df.columns
+y = df['una_de_las_columnas'].values
+# Limpiar los valores de 0
+y = np.where(y == 0, 1, y)
+# El minimo
+np.min(y)
+# El maximo
+np.mx(y)
+# promedio: sum(yi)/n
+np.mean(y)
+# o
+np.sum(y)/len(y)
+# La medio geometrica
+scipy.stats.mstats.hmean(y)
+# La mediana
+np.median(y)
+# la moda no viene no esta tendro de numpy asi que debemos declararla 
+# moda = valor de 'y' con la maxima freciencia 
+moda = np.nan
+valores, conteo_valores = np.unique(y, return_counts = True)
+pos = np.argmax(conteo_valores)
+moda = valores[pos]
+
+# desviacion estantar
+np.std(y)
+
+# Revisiones
+# Lo que se quiere ver es que tanto cambian las medidas de tendecia central cuando se agregan valores extremos
+y_alterado = y.copy()
+y_alterado[ y_alterado == max(y_alterado) == 100000 ]
+# Esto demuestra de la media es una de las medidas que se ve afectada por valores extremos
+print(np.median(y))
+print(np.mean(y))
+print(np.mean(y_alterado))
+# En el caso de la mediana nos da exactamente el mismo valor
+# Hay medidas que pueden o no verse afectadas por valores extremos
+print(np.median(y))
+print(np.median(y_alterado))
 ```
