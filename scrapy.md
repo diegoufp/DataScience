@@ -673,3 +673,36 @@ class SpiderCIA(scrapy.Spider):
 ```
 scrapy crawl cia -o cia.json
 ```
+
+## Deploy en [Scrapy Cloud](https://www.scrapinghub.com/scrapy-cloud/ "Scrapy Cloud")
+
+Existe una nube hecha por las misma personas que trabajaron en scrapy para que los spider se puedan poner en internet para que los datos sean accesibles.
+
+Lo primero es crearse una cuenta, puedes registrarte con una cuenta de google o github.
+
+Ya cuando te hayas registrado tienes que `crear un nuevo proyecto`.
+Y despues el sitio te dara las intrucciones que tiene que hacer en la terminal de comandos.
+
+Tienes que estar en la carpeta del proyecto en la terminal de comandos.
+
+Este paquete de python nos permite logearnos de manera remota en la nube de scrapy y hacer el deploy efectivo de nuestro proyecto.
+```
+pip install shub
+```
+Este comando nos va a pedir una API key despues que esta no la dara en las intrucciones.
+```
+shub login
+```
+```
+shub deploy #####
+```
+Si no occurrio ningun error solo falta recargar la pagina del navegador y estaran los archivos subidos.
+
+En la pesta;a de `Dashboard` se encontraran tus spiders junto con la informacion del codigo.
+
+Para hacerlo accecible en la pesta;a de `Dashboard` , `Items`, boton `PUBLISH` y en la opcion de `publish dataset`. Despues es necesario el ingrear un logo para el dataset.
+
+Para salir de la cuenta en la terminal de comandos logeada
+```
+shub logout
+```
