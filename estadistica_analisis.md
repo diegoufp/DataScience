@@ -244,3 +244,56 @@ limit_sup = Q3+1.5*RI
 plt.hist(y)
 
 ```
+
+## Visualizacion de datos 
+
+```python
+import scipy.stats
+import numpy as np
+import pandas as pd
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Para poder visualizar los graficos en el ambiante de jupyter notebook
+%matplotlib inline
+
+df = pd.read_csv('nombre_Del_archivo.csv')
+df.columns
+
+# Variables Categoricas
+y = df['cuartil-a;o'].apply(lambda x: 'cuartil-' + str(int(x)))
+# Diagrama de barras
+# El orden de las barras python los organiza empezado de mayor frecuencia a menor frecuencia
+fig, ax = plt.subplots()
+ax.bar(y.value_counts().index, y.value_counts())
+ax.set_xlabel('Cuartiles del a;o')
+ax.set_ylabel('Frecuencia')
+
+# Se;alar un cuartil en particular
+fig, ax = plt.subplots()
+ax.bar(y.value_counts().index, y.value_counts())
+ax.set_xlabel('Cuartiles del a;o')
+ax.set_ylabel('Frecuencia')
+ax.patches[3].set_facecolor('red')
+
+# Diagrama de pastel
+fig, ax = plt.subplots()
+ax.pie(y.value_counts(), labels = y.value_counts().index)
+# Agregar un titulo
+ax.set_title('Diagrama de pie')
+
+# Variables Numericas
+y = df['variable']
+fig, ax = plt.subplots()
+ax.hist(y, bins = 30)
+ax.set_xlabel('Viento')
+ax.set_ylabel('Frecuencias')
+# Mediciones
+# c = color de la linea
+# linestyle = estilo de linea
+plt.axvline(np.mean(y), c = 'r', linestyle = '--', label = 'Promedio')
+plt.axvline(np.mean(y)+np.std(y), c = 'k', linestyle = '--', label = '+ 1-desviacion')
+plt.axvline(np.mean(y)-np.std(y), c = 'k', linestyle = '--', label = '- 1-desviacion')
+ax.legend()
+```
