@@ -297,3 +297,30 @@ plt.axvline(np.mean(y)+np.std(y), c = 'k', linestyle = '--', label = '+ 1-desvia
 plt.axvline(np.mean(y)-np.std(y), c = 'k', linestyle = '--', label = '- 1-desviacion')
 ax.legend()
 ```
+
+### Boxplot y scatterplot
+
+```python
+# Boxplot
+y = df['variable_de_interes']
+fig, ax = plt.subplots()
+ax.boxplot(x = y)
+# Boxplot que permita mapear el conportamiento de 2 variables
+sns.boxpot(x = 'primera_variable', y = 'segunda_varible', data= df)
+
+# Scatterplot
+# Visualizacion de puntos
+fig, ax = plt.subplots()
+ax.scatter(df['varible_uno'], df['varible_dos'])
+# La visualizacion de puntos al tener tantos valores puede ser un poco confusa para ello se puede utilizar un parametro
+# El parametro se llama alpha que ayuda a difuminar los puntos y permitir visualizar mas claramente la concentracion de los datos.
+ax.scatter(df['varible_uno'], df['varible_dos'], alpha = 0.03)
+ax.title('Distribucion conjunta')
+
+# Para agregarle color con gaussian_kde
+from scipy.stats import gaussian_kde
+xy = np.vstack(df['varible_uno'], df['varible_dos'])
+z = gaussian_kde(xy)(xy)
+fig, ax = plt.subplots()
+ax.scatter(df['varible_uno'], df['varible_dos'], c=z, label='var1 vs var2')
+```
