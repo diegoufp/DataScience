@@ -324,3 +324,73 @@ z = gaussian_kde(xy)(xy)
 fig, ax = plt.subplots()
 ax.scatter(df['varible_uno'], df['varible_dos'], c=z, label='var1 vs var2')
 ```
+
+## Teorema de Bayes
+
+El teorema de bayes nos permite inferir la probabilidad de un evento `a` cuando tenemos informacion parcial sobre este evento, condicionado a un segundo evento llamado `b` y la informacion total de la distribucion de probabilidad de este evento `b`.
+
+Se probaran 3 concentos claves:
+- Probabilidad univariada
+- Probabilidad conjunta bivariada 
+- Probabilidad condicional 
+
+Escenario:
+Tenemos 10 esferas cada una marcada con un numero de 1 a 3 y un color que puede ser negro o blanco.
+
+CSV
+```csv
+bola;color;numero
+1;blanco;1
+2;negro;1
+3;negro;1
+4;negro;1
+5;blanco;2
+6;negro;2
+7;negro;2
+8;blanco;3
+9;blanco;3
+10;negro;3
+```
+
+Python
+```python
+import scipy.stats
+import numpy as np
+import pandas as pd
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+%matplotlib inline
+
+df = pd.read_csv('juego-azar.csv', sep=';')
+df.columns
+
+# Probabilidades univariadas
+# HAremos un conteo
+df.numero.value_counts()
+# Para convertir el conteo en probabilidad se divide por el total de casos
+df.numero.value_counts()/len(df)
+# Calcular la probabilidad univariada de los colores
+df.color.value_counts()/len(df)
+
+# Probabilidad conjunta bivariadas
+# Realizamos una agrupacion con groupby() y un conteo con size()
+df.groupby(['numero', 'color']).size()
+# Para convertirlo en probabilidades
+df.groupby(['numero', 'color']).size()/len(df)
+
+# Probabilidad condicional 
+# P(A|B) = P('B'|2) = 1/3 = El numero de esferas blancas/ El numero total de esferas con el numero 2
+1/3
+
+# Teorema de Bayes
+# La utilidad de este teorema es para derivar analisis sobre 'A'(que es un evento particular) cuando no conocemos sus probabilidades individuales univariadas P(A)
+# Pero si tenemos informacion sobre el elemento condicionado P(A|B) y algunas probabilidades asociado a 'B' que sera P(B)
+# EL teorema de bayes nos permite llegar a la probabilidad de A con esta formula similar:
+#P(blanco) = P(p_blanca|1)*p(1) + P(p_blanca|2)*p(2) + P(p_blanca|3)*p(3)
+p_blanco =  (1/4)*(4/10) + (1/3)*(3/10) + (2/3)*(3/10)
+p_blanco
+
+# Para una representacion mas visual
+pd.crosstab(index=df.color, columns=df.numero, margins=True)/len(df)
+```
