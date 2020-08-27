@@ -394,3 +394,75 @@ p_blanco
 # Para una representacion mas visual
 pd.crosstab(index=df.color, columns=df.numero, margins=True)/len(df)
 ```
+
+## Funciones de distribución discreta y continua
+
+### Distribuciones discretas
+
+Cuando estamos habalndo de distribuciones discretas todo el **rango** de la funcion debe cumplir y contener a todos lo valores de `X` y cada uno de los valores de x no debe superar el valor de 1.
+
+El calculo de **probabilidad** de la variable aleatoria `X` sera puntualmente una probabilidad de `P(xi)` en la que `xi` ya es un valor puntual.
+
+**Calculo de probabilidad acumulada** es la suma de las probabilidades de tener una valor igual o menor a un `xi`.
+
+**Regla de completitud de Espacio** que es contemplar todos los valores posibles que puede tomar la variable aleatoria `X`, luego la sumatoria de todas la probabilidades del rango, de los diferentes valores que tiene x, y debe sumar simepre 1.
+
+Las medidas de tentecia central para una variable aleatoria como **Valor esperado** o promedio.
+
+La desviacion estandar que en este caso la llamaremos **Varianza**, que es cuadrado de las diferencia entre la media su valor `X`.
+
+Los elementos de **Distribuciones discretas** se tiene que validar dentro de una funcion de densidad continua.
+
+El **valor esperado** al igual que la **varianza** cumplen una serie de caracteristicas y una forma especifica a la hora de calcularse.
+
+```python
+import scipy.stats
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+%matplotlib inline
+from scipy.stats import binom
+
+# P es la probabilidad de exito
+# n es el numero de intentos para obtener el numero dado de exitos.
+
+p = 0.3
+n = 8
+x = list(range(0,9))
+# y contendra las probabilidades asociadas a los valores de x
+y = list([])
+
+for i in x:
+    # binom.pmf nos va a permitir calcular para x particulas su probabilidad asociada
+    # Esta funcion recibe como parametro p y el numero de intentos
+    y.append(binom.pmf(i, p=p, n=n))
+    
+# Generamos una grafica de esta probabilidades 
+fig, ax = plt.subplots()
+ax.bar(x,y)
+ax.set_ylabel('Probabilidad discreta')
+# El grafico contiene la distribucion de probabilidad de la variable y las alturas de dischas probabilidades nunca son superiores a 1 ni inferiores a 0
+
+# Corroborar Regla de completitud de Espacio, es decir que la suma de todas sus probabilidades de como resultado 1
+np.sum(y)
+
+# media 
+# Utilizando numpy usaremos el promedio ponderado, esto es por que debemos calcular el valor que va a tomar cada uno de los x de esta dritribucion ponderada por su probabilidad
+media = np.average(x, weights = y)
+# Varianza
+varianza = np.average(((x - media)**2), weights = y)
+
+# Para agregarlo al grafico 
+fig, ax = plt.subplots()
+ax.bar(x,y)
+ax.set_ylabel('Probabilidad discreta')
+ax.axvline(x = media, c = 'r', linestyle = '--', label = 'Valor Esperado')
+# Dentro de una distribucion normal encontramos que la gran mayoria de los valores en una distribucion caen dentro de los primeros 3 sigma a la izquierda y 3 sigma a la derecha de la media.
+# El concepto de six-sigma donde se espera que caigan el 99% de los datos 
+ax.axvline(x = media + 3*np.sqrt(varianza), c = 'r', linestyle = '--', label = 'Desviacion Estandar')
+ax.legend()
+```
+
+### Distribucion continua 
+
