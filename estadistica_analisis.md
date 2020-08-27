@@ -99,6 +99,7 @@ Casos totales
 
 El calculo de probabilidad siempre debe estar dentro del rango de 0 o 1 nunca mayor, nunca menor `0 < P(B) < 1`
 
+- Varibale de Bernoulli
 ```python
 import numpy as np
 import datetime
@@ -512,4 +513,93 @@ ax.plot(x,y)
 ax.set_title('Probabilidad continua')
 
 mean, var, skew, kurt = norm.stats(moments = 'mvsk')
+```
+
+## Distribuciones de mayor aplicación discretas y continuas
+
+### Discretas
+
+1. Distribucion de **Bernoulli** (Experimento Binario asociado a exito o fracaso)
+
+```python
+# Bernoulli
+import matplotlib.pyplot as plt
+from scipy.stats import bernoulli
+import seaborn as sns
+%matplotlib inline
+
+p = 0.3
+data = bernoulli.rvs(p, size=100)
+mean, var, skew, kurt = bernoulli.stats(p, moments='mvsk')
+mean, var, skew, kurt
+# Ver la forma de la distribucion
+ax = sns.distplot(data, bins=30, kde = False, color = 'blue')
+ax.set(xlabel= 'Distribucion Bernoulli', ylabel='Frecuencia')
+ax.axvline(x=mean, linestyle='--', label = 'Media')
+```
+
+2. Distribucion **Binomial**: Numero de exitos x en N ensayos.
+
+```python
+# Binomial
+import matplotlib.pyplot as plt
+from scipy.stats import binom
+import seaborn as sns
+%matplotlib inline
+
+p = 0.3
+# variable de exito
+n = 10
+data = binom.rvs(p=p, n=n, size=100)
+mean, var, skew, kurt = binom.stats(p=p,n=n, moments='mvsk')
+mean, var, skew, kurt
+# Graficamente
+ax = sns.distplot(data, bins=30, kde = False, color = 'blue')
+ax.set(xlabel= 'Distribucion Binomial', ylabel='Frecuencia')
+ax.axvline(x=mean, linestyle='--', label = 'Media')
+ax.legend()
+```
+
+3. Distribucion **Geometrica**: Numero de ensayos x hasta 1 exitos.
+
+```python
+# Geometrica
+import matplotlib.pyplot as plt
+# La geometrica es un caso particular de la distribucion binomial negativa
+from scipy.stats import nbinom
+import seaborn as sns
+%matplotlib inline
+
+p = 0.3
+n = 10
+data = nbinom.rvs(p=p, n=n, size=100)
+mean, var, skew, kurt = nbinom.stats(p=p,n=n, moments='mvsk')
+mean, var, skew, kurt
+# Graficamente
+ax = sns.distplot(data, bins=30, kde = False, color = 'blue')
+ax.set(xlabel= 'Distribucion Binomial Negativa', ylabel='Frecuencia')
+ax.axvline(x=mean, linestyle='--', label = 'Media')
+ax.legend()
+```
+4. Distribucion **Binomial Negativa**: Numero de ensayos x hasta el K-esimo exito.
+
+5. Distribucion de **Poisson**: Numero de llegdas en N a una longitud de tiempo.
+
+```python
+# Poisson
+import matplotlib.pyplot as plt
+from scipy.stats import poisson
+import seaborn as sns
+%matplotlib inline
+
+lamda_p = 100
+# el parametro mu esta asociada a la media
+data = poisson.rvs(mu = lamda_p, size=100)
+mean, var, skew, kurt = poisson.stats(mu= lamda_p, moments='mvsk')
+mean, var, skew, kurt
+# Graficamente
+ax = sns.distplot(data, bins=30, kde = False, color = 'blue')
+ax.set(xlabel= 'Distribucion Poisson', ylabel='Frecuencia')
+ax.axvline(x=mean, linestyle='--', label = 'Media')
+ax.legend()
 ```
