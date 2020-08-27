@@ -411,7 +411,7 @@ Las medidas de tentecia central para una variable aleatoria como **Valor esperad
 
 La desviacion estandar que en este caso la llamaremos **Varianza**, que es cuadrado de las diferencia entre la media su valor `X`.
 
-Los elementos de **Distribuciones discretas** se tiene que validar dentro de una funcion de densidad continua.
+Los elementos de **Distribuciones discretas** se tiene que validar dentro de una funcion de **densidad continua**.
 
 El **valor esperado** al igual que la **varianza** cumplen una serie de caracteristicas y una forma especifica a la hora de calcularse.
 
@@ -466,3 +466,50 @@ ax.legend()
 
 ### Distribucion continua 
 
+Las **distribuciones de probabilidad continuas**, como la distribución normal, describen valores en un rango o escala y se muestran como figuras sólidas en la galería de distribuciones. Las distribuciones continuas son en realidad abstracciones matemáticas, ya que suponen la existencia de cada valor intermedio posible entre dos números. Es decir, una distribución continua asume que hay un número infinito de valores entre dos puntos de la distribución.
+
+Curtosis:
+Nos da indicios de como están distribuidos los datos.
+
+- Si los datos se son mas uniformes y se acercan mas a la media entonces estamos en presencia de una distribución leptocúrtica (coeficiente de curtosis >0)
+- Si los datos están muy dispersos y la curva no presenta una cima pronunciada, estamos en presencia de una distribución platicúrtica (coef. de curtosis < 0)
+- Si los datos presentan un comportamientos normal la curtosis es igual a 0 (mesocúrtica)
+
+Simetría
+La simetría hace referencia a que tan iguales son las dos partes de la distribución.
+
+- Si la distribución es simétrica sus Medidas de tendencia central (media, mediana y moda) serán iguales.
+
+```python
+import scipy.stats
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+%matplotlib inline
+from scipy.stats import binom
+from scipy.stats import norm
+
+# Probabilidad continua
+N = 10000
+
+x = list(range(0,N+1))
+y = list([])
+
+for i in x:
+   y.append(binom.pmf(i, p=0.3, n= N))
+    
+fig, ax = plt.subplots()
+ax.plot(x,y)
+ax.set_title('Probabilidad continua')
+
+# Porbabilidad acumulada
+for i in x:
+    y.append(binom.cdf(i, p=0.3, n= N))
+    
+fig, ax = plt.subplots()
+ax.plot(x,y)
+ax.set_title('Probabilidad continua')
+
+mean, var, skew, kurt = norm.stats(moments = 'mvsk')
+```
