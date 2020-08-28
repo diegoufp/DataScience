@@ -521,6 +521,10 @@ mean, var, skew, kurt = norm.stats(moments = 'mvsk')
 
 1. Distribucion de **Bernoulli** (Experimento Binario asociado a exito o fracaso)
 
+Experimento: Lanzamiento de UNA moneda, Número de caras obtenidas, es una variable aleatoria (un valor numérico que está afectado por el azar.)
+Fenómeno o experimento que puede resultar en uno solo de dos posibles resultados, llamados genéricamente ACIERTO (A) o FRACASO (F).
+La probabilidad de acierto p es conocida y por ende la de fracaso que será (1 − p) = q.
+
 ```python
 # Bernoulli
 import matplotlib.pyplot as plt
@@ -539,6 +543,10 @@ ax.axvline(x=mean, linestyle='--', label = 'Media')
 ```
 
 2. Distribucion **Binomial**: Numero de exitos x en N ensayos.
+
+Lanzamiento de MUCHAS monedas, una tras otra.
+Cuando lanzamos una moneda justa 10 veces, cual es el más probable número de caras?
+Lo más probable es que los lanzamientos se distribuyan de igual manera entre caras y sellos, es decir 5 caras y 5 sellos.
 
 ```python
 # Binomial
@@ -562,6 +570,12 @@ ax.legend()
 
 3. Distribucion **Geometrica**: Numero de ensayos x hasta 1 exitos.
 
+
+4. Distribucion **Binomial Negativa**: Numero de ensayos x hasta el K-esimo exito.
+
+Se realizan repeticiones independientes de un proceso Bernoulli, hasta obtener “k” aciertos.
+Interesa determinar la probabilidad de que se requieran “x” repeticiones para obtener los k aciertos.
+
 ```python
 # Geometrica
 import matplotlib.pyplot as plt
@@ -581,9 +595,17 @@ ax.set(xlabel= 'Distribucion Binomial Negativa', ylabel='Frecuencia')
 ax.axvline(x=mean, linestyle='--', label = 'Media')
 ax.legend()
 ```
-4. Distribucion **Binomial Negativa**: Numero de ensayos x hasta el K-esimo exito.
 
 5. Distribucion de **Poisson**: Numero de llegdas en N a una longitud de tiempo.
+
+Una binomial se aproxima a una Poisson cuando la probabilidad de éxito es baja
+
+Se asocia con fenómenos o sucesos deﬁnidos en determinados intervalos de tiempo y/o regiones de espacio.
+
+La probabilidad de que el fenómeno suceda por lo menos una vez, es directamente proporcional al tamaño del intervalo de tiempo y/o región espacial.
+
+La probabilidad de que el fenómeno ocurra más de una vez, en intervalo y/o regiones relativamente pequeños es tan pequeña que se puede despreciar.
+
 
 ```python
 # Poisson
