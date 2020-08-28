@@ -625,3 +625,70 @@ ax.set(xlabel= 'Distribucion Poisson', ylabel='Frecuencia')
 ax.axvline(x=mean, linestyle='--', label = 'Media')
 ax.legend()
 ```
+
+### Continuas
+
+- Distribucion **Exponencial**
+
+Es el caso inverso de la funcion de poisson, es decir, en poisson condabamos numero de eventos * unidad de tiempo y en exponencial vamos a contar el tiempo que nos toca llegar a uno de esos eventos.
+
+Utilizada generalmente para análisis de fiabilidad, p.e: probabilidad de que un componente falle transcurrido una cierta cantidad de tiempo. Investiguen sobre la “perdida de memoria” de la distribución exponencial.
+
+```python
+# Exponencial
+import matplotlib.pyplot as plt
+from scipy.stats import expon
+import seaborn as sns
+%matplotlib inline
+
+data = expon.rvs(size=100000)
+mean, var, skew, kurt = expon.stats(moments = 'mvsk')
+# Graficamente
+ax = sns.distplot(data, bins=500, kde = False, color = 'blue')
+ax.set(xlabel= 'Distribucion Exponencial', ylabel='Frecuencia')
+ax.axvline(x=mean, linestyle='--', label = 'Media')
+ax.legend()
+```
+
+- Distribucion **Normal**
+
+dadas sus características, se utiliza para inferencia estadística, es decir, estimar/evaluar parámetros de toda una población, basados en una muestra. Aquí es donde se utilizan los famosos intervalos de confianza. Investiguen sobre las “pruebas de hipótesis”.
+
+```python
+# Normal
+import matplotlib.pyplot as plt
+from scipy.stats import norm
+import seaborn as sns
+%matplotlib inline
+
+# Por defecto la funcion normal tiene una media de 0 y una varianza de 1
+data = norm.rvs(size=10000000)
+mean, var, skew, kurt = norm.stats(moments = 'mvsk')
+# Graficamente
+ax = sns.distplot(data, bins=500, kde = False, color = 'blue')
+ax.set(xlabel= 'Distribucion Normal Estandar', ylabel='Frecuencia')
+ax.axvline(x=mean, linestyle='--', label = 'Media')
+ax.legend()
+```
+
+- Distribucion **Uniforme**
+
+Asume que cada uno de los eventos estan distribuidos con una misma probabilidad.
+
+se utiliza generalmente en el ámbito de simulación, por ejemplo “creación” de escenarios aleatorios, números aleatorios, etc.
+
+```python
+# Uniforme
+import matplotlib.pyplot as plt
+from scipy.stats import uniform
+import seaborn as sns
+%matplotlib inline
+
+data = uniform.rvs(size=10000000)
+mean, var, skew, kurt = uniform.stats(moments = 'mvsk')
+# Graficamente
+ax = sns.distplot(data, bins=500, kde = False, color = 'blue')
+ax.set(xlabel= 'Distribucion Uniforme 0 - 1', ylabel='Frecuencia')
+ax.axvline(x=mean, linestyle='--', label = 'Media')
+ax.legend()
+```
