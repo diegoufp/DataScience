@@ -692,3 +692,35 @@ ax.set(xlabel= 'Distribucion Uniforme 0 - 1', ylabel='Frecuencia')
 ax.axvline(x=mean, linestyle='--', label = 'Media')
 ax.legend()
 ```
+
+## Estandarización, covarianza y correlación
+
+### Estandarizacion o tificacion de variables
+1. **Centrar** la variable: restar su media a cada uno de los valores originales.
+
+2. **Reducir**la variable: dividir todos sus valoes por la desviacion.
+
+El **resultado** de una variable estandarizada va a ser una variable aliatoria que va  a tener un valor esperado 0 y una varianza o desviacion estandar igual a 1.
+
+El efecto de estandarizar nos va a permitir llevar nuestra variable de una dimencion especifica a una variable adimencional.
+
+### Covarianza y correlacion
+
+Ambas miden el valor de la relacion **lineal** entre dos variables aleatoria `X` y `Y`
+
+- **Convarianza**
+
+Sin embargo a diferencia de la correlacion, la **covarianza** nos hablara unicamente de la direccion de esta relacion.
+
+    - Mide la **direccion** (signo) de la relacion entre X y Y
+    - Magnitud **no estandarizada**
+    - Rango `Cov(X)=[-infinito, infinito]`
+
+- **Covarianza**
+
+Mientras que la **correlacion** nos permitira entender tanto la direccion de la relacion como la fuerza que tiene. La correlacion entonces sera un valor entre -1 y 1, en donde mas cercano a -1 estaremos mas cerca de una correlacion inversa perfecta y las cercano a 1 estaremos mas cerca de una correlacion directa perfecta entre las dos variables X y Y.
+
+    - Mide direccion (signo) de la relacion entre X y Y
+    - Mide la **fuerza** (magnitud **estandarizada**)
+    - Rango Cov(X) = [-1,1]
+    - Relacion lineal perfecta = -1 o 1
