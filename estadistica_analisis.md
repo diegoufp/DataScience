@@ -867,3 +867,135 @@ ax.set(xlabel = 'Distribucion normal mu1', ylabel = 'Frecuencia')
 ax.scatter(muestra_10, y, c='k')
 # Como resultado se puede observar como la muestra puede pertenecer con mayor o menor porbabilidad a alguna de las dos hipotesis que se planeo sobre el parametro poblacional 
 ```
+
+## Estimadores de maxima verosimilitud
+
+Estimadores de maxima verosimilitud son estimadores que han sido calculados maximizando la funcion de verosimilitud o funcion de probabilidad de ocurrencia de la muestra.
+
+Cada vez que tomamos el valor de una poblacion como una muestra debemos clacular su probabilidad asociada.
+
+Entonces los **Estimadores de maxima verosimilitud** seran funciones de la muestra que nos permitan calcular la mejor version(mejor estimador) del parametro estimado.
+
+La forma analitica que hacen uso las funciones de maxmima verosimilitud
+```
+L(Parametro | Muestra): Likelihood
+```
+
+1. El método de máxima verosimilitud consiste en obtener el valor de lambda donde la **L(lambda) sea máximo**.
+
+2. L(lambda) es la **función de máxima verosimilitud**, y está definida como el producto entre todos los valores de la muestra aleatoria evaluados en su función de densidad.
+
+3. En este caso la distribución a estudiar es una **exponencial**, esto es importante, porque TODA distribución exponencial tiene función de densidad = **parametro * e^(parametro*x)**, entonces ya tenemos una función con que trabajar.
+
+4. Se desarrolla la función para después aplicar Logaritmo natural.
+
+5. **Por qué logaritmo natural?** Por dos razones, una tiene que ver con lo práctico de utilizar logaritmos en términos operatorios, pero la mas importante es que, dadas las propiedades de los logaritmos, **la función L(lambda) es máxima en el mismo punto que Ln(L(lambda)). **
+
+6. Se desarrolla la nueva función que se simplifica gracias a las propiedades de los logaritmos.
+
+7. **Por qué se deriva y se iguala a cero?** recuerden que la primera derivada hace referencia a la pendiente de la función, y si la pendiente es cero significa que **estamos en presencia de un mínimo o un máximo**.
+
+8. Acá falto algo, porque para poder asegurar que ese valor de lambda es máximo, se debe derivar por segunda vez, si la segunda derivada es < 0 entonces estamos frente a un máximo, no se puede asegurar nada sin hacer este análisis.
+
+9. Sorpresa! el estimador de max verosimilitud de una función es el promedio muestral.
+
+### Mejores estimadores
+- **Promedio muestral**:
+Mejor estimador para la media de una distribucion **exponencial**.
+Mejor estimador para una distribucion **normal**, **poisson** y **Bernoulli**
+
+- **Varianza Muestral**
+Mejor estiamdor para sigma en una distribucion normal
+
+## Distribuciones muestrales
+
+Estumador: Es una funcion de la muestra.
+
+Estadistico: Una funcion que va a involucrar la muestra con el parametro poblacional bajo una hipotesis.
+
+Y sobre esta hipotesis se podra generar utilizando transformaciones, estandariazaciones las distribuciones muestrales para el calculo de probabilidad.
+
+### Parametros pobracional a estimar
+
+- **Media Muestral**: Media, Proporecion o Lambda.
+    - **Normal Estandar**: Distribucion con Varianza conocida.
+    - **t-Student**: Distribucion con Varianza Desconocida.
+
+- **Varianza Muestral**: Varianza.
+    - **Chi-cuandrada**: Distribucion de una sola Varianza.
+    - **F Fisher-Snedecor**: Distribucion del Cociente de la Varianza X sobre Varianza Y.
+
+```python
+import matplotlib.pyplot as plt
+from IPython.core.display import Image
+import seaborn as sns
+from scipy.stats import t
+
+%matplotlib inline
+
+# Se va a generar una primera muestra de datos
+data1 = t.rvs(100, size=1000000)
+# Se generara una segunda muestra pero con menos grados de libertad para que se pueda ver como cambia graficamnete
+data2 = t.rvs(4, size=1000000)
+
+ax = sns.distplot(data1, bins = 500, kde = False, color= 'red')
+ax = sns.distplot(data2, bins = 500, kde = False, color= 'blue')
+
+# Para ver otro grafico de distribucion se utilizara la funcion chi-cuadrada que nos permite identificar la forma del calculo de probabilidad para varianza
+from scipy.stats import chi2
+data1 = chi2.rvs(5, size=1000000)
+data2 = chi2.rvs(15, size=1000000)
+ax = sns.distplot(data1, bins = 500, kde = False, color= 'red')
+ax = sns.distplot(data2, bins = 500, kde = False, color= 'blue')
+
+# La funcion F nos permite aproximar cocientes de varianzas
+from scipy.stats import f
+
+data1 = f.rvs(5, 25, size=1000000)
+data2 = f.rvs(15, 25, size=1000000)
+ax = sns.distplot(data1, bins = 500, kde = False, color= 'red')
+ax = sns.distplot(data2, bins = 500, kde = False, color= 'blue')
+
+# Hacer calculos de probabilidad 
+# probabilidad de tener un 4 en esta distribucion
+f.pdf(4, 15, 25)
+# Probabilidad acumulada 
+f.cdf(4, 15, 25)
+# Pra ahacer calculos inversos o encontrar aquel valor que acumule una cierta probabilidad
+f.ppf(0.9988900520089906, 15, 25)
+```
+
+## Teorema del limite central
+
+Lasuma de `n` variables aleatorias **independientes, con un n > 30** tiende a una distribucion normla o la curva de campana incluso si las variables aleatorias originales no se distribuyen como una normal.
+
+Teorema del limite central nos permitira aproximar la funcion de distribucion de una variable aleatoria de la cual no conocemos previamente su distribucion.
+
+```python
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+%matplotlib inline
+
+from scipy.stats import expon
+from scipy.stats import uniform
+
+# Definamos una pobracion sobre la cual vamos de derivar analisis 
+poblacion = pd.DataFrame()
+poblacion['numbers'] = expon.rvs(40, size = 100000)
+# Vamos a formar un grafico utilizando pandas
+poblacion['numbers'].hist(bins = 100)
+
+# Muestra de la poblacion que hemos definido
+muestra_promedio = []
+tamano = 5000
+for i in range(0, tamano):
+    muestra_promedio.append(poblacion.sample(n=100).mean().values[0])
+# Genenrar el grafico
+fig, ax = plt.subplots()
+ax.hist(muestra_promedio, bins = 50 , alpha = 0.5)
+ax.set_xlabel('Valor promedio')
+ax.set_ylabel('Frecuencia')
+# EL grid nos permite ver la parilla de valores para identificar numeros en la grafica
+ax.grid()
+```
