@@ -695,15 +695,52 @@ ax.legend()
 
 ## Estandarización, covarianza y correlación
 
-### Estandarizacion o tificacion de variables
+### Estandarizacion
+
 1. **Centrar** la variable: restar su media a cada uno de los valores originales.
 
-2. **Reducir**la variable: dividir todos sus valoes por la desviacion.
+2. **Reducir**la variable: dividir todos sus valores por la desviacion.
 
 El **resultado** de una variable estandarizada va a ser una variable aliatoria que va  a tener un valor esperado 0 y una varianza o desviacion estandar igual a 1.
 
 El efecto de estandarizar nos va a permitir llevar nuestra variable de una dimencion especifica a una variable adimencional.
 
+```python
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+%matplotlib inline
+
+df = pd.read_csv('iris-data.csv', index_col=0)
+
+df.columns
+
+df.tipo_flor.value_counts()
+
+# Original
+y = df['lar.petalo']
+fig, ax = plt.subplots()
+ax.set_title('Variable Original')
+ax.hist(y, bins = 30)
+ax.axvline(x= np.mean(y), c='k', label='media', linestyle='--')
+ax.axvline(x= np.mean(y) + np.std(y), c='r', label='desviacion estandar', linestyle='--')
+ax.legend()   
+
+# Estandarizacion de una variable
+# 1. Centrar la variable: restar su media a cada uno de los valores originales. 
+# 2. Reducir la variable: dividir todos sus valores por la desviacion.
+y = df['lar.petalo']
+fig, ax = plt.subplots()
+ax.set_title('Variable Estandarizada')
+# Para estandariazar debemos restar a cada valor de 'y' su media.
+# Y despues dividiremos cada uno de los valores de 'y' (que han sido restados en su media) sobre la desviacion.
+ax.hist((y - np.mean(y))/np.std(y), bins = 30)
+ax.axvline(x= np.mean(np.mean(y - np.mean(y))/np.std(y)), c='k', label='media', linestyle='--')
+ax.axvline(x= np.mean(np.mean(y - np.mean(y))/np.std(y)) + np.std((y - np.mean(y))/np.std(y)), c='r', label='desviacion estandar', linestyle='--')
+ax.legend() 
+```
 ### Covarianza y correlacion
 
 Ambas miden el valor de la relacion **lineal** entre dos variables aleatoria `X` y `Y`
@@ -716,7 +753,24 @@ Sin embargo a diferencia de la correlacion, la **covarianza** nos hablara unicam
     - Magnitud **no estandarizada**
     - Rango `Cov(X)=[-infinito, infinito]`
 
-- **Covarianza**
+```python
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+%matplotlib inline
+
+# Covarianza
+fig, ax = plt.subplots()
+ax.scatter(df['lar.petalo'], df['lar.sepalo'], alpha = 0.7)
+ax.set_xlabel('lar.petalo')
+ax.set_ylabel('lar.sepalo')
+# Las escalas que tiene el grafico aveces no son las que tiene originalmente, paar ello podemos utilizar ax.autoscale() para garantizar que la variable conserva las escalas que tiene originalmente
+ax.autoscale()
+```
+
+- **Correlacion**
 
 Mientras que la **correlacion** nos permitira entender tanto la direccion de la relacion como la fuerza que tiene. La correlacion entonces sera un valor entre -1 y 1, en donde mas cercano a -1 estaremos mas cerca de una correlacion inversa perfecta y las cercano a 1 estaremos mas cerca de una correlacion directa perfecta entre las dos variables X y Y.
 
@@ -724,3 +778,27 @@ Mientras que la **correlacion** nos permitira entender tanto la direccion de la 
     - Mide la **fuerza** (magnitud **estandarizada**)
     - Rango Cov(X) = [-1,1]
     - Relacion lineal perfecta = -1 o 1
+
+```python
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+%matplotlib inline
+
+# Correlacion
+np.cov(df['lar.petalo'], df['lar.sepalo'])
+# Vamos a pedir a pandas que nos genere la correlacion entre todas las variables al interior del dataset
+df.corr(method= 'spearman')
+# En esta caso queremos buscar la correlacion entre df['lar.petalo'] y df['lar.sepalo'] la cual es una asociacion (0.881898) muy cercana a 1(1 es el valor mazimo)
+# Hay otras formas de medir la correlacion como como kendal
+df.corr(method= 'kendall')
+# Pero esta no va a medir correlaciones lineales necesariamente y por eso pueden variar en su magnitud
+
+# Correlacion de forma mas grafica
+corr = df.corr(method= 'kendall')
+sns.heatmap(corr, xticklabels = corr.columns, yticklabels = corr.columns)
+# Hora se puede ver graficamente y de forma mas puntual que variables tienen una correlacion con una magnitud mucho mas fuerte negativa(las mas oscuras) o una correlacion mucho mas fuerte positiva cercana a 1 ( las mas claras)
+# si la correlacion es igual a cero entronces es una correlacion nula o inexistente
+```
