@@ -802,3 +802,68 @@ sns.heatmap(corr, xticklabels = corr.columns, yticklabels = corr.columns)
 # Hora se puede ver graficamente y de forma mas puntual que variables tienen una correlacion con una magnitud mucho mas fuerte negativa(las mas oscuras) o una correlacion mucho mas fuerte positiva cercana a 1 ( las mas claras)
 # si la correlacion es igual a cero entronces es una correlacion nula o inexistente
 ```
+
+## Estimadores a traves de datos
+
+Criterios para seleccion de un estimador:
+
+1. Que sea **centrado**, es decir, que el valor esperado del estimador tenga como resultado el valor del parametro que queremos calcular.
+
+2. De **minima varianza** o el parametro que ofrezca la menor varianza posible.
+
+3. Es deseable que tenga una relacion **lineal** entre el parametro que quiere estimar.
+
+```python
+import sklearn
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_iris
+from scipy import stats
+import seaborn as sns
+from scipy.stats import norm
+%matplotlib inline
+
+# Se va simular que se toma una muestra de la distribucion normal y que la muestra tuvo valor 3
+x1 = 3
+# Como no conocemos lo valores poblacionales de esta distribucion vamos a generar una serie de hipotesis
+# Vamos a decir que el parametro poblacional podria estimarse con mu1 = 4 o con mu2 = 7 
+# Y se calculara la probabilidad de haber obtenido esta muestra bajo estas hipotesis del parametro poblacional 
+mu1 = 4
+mu2 = 7
+sigma = 1
+# sigma sera la desviacion estandar que debemos conocer de antemano 
+sigma = 1
+# y pediremos a esta funcion entonces la densiti probabiliti function
+p_muestra = norm.pdf(x1,mu2, sigma)
+p_muestra
+
+# En esta escenario estamos muestrando dos valores en lugar de uno solo
+# Queremos buscar la probabilidad conjunta de que ocurrieran estos 2 casos
+x1 = 3
+x2 = 10
+mu1 = 4
+mu2 = 7
+sigma = 1
+sigma = 1
+p_muestra = norm.pdf(x1,mu2, sigma) * norm.pdf(x2,mu2, sigma)
+p_muestra
+
+# Generaremos una muestra mas grande
+muestra_10 = norm.rvs(5, sigma, size = 10)
+y = list([])
+for i in range(10):
+    y.append(3000)
+# Visualmente
+data1 = norm.rvs(mu1, sigma, size = 100000)
+data2 = norm.rvs(mu2, sigma, size = 100000)
+# Normalmente en la grafica apareceran a escala de probabilidad, si quisieras que lo tome como frecuencian entonces tienes que agregar el parametro kde=False
+ax = sns.distplot(data1, bins = 50, color = 'blue', kde = False)
+ax.set(xlabel = 'Distribucion normal mu1', ylabel = 'Frecuencia')
+
+ax = sns.distplot(data2, bins = 50, color = 'red', kde = False)
+ax.set(xlabel = 'Distribucion normal mu1', ylabel = 'Frecuencia')
+
+ax.scatter(muestra_10, y, c='k')
+# Como resultado se puede observar como la muestra puede pertenecer con mayor o menor porbabilidad a alguna de las dos hipotesis que se planeo sobre el parametro poblacional 
+```
