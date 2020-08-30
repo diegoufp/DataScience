@@ -1117,3 +1117,43 @@ p_prom_mu2 = norm.cdf(z_2)
 # Tambien tenemos en contraposision la potencia de la prueba que 1 - beta o el error tipo 2
 # sin embargo beta no es facilmente calculable por lo cual se suele optimizar el error asociado al alpha (a no rechazar la hipotesis nula cuando esta es verdadera)
 ```
+
+## Intervalos de confianza
+
+Los intervalos de confianza nos permiten encontrar un limte inferior y superior tales que cumulen una cierta probabilidad o confianza de que el parametro poblacional estara contenido y podra tomar ese valor en diferentes escenarios bajo los cuales sea medida esa variable.
+
+Un intervalo de confianza de 95% indica que 19 de 20 muestras (95%) de la misma poblacion producira intervalos de confianza que contendra el parametro de poblacion.
+
+Pasos para calcular el Intervalo de Confianza(IC) asociado a una variable aleatoria:
+
+1. Definir el parabmetro que deseamos estimar 
+2. Identificar el estimador (Promedio muestral o Varianza muestal)
+3. Indentifica el estadistico y su distribucion (normal, t-student, chi-cuadrada, F-fisher, etc)
+4. Tolerancia al error alfa, estimacion puntual y rango de error
+5. Conclusion del intervalo
+6. Opcional: Pruebas de hipotesis usando Intervalos de Confianza
+
+```python
+import pandas as pd
+import numpy as np
+from scipy.stats import norm
+
+Muestra = [4046, 2578, 3796, 3412, 3315, 3228, 3666, 3877, 3154, 4062, 4365, 3776, 3761, 2587, 2911, 3184, 3810, 4459, 3385, 3899, 3602, 2701, 2821, 2790, 2557, 2540, 4119, 2712, 2743, 2713, 4466, 3937, 3871, 4427, 3177, 2556, 2903, 3522, 4155, 4010, 4453, 3080, 3008, 3865, 3356, 2799, 3308, 2759, 4347, 2576, 4075, 3333, 2936, 3746, 3334, 3940, 4113, 4220, 3580, 3922]
+# nivel de tolerancia al error alpha
+alpha = 0.05
+# Para encontrar estos limites inferiores y superiores lo que deseamos es encontrar un valor al que se acumule el 90% entre ellos o que deje fuera en ambas colas el 5%
+lim_inf = norm.ppf(alpha/1)
+lim_sup = norm.ppf(1-(alpha/1))
+lim_inf, lim_sup
+# Esto es para una distribucion normal estandar con media 0 y varianza 1
+
+promedio = np.mean(Muestra)
+desviacion = np.std(Muestra)
+# Ajustar los limites definidos 
+# Lo quevamos a hacer es el proceso inverso a la estandarizacion
+lim_inf_new = lim_inf*desviacion + promedio
+lim_sup_new = lim_sup*desviacion + promedio
+# Vemos entonces que el intervalo de confianza contendria al 95% de los valores de el parametro poblacional es:
+lim_inf_new, lim_sup_new
+# (2494.1372815063205, 4450.629385160346)
+```
