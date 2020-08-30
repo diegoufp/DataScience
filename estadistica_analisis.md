@@ -1157,3 +1157,24 @@ lim_sup_new = lim_sup*desviacion + promedio
 lim_inf_new, lim_sup_new
 # (2494.1372815063205, 4450.629385160346)
 ```
+
+## Regresion lineal
+
+La regresion lineal es un modelo, algoritmo o funcion matematica que aproxima de forma **optima** la relacion entre una variable `Y` y una variable `X` o un set de variables utilizando la funcion de la recta (es decir una lineal).
+
+El objetivo de la regresion lineal sera identificar cuales seran esta variables `X` que aportan mayor capacida para explicar a `Y` y tambien que nos permitar predecir en un futuro el valor que podra tomar la variable aleator `Y`.
+
+**Funcion de la Recta**: `Y = aX + b`, `a = pendiente` y `b = corte en el eje de las cordenadas`
+
+**Funcion de Regresion**: `Y = aX + b + error`, X y Y
+
+a y b son los **parametros poblacionales** de la funcion que relaciona a Y y X
+
+El objetivo de un analisis de regresion es encontrar los mejores estimadores de a y b con el **minimo error**
+
+Pasos para la regresion lineal:
+1. Identificar a partir de un conjunto de variables Xn cuales son las que mejor explican linealmente a una VA de cuales son las que mejor explican linealmente a una VA de interes Y
+2. Apartir del modelo de regresion lineal, predecir el comportamiento de una VA Y con base en el comportamiento de un conjunto de variables Xn
+
+Hay que tener presente que al se X y Y variables aleatoriasm debemos agregar un componente extra de error a nuestra funcion de la recta y bajo la funcion de minimizacion de error el valor que debera tender a tomar esta variable de error sera 0.
+
