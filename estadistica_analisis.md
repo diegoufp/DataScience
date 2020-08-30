@@ -1065,3 +1065,55 @@ ax.legend()
 ```
 
 Con esto podemos concluir en el caso de Mustage, estaria a favor de que el tiempo que le toma a una persona logearse y poder acceder a un credito es mayor que lor requerimentos que necesitan sobre el provedor.
+
+## Errores estadisticos
+
+Siempre se va a trabajar con la hipotesis nula y alterna por lo tanto tenemos siempre la opcion de aceptar la hipotesis y en contraste saber si la hipotesis era o no verdadera.
+
+- **Error Tipo I**
+**Rechazar H0** cuando en realidad es cierta
+`Alpha = P(Rechazar H0 | H0 es cierta)`
+
+- **Error Tipo II**
+**No rechazar H0** cuando en realidad es falsa
+`Beta = P(No Rechazar H0 | H0 es falsa)`
+
+```python
+import pandas as pd
+import numpy as np
+import seaborn as sns
+from scipy.stats import norm
+
+muestra = [42, 35, 29, 45, 41, 57, 54, 47, 48, 56, 47, 35, 52, 31, 52, 55, 57, 58, 26, 29, 32, 37, 32, 34, 48, 20, 48, 51, 27, 24, 39, 40, 31, 34, 23, 24, 41, 58, 44, 48, 31, 23, 27, 55, 43, 47, 30, 57, 38, 51]
+
+mu1 = 37
+mu2 = 42
+promedio = np.mean(muestra)
+
+desv = 2
+
+z_1 = (promedio - mu1)/desv
+z_2 = (promedio - mu1)/desv
+
+data1 = norm.rvs(loc = mu1, scale = desv, size=1000000)
+data2 = norm.rvs(loc = mu2, scale = desv, size=1000000)
+
+ax = sns.distplot(data1, bins = 500, kde = True, color = 'blue')
+ax = sns.distplot(data2, bins = 500, kde = True, color = 'red')
+ax.axvline(x = promedio, c='k', linestyle = '--', label = 'Promedio muestral')
+ax.legend()
+# Nuestro promedio parece se mas probable bajo la hipotesis de que la media sige un valor igual a 42 y no a 37
+
+# Generar los valores estadisticos a los errores 
+# Error tipo 1: p rechazar h0 cuando esta es verdadera
+p_prom_mu1 = norm.cdf(z_1)
+1 - p_prom_mu1
+# La probabilidad de rechazar la hipotesis nula cuando es verdadera sera de 3%
+
+# Error tipo 2: probabilidad de no rechazar h0 cuando esta es falsa
+p_prom_mu2 = norm.cdf(z_2)
+# De esta forma encontramos que la probabilidad de equivocarnos al no rechazar h0 cuando esta es falsa sera de 25%
+# Sendo alpha la probabilidad de equivocarnos al no rechazar h0 siendo esta verdadera es deseable que este sea el error que tienda a 0 
+# Tambien tenemos en contraposision la potencia de la prueba que 1 - beta o el error tipo 2
+# sin embargo beta no es facilmente calculable por lo cual se suele optimizar el error asociado al alpha (a no rechazar la hipotesis nula cuando esta es verdadera)
+```
