@@ -999,3 +999,69 @@ ax.set_ylabel('Frecuencia')
 # EL grid nos permite ver la parilla de valores para identificar numeros en la grafica
 ax.grid()
 ```
+
+## Prueba de hipotesis 
+
+Una **prueba de hipotesis** es una regla que especifica si se puede aceptar o rechazar una afirmacion acerca de un **parametro poblacional** (lambda, sigma, mu, etc) dependiendo de la evidencia proporcionada por una muestra de datos.
+
+Los pasos para ahcer una prueba de hipotesis:
+
+1. Identificar el parametro poblacional sobre el cual queremos hacer inferencia.
+2. Definir una hipotesis nula(siempre de igualdad =) y una hipotesis alterna (mayor que >, menor que < o diferente que).
+3. Identificar el estimador que bamos  ausar para nuestro parametro poblacional(Promedio muestral o varianza muestral).
+4. Identificar el estadistico y su distribucion (normal, t-student, chi-cuadrada, F-fisher, etc).
+5. Asignar el valor estadistico que va a tener la prueba | H0.
+6. Toleracincia al error alfa, valor critico y criterio de rechazo de H0.
+7. Conclusion de rechazo o no rechazo de H0 con un margen de error de alfa.
+
+### Caso ejemplo
+
+- La empresa Mustage S.A. esta desarrollando una plataforma para otrorgar credito de bajo monto.
+- EL tiempo para completar exitosamente una consulta de informacion de clientes ante las fuentes de buro **no debe ser superior a 30 segundos** en **promedio**.
+- Muestra de **n = 50** clientes consultados.
+- La empresa esta dispuesta a asumir un error del 5% en la prueba.
+
+```python
+import pandas as pd
+import numpy as np
+%matplotlib inline
+import seaborn as sns
+from scipy.stats import expon
+from scipy.stats import norm
+from scipy.stats import uniform
+
+muestra = [42, 35, 29, 45, 41, 57, 54, 47, 48, 56, 47, 35, 52, 31, 52, 55, 57, 58, 26, 29, 32, 37, 32, 34, 48, 20, 48, 51, 27, 24, 39, 40, 31, 34, 23, 24, 41, 58, 44, 48, 31, 23, 27, 55, 43, 47, 30, 57, 38, 51]
+# Hipotesis
+media, var, skew, kurt = expon.stats(scale = 30, moments = 'mvsk')
+# Paso 1: parametro lambda
+# Paso 2: HP
+mu = 30
+mu > 30
+# Paso 3: Mejor estimador
+# Estimador 
+# Paso 4: Distribucion
+promedio = np.mean(muestra)
+promedio
+# Paso 5:
+# Teorema del limite Central = (Promedio-media)/(Desviación Estandar /(n)^(1/2))
+z = (promedio - mu)/np.sqrt(var/50)
+# Paso 6
+alpha = 0.05
+# Criterios de rechazo
+data_norm = norm.rvs(size=100000)
+ax = sns.distplot(data_norm, bins = 500, kde = False, color = 'blue')
+ax.set_title('Distribucion normal')
+
+# Para poder visualizar las regiones de rechazo y fallo critico 
+valor_critico = norm.ppf(1-alpha, loc = 0, scale = 1)
+# Si alpha es la probabilidad de error 1 - alpha nos dara la probabilidad de no error o valor de tolerancia
+ax = sns.distplot(data_norm, bins = 500, kde = False, color = 'blue')
+ax.set_title('Distribucion normal')
+ax.axvline(x = valor_critico, linestyle = '--', label = 'valor cirtico')
+ax.axvline(x = z, linestyle = '--', label = 'valor estadistico', color='k')
+ax.legend()
+# Las pruebas de hipotesis nos han permitido evidenciar que tan probable es que nuestro valor poblacional mu tenga un valor de 30 o superior dada la muestra
+# En este caso tenemos una prueba de hipotesis de =>
+```
+
+Con esto podemos concluir en el caso de Mustage, estaria a favor de que el tiempo que le toma a una persona logearse y poder acceder a un credito es mayor que lor requerimentos que necesitan sobre el provedor.
