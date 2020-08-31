@@ -1178,3 +1178,45 @@ Pasos para la regresion lineal:
 
 Hay que tener presente que al se X y Y variables aleatoriasm debemos agregar un componente extra de error a nuestra funcion de la recta y bajo la funcion de minimizacion de error el valor que debera tender a tomar esta variable de error sera 0.
 
+```python
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import statsmodels.api as sm
+import pyreadstat as pr
+from sklearn import linear_model
+from sklearn.metrics import mean_squared_log_error, r2_score
+from sklearn import metrics
+
+%matplotlib inline
+
+arc = 'compensacion-ejecutivos.sav'
+df, meta = pr.read_sav(arc)
+df.columns
+# En un modelo de regresion debemos definir la variable y que queremos analizar
+y = df['salario']
+# Eliminaremos las columnas que ya no vayamos a utilizar del dataframe
+X = df.drop(['salario', 'noasiat', 'postgrad'], axis = 1)
+# Definir la regresion lineal
+# sm.OLS sera la manera en la que optimicemos los parametros de nuestra funcion de regresion
+# agregaremos sm.add_constant para que agrege una constante de la funcion de regresion y no solamente calcule la pendiente 
+# un fit es lo que nos va permitir calcular sobre estos parametros de la funcion OLS(los mejores valores de a y b)
+reg_lin = sm.OLS(y, sm.add_constant(X)).fit()
+# resultados de la regresion lineal
+# en esta ocacion debemos darle alguna funcion de sumarizacion para que nos muestre en detalle el contenido de la regresion
+print(reg_lin.summary())
+
+# En particular los modelos de regresion deben checar 3 cosas:
+# 1. Que el error se distribuya normal
+# Para ellos de va a a crear un figura de los errores
+fig, ax = plt.subplots()
+# El 'y' estimado sera el 'y' calculando neutra funcion de regresion 
+y_pred = reg_lin.predict(sm.add_constant(X))
+ax.scatter(y, y - y_pred)
+plt.axhline(y=0, color = 'black', alpha = 0.8, linestyle = '--')
+# los mismo puede chequearse utilizando la prueba de Jarque-Bera(JB) que este tambien nos permite identificar si hay problemas de distribucion del error
+# 2. Identificar que no haya multicolinealidad entre los regresores o las variables 'x' y esta se puede probar atravez de la prueba Cond. No., esta prueba nos permite identificar si es de multicolinealidad 
+# Y la prueba Omnibus nos permite saber si las varianzas del modelo son iguales o estan igualemte distribuidas y esto se conoce como homocedasticidad de la varianza
+
+# Se conluye que el modelo de regresion lineal nos va a permitir identificar los pesos que tienen estas variables a la hora de explicar a 'y' y tambien hacer predicciones en el futuro sobre la variable 'y'.
+```
