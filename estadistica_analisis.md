@@ -1220,3 +1220,70 @@ plt.axhline(y=0, color = 'black', alpha = 0.8, linestyle = '--')
 
 # Se conluye que el modelo de regresion lineal nos va a permitir identificar los pesos que tienen estas variables a la hora de explicar a 'y' y tambien hacer predicciones en el futuro sobre la variable 'y'.
 ```
+
+## Regresion logistica
+
+La regresion logistica nos va a permitir aproximar el valor de una variable categorica aleatoria.
+
+Los modelos de regresion lineal tienen como variable de respuesta (Y) una variable **cuantitativa**
+
+Que pasa si la variable de respuesta fuera **cualitativa**?
+
+Por ejemplo, una variable cualitativa o de naturaleza Bernoulli. Que indique, si uuna persona compra o no un producto.
+```
+X = 0: **No Comprador,      X = 1: Comprador
+```
+Ahora la regresion lineal no se puede aplicar porque al estimar los valores 0 o 1 incurririamos en valores menores a 0 y mayores que 1.
+
+Para ello entonces transformaremos la variable de salida con el operador logistico, el cual acotara el resultado a 0 o 1.
+
+La funcion **logistica**, transforma la variable `Y` numerica en una probabilidad `[0,1]` valiendore de la misma estructura que la regresion lineal.
+
+```python
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import statsmodels.api as sm
+import pyreadstat as pr
+from sklearn import linear_model
+from sklearn.metrics import mean_squared_log_error, r2_score
+from sklearn import metrics
+from sklearn.metrics import accuracy_score
+
+%matplotlib inline
+
+arc = 'compensacion-ejecutivos.sav'
+df, meta = pr.read_sav(arc)
+df.columns
+# analizis profundo de una variable
+df.salario.describe()
+
+# Queremos saber cuales son las variables que mas influyen para que una persona gane una salario superior a 96000
+y = np.where(df['salario'] > 96000, 1, 0)
+# axis 1 para eliminarlo
+X = df.drop(['salario'], axis= 1)
+
+fig, ax = plt.subplots()
+ax.scatter(df.salario, y)
+ax.set_xlabel('salario')
+ax.set_ylabel('y')
+# Podemos ver como la variable 'y' puede tomar los valores de 1 o 0
+# Despues nos debemos aproximar de una variable continua a una variable categorica
+
+# regresion logistica
+reg_log = linear_model.LogisticRegression()
+# fit es la funcion que entrena o calcula los parabletros optimos de la funcion 
+reg_log.fit(X, y)
+# Se debe calcular los valores de 'y' estimado
+y_estimado = reg_log.predict_proba(X)
+# Si se quisiera estimar la probabilidad de 1.
+y_estimado_1 =  reg_log.predict_proba(X)[:,1]
+# Si no quisieramos el valor de la probabilidad si no el valor puntual 
+y_estimado_vp = reg_log.predict(X)
+y == y_estimado_vp
+# El accuracy_score es una medicion de que tan acertado es una modelo a la hora de predecir 
+# Habilitar la medida de desempe;o 
+metrics.accuracy_score(y, reg_log.predict(X))
+# En esta ocacion este modelo puede aproximar en un 90% de los casos.
+# Seria un error usar la regresion lineal para predecir variable categoricas.
+```
