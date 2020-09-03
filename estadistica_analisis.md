@@ -1345,3 +1345,21 @@ Image(graph.create_png())
 # Identificar cual es el nivel de prediccion del arbol
 metrics.accuracy_score(y_test, y_pred)
 ```
+
+## Proyecto
+Construccion de un modelo de prediccion
+
+**Objetivo**
+Definir la variables relevantes para clasificar la supervivencia de un pasajero en el Titanic (competencia Kaggle)
+
+**Proceso**
+1. Definicion de target
+```
+X = 0   o     X = 1
+```
+2. Pre-Procesamiento
+    - Analisis descriptivo
+    - Outliers
+    - Nuevas variables
+    - Seleccion de variables
+
