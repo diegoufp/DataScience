@@ -1287,3 +1287,61 @@ metrics.accuracy_score(y, reg_log.predict(X))
 # En esta ocacion este modelo puede aproximar en un 90% de los casos.
 # Seria un error usar la regresion lineal para predecir variable categoricas.
 ```
+
+## Arbol de Decision
+
+Al igual que las regresiones lineales o logisticas, los arboles de decision son otro tipo de algoritmo de naturaleza **explicativa** y **predictiva** que permite estimar un valor de Y basado en asociaiones con eventos X1, X2, ..., Xk.
+
+Los arboles de decision son ampliamente utilizados debido a su **alta capacidad explicativa** a la hora de estimar Y con un conjunto de variables X
+
+Las preguntas en cada nodo pueden ser varaibles categoricas o numericas.
+
+Los arboles de decision pueden ser de regresion cuando aproximan una variable numerica o de clasificacion cuando eproximan una categoria.
+
+```python
+import pandas as pd
+# Importar el clasificador
+from sklearn.tree import DecisionTreeClassifier
+# Importar funciones de particion
+from sklearn.model_selection import train_test_split
+# Importar las metricas de scikeit-learn
+from sklearn import metrics
+from sklearn.tree import export_graphviz
+from io import StringIO
+from IPython.display import Image
+import pydotplus
+
+df = pd.read_csv('rating-peliculas.csv')
+df.columns
+# nos pervite visualizar la composicion del dataframe
+df.describe()
+
+# Debemos definir para el analisis una variable objetivo 
+y = df.genero
+y.value_counts()
+# Si quisieramos categorizar o aproximarnos a estas categorias para una pelicula 
+X = df.drop(['pelicula', 'genero'], axis = 1)
+# Para el analisis del arbol de decicion aproximaremos un concepto, dividiremos la muestra para probar el desempe;o del modelo en dos partes
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1)
+# Crear el arbol de decicion
+# En este caso la variable que vamos a aproximar es categorica por eso vamos a usar un DecisionTreeClassifier pero tambien existe en su version de regresion o para aproximar variable numericas 
+# EL parametro criterion nos permite entregar al arbol la funcion de desempe;o que el va a optimizar para encontrar los mejores parametros
+# En el argumento max_depth se va a pasar la profundidad que queremos que tenga el arbol la profundidad esta asociada  a las ramas o los niveles de reglas que vamos a generar 
+clf = DecisionTreeClassifier(criterion='entropy', max_depth = 3)
+clf = clf.fit(X_train, y_train)
+y_pred = clf.predict(X_test)
+
+# generar el arbol de manera visual 
+# StringIO nos va a permitir poner las reglas del arbol de decicion que generamos en strings 
+dot_data = StringIO()
+export_graphviz(
+    clf, out_file= dot_data, filled= True, rounded=True, special_characters=True, feature_names=X.columns, class_names=y.value_counts().index
+    )
+graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
+# Nos va a permitir guardas la imagen del arrbol que generemos
+graph.write_png('peliculas.png')
+Image(graph.create_png())
+
+# Identificar cual es el nivel de prediccion del arbol
+metrics.accuracy_score(y_test, y_pred)
+```
