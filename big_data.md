@@ -49,3 +49,23 @@ Enfocados en la transaccionalidad y en la lectura y escritura rapida de filas un
 
 ## AWS REDSHIFT
 
+### ¿Cómo funciona AWS Redshift?
+
+El secreto es repartir el trabajo, no se instala en un único servidor sino que se instala en un clúster(arreglos de varios servidores conectados {NODOS})
+
+**Nos conectamos a un nodo líder.**
+El cual organiza y asigna las tareas a los otros nodos. (Tareas en paralelos)
+El nodo seguidor
+Y cada nodo seguidor reparte su tarea entre sus Slides. Para trabajar la tarea asignada por el nodo lider en paralelo.
+
+La base de redshift es PostgreSQL.
+
+### Beneficios de usar Redshift
+
+- Integracion total con AWS.
+- Las bases de datos mas rapidas en la nube.
+- Los costos mas bajos en la nube.
+- Alta escalabilidad.
+- Clientes SQL.
+
+
