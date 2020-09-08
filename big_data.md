@@ -101,3 +101,13 @@ Tenemos un identificador de cluster, en esta ocacion en `Node type` seleccionamo
 Le podemos cambiar el nombre de la base de datos, tenemos que agregar un nombre de usuario con contrase;a.
 
 En `Cluster permissions (optional)` en `Available IAM roles` le agregamos el rol que creamos y le damos en el boton de `crear cluster`.
+
+## Iniciado con Redshift
+
+En [CLUSTERS](https://us-east-2.console.aws.amazon.com/redshiftv2/home?region=us-east-2#clusters "CLUSTERS") en la pesta;a de `propiedades` podemos encontrar varios idicadores que nos van a ayudar a realizar las concecciones.
+
+Al final hay un indicador que me dice si esta cluster va a poder recibir conecciones externas `Publicly accessible` tiene que decir que `si`.
+
+Despues vamos a ir al `VPC security group` del cluster y le vamos a indicar que vamos a ir al id de seguridad. En dicha opcion se va a poder agregar o eliminar reglas de firewall.
+
+Le damos a la opcione `editar regla de entrada`
