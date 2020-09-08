@@ -32,3 +32,20 @@ Contienen la informacion del "como" lo quiero medir.
     - DATE
     - USERS
 
+## Bases de datos columnares
+
+Una **Base de datos columnar** es una base de datos optimizada para lograr una recuperacion rapida de columnas de datos, normalmente en aplicaciones analiticas, esto permite procesar queries complejos de una manera optima.
+
+- Excelente para aplicaciones de analitica.
+- En redshift cada columna se almacena en bloques de 1 MB.
+- Una consulta a una tabla de 10 columnas de las cuales requiero 2, leeria unicamente las 2 necesarias.
+
+## Bases de datos basadas en filas
+Enfocados en la transaccionalidad y en la lectura y escritura rapida de filas unicas.
+
+- Excelentes para aplicaciones OLTP.
+- Un registro a cada bloque de datos(pueden ser mas).
+- Una cosulta a una tabla de 10 columnas de las cuales solo requiero 2, leeria las 8 innecesarias tambien.
+
+## AWS REDSHIFT
+
