@@ -68,4 +68,36 @@ La base de redshift es PostgreSQL.
 - Alta escalabilidad.
 - Clientes SQL.
 
+### Creando entorno de trabajo en AWS
 
+Al entrar a [AWS](https://us-east-2.console.aws.amazon.com/console/home?region=us-east-2 "AWS") se busca la opcion `IAM` en `All services`.
+
+Nos iresmos a `Roles` en la pesta;a de `Administacion del acceso` y le damos en el boton de `Crear un rol`.
+
+En `Or select a service to view its use cases` buscamos `Redshift` y despues en `Redshift - Customizable` y despues en el boton `Nexr: Permissions`.
+
+En el Search buscamos `S3` y se;alamos la opcion de `AmazonS3FullAccess` y en el boton `Next: Tags`.
+
+En esta opcacion no crearemos etiquetas si se le damos en el boton `Next` y le ponemos un nombre al rol y le damos en el boton `Crear rol`.
+
+Si ya tenemos un rol de permisos para acceso a AWS y a S3 entonces ahora se creara un buket de datos en S3.
+
+Volvemos al incio de [AWS](https://us-east-2.console.aws.amazon.com/console/home?region=us-east-2 "AWS") se busca la opcion `s3` en `All services`.
+
+Y le damos en `crear bucket` y le asignamos un nombre y le damos en `Crear`.
+
+Un **bucket** es simplemente un espacio de almacenamiento de datos en donde se pueden agregar carpetas y archivos de mucha capacidad. Este es un servicio que te empieza a acobrar a partir de terabyts de informacion.
+
+### Configura cluster
+
+Para este caso se usara la version gratuita de amazon redshift
+
+Al entrar a [AWS](https://us-east-2.console.aws.amazon.com/console/home?region=us-east-2 "AWS") se busca la opcion `Amazon Redshift` en `All services`.
+
+Le damos a la pesta;a de [CLUSTERS](https://us-east-2.console.aws.amazon.com/redshiftv2/home?region=us-east-2#clusters "CLUSTERS") y despues en el boton `crear clusters`.
+
+Tenemos un identificador de cluster, en esta ocacion en `Node type` seleccionamos `DC2` opcion `dc2.large` y le agregaremos 2 nodos.
+
+Le podemos cambiar el nombre de la base de datos, tenemos que agregar un nombre de usuario con contrase;a.
+
+En `Cluster permissions (optional)` en `Available IAM roles` le agregamos el rol que creamos y le damos en el boton de `crear cluster`.
