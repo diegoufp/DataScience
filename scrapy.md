@@ -604,6 +604,16 @@ custom_settings = {
     'USER_AGENT': 'PepitoMartinez',
     'FEED_EXPORT_ENCODING': 'utf-8'
 }
+
+# Despuesta de la cactualizacion la forma de hacerlo es asi 
+custom_settings={
+‘FEEDS’:{
+‘quotes.json’:{
+‘format’: ‘json’,
+‘encoding’: ‘utf8’,
+‘indent’: 4,
+}
+},
 ```
 
 ## Intelligence Agency
