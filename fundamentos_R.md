@@ -443,3 +443,130 @@ ggplot(mtcars, aes(x=hp))+geom_histogram(binwidth = 30)+labs(x="Caballos de fuer
 # cambiar barras de color 
 ggplot()+geom_histogram(data=mtcars, aes(x=hp), fill="blue", color="red", binwidth=20)+labs(x="Caballos de fuerza", y="Cantidad de carros", title="Caballos de fuerza en carros seleccionados")+xlim(c(80,280))+theme(legend.position = "none")+theme(panel.background = element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 ```
+```r
+# histograma de orangeec
+ggplot()+geom_histogram(data=orangeec, aes(x=GDP.PC), fill="blue", color="red", binwidth=2000)+labs(x="PIB per capita", y="Cantidad de paises", title="PIB per capita en paises latam")+theme(legend.position = "none")+theme(panel.background = element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+
+# hist orangeec Contribucion economia naranja
+ggplot()+geom_histogram(data=orangeec, aes(x=Creat.Ind...GDP), fill="blue", color="red", binwidth=1)+labs(x="Aporte economia naranja en PIB(%)", y="Cantidad de paises", title="Contribucion economia naranja al pib en paises latam")+theme(legend.position = "none")+theme(panel.background = element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+# hist orangeec Penetracion de internet
+ggplot()+geom_histogram(data=orangeec, aes(x=Internet.penetration...population), fill="red", color="yellow", binwidth=5)+labs(x="Penetracion internet (%)poblacion", y="Cantidad de paises", title="Penetracion de internet en paises latam")+theme(legend.position = "none")+theme(panel.background = element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+# Para boder pones los labels a las barras se necesita agrega el siguiente codigo 
+scale_x_continuous(breaks = seq(40, max(100), 5))
+#y quedaria asi:
+ggplot()+geom_histogram(data=orangeec, aes(x=Internet.penetration...population), fill="red", color="yellow", binwidth=5)+scale_x_continuous(breaks = seq(40, max(100), 5))+labs(x="Penetracion internet (%)poblacion", y="Cantidad de paises", title="Penetracion de internet en paises latam")+theme(legend.position = "none")+theme(panel.background = element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+```
+
+## EDA con box plot- ggplot2
+
+Para realizar **EDA con un box plot** dentro de R debemos utilizar la función boxplot, los argumentos que debemos pasarle son:
+
+- la información que vamos a explorar.
+- **ylab**: título para el eje y.
+- **main**: título de la gráfica.
+- **as.factor()** : para indicar que el numero es una categoria. Se paso de ver con error la grafica a ver las tres categorias de 4, 6 y 8 cilindros en cada boxplot correspondiente
+También podemos usar ggplot2 para crear un Box Plot.
+- **alpha**:  para cambiar el color de un boxplot en la grafica.Se cambio un azul oscuro por un gris para ver la linea de la media.
+```r
+# boxplot
+boxplot(mtcars$hp, ylab="caballos de fuerza", main="caballos de fuerza en carros mtcars")
+
+# boxplot con ggplot2
+ggplot(mtcars,aes(x=cyl,y=hp,fill=cyl))+geom_boxplot()+labs(x="cilindros", y="caballos de fuerza", title="caballos de fuerza segun cilindros en mtcars")+theme(legend.position = "none")+theme(panel.background = element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+# si ejecutamos el codigo anterior ocurrira un error por que es necesario agrupar la variable. Ya que es numerica y es necesario cambiarlo a factor o etiqueta.
+ggplot(mtcars,aes(x=as.factor(cyl),y=hp,fill=cyl))+geom_boxplot()+labs(x="cilindros", y="caballos de fuerza", title="caballos de fuerza segun cilindros en mtcars")+theme(legend.position = "none")+theme(panel.background = element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+# si ocurre un error de icompatibilidad usar el comando 'dev.off()' en la consola de rstudio.
+dev.off()
+
+# cambiar el color de los box
+ggplot(mtcars,aes(x=as.factor(cyl),y=hp,fill=cyl))+geom_boxplot(alpha=0.6)+labs(x="cilindros", y="caballos de fuerza", title="caballos de fuerza segun cilindros en mtcars")+theme(legend.position = "none")+theme(panel.background = element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+#
+ggplot(mtcars, aes(x=as.factor(am), y=mpg, fill=am))+geom_boxplot()+labs(x="Tipo de caja", y="millas por galon", title="Millas por galon segun tipo de caja-mtcars")+theme(legend.position = "none")+theme(panel.background = element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+## si queremos que los valores de 0 y 1 cambien podemos usar el siguiente codigo:
+mtcars$am <- factor(mtcars$am, levels = c(1,0), labels = c("manual","automatico"))
+# y ahora probamos nuevamnet el codigo del boxplot para observar el cambio
+ggplot(mtcars, aes(x=as.factor(am), y=mpg, fill=am))+geom_boxplot()+labs(x="Tipo de caja", y="millas por galon", title="Millas por galon segun tipo de caja-mtcars")+theme(legend.position = "none")+theme(panel.background = element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+```
+
+Al tratar de hacer un boxplot de economia naranja nos topamos con el inconveniente de que las unas etiquetas con las que contamos en este dataset con las etiquetas de los paises y que lo demas datos son numeros asi que no se podria hacer ningun cruce para hacer el boxplot, no podemos hacer un boxplot para cada pais. Boxplot nos cruza una **variable categotica** o etiquetas **con numeros**.
+
+Para resolver esta problematica se hara una clasificacion de paises segun el pib per capita por cada pais(cuales estan por ensema del promedio y cuales estan por debajo)
+
+```r
+# para ver el promedio del pib per capita
+economy <- mean(orangeec$GDP.PC)
+economy
+
+# Despues usaremos el paquete dplyr, se instala con 'install.packages("dplyr")' y cuando lo hayamos instalado solamente usamos el comando para activar la libreria
+library(dplyr)
+```
+**CREAR UNA NUEVA VARIABLE CATEGORICA**
+
+Esta variable se crea usando la variable numerica declarada en el **PASO 1**
+
+- `%>%` : significa que 'va a pasar a'
+
+- **mutate**: viene porque ese dataset va a cambiar, se va agrandar, va a mutar 
+
+- **ifelse**: significa que la nueva variable sera si otra variable del dataset es > menor a la declarada en el 
+
+```r
+# CREAR UNA NUEVA VARIABLE CATEGORICA
+orangeec <- orangeec %>% mutate(Strong_economy = ifelse(GDP.PC < economy, "Por debajo del promedio pib per capita", "Sobre promedio pib per capita"))
+# despues de correr el codigo vamos a poder ver una nueva variable en el dataset
+```
+
+```r
+# box plot de economia naranja
+ggplot(orangeec, aes(x=Strong_economy, y=Creat.Ind...GDP, fill=Strong_economy))+geom_boxplot(alpha=0.4)+labs(x="Tipo de pais", y="Aporte economia naranja al pib", title="Aporte economia naranja en pid paises latam con alto y bajo pib per capita")+theme(legend.position = "none")+theme(panel.background = element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+# box plot de economia naranja penetracion de internet
+ggplot(orangeec, aes(x=Strong_economy, y=Internet.penetration...population, fill=Strong_economy))+geom_boxplot(alpha=0.4)+labs(x="Tipo de pais", y="penetracion de internet", title="Penetracion de internet en paises latam con alto y bajo pib per capita")+theme(legend.position = "none")+theme(panel.background = element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+```
+
+## EDA con gráficas de dispersión con más de dos variables - ggplot2
+
+```r
+# scatter plot con ggplot en mtcars - dos variables
+ggplot(mtcars, aes(hp, mpg))+geom_point()+labs(x="caballos fuerza", y="millas por galon", title="Relacion caballos de fuerza y millas por galon")+theme(legend.position = "none")+theme(panel.background = element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+# scatter plot de Relacion peso-potencia
+ggplot(mtcars, aes(wt, hp))+geom_point()+labs(x="peso", y="potencia", title="Relacion peso-potencia")+theme(legend.position = "none")+theme(panel.background = element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+# scatter plot con ggplot en mtcars - cuatro variables
+ggplot(mtcars, aes(hp, qsec))+geom_point(aes(color=am,size=cyl))+labs(x="caballos fuerza", y="tiempo en 1/4 de milla", title="Caballos-verlocidad segun cilindraje y tipo de caja")+theme(legend.position = "none")
+
+# Internet y aporte economia
+ggplot(orangeec, aes(Internet.penetration...population,Creat.Ind...GDP))+geom_point(aes(color=factor(Strong_economy),size=GDP.Growth..))+labs(x="Penetracion Internet", y="Aporte economia naranja PIB", title="Internet y aporte economia naranja segun economia y crecimiento pib")
+
+# Relaciòn entre inversion en educacion y desempleo
+# En el eje x se encuentra la inversiòn en educaciòn como porcentaje % del PIB como Education.invest…GDP
+#El tamaño de cada esfera depende del porcentaje % de la poblacion que esta por debajo de la linea de pobreza se ve con la etiqueta X…pop.below.poverty.line
+En el eje y esta el desempleo como Unemployment
+ggplot(orangeec, aes(Education.invest...GDP,Unemployment))+geom_point(aes(color=factor(Strong_economy),size=X..pop.below.poverty.line))+labs(x="Inversion en educacion", y="Desempleo", title="Relacion entre inversion en educacion y desempleo segun el % de la poblacion que esta por debajo de la linea de pobreza")
+```
+
+**SCATTER PLOT INTERACTIVO**
+
+Para crear un scatter plot interactivo se hara uno de el paquete `plotly` con el comando `install.packages("plotly")` y despues usamos la libreria con el comando `library(plotly)`. Si llega a tener un error y no se descarga `plotly` intenta descargando las siguientes dependencias:
+```
+sudo apt-get install libssl-dev
+sudo apt-get install libcurl4-openssl-dev
+sudo apt-get install libssh2-1-dev
+sudo apt-get install libpq-dev
+sudo apt-get install zlib1g-dev
+```
+```r
+# SCATTER PLOT INTERACTIVO
+my_graph <- ggplot(orangeec, aes(Internet.penetration...population, Creat.Ind...GDP, label=row.names(orangeec)))+geom_point()+labs(x="Penetracion de internet", y="Aporte economia naranja", title="Penetracion Internet y aporte economia naranja")
+my_graph
+p <- ggplotly(my_graph)
+p
+```
