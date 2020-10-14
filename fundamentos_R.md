@@ -253,3 +253,191 @@ tiempo
 ```r
 colSums(tiempo)
 ```
+**rbind**: función para añadir una fila.
+```r
+final_matrix <- rbind(tiempo, c(10,15,30,5,0))
+final_matrix
+```
+
+**cbind**: funcion para añadir una columna.
+```r
+final_sabado_matrix <- cbind(final_matrix, Sabado = c(40,20,30))
+final_sabado_matrix
+```
+
+Identificar los elemenos de la matriz se usa la siguiente sintaxis `nombre_de_la_matriz[final,columna]`:
+```
+final_sabado_matrix[1,5]
+```
+
+## Operadores para comparar y ubicar datos
+
+Operadores| Significado
+----------|-------------
+`==` | igual
+`!=` | No igual (diferente)
+`<` | Menor que
+`<=` | Menor o igual que
+`>` | Mayor que 
+`>=` | Mayor o igual que
+`|` | o
+`!` | No
+`%in%` | que este es el dataset
+
+```r
+# Despues de que escribimos el signo '$' nos va a mostrar las variables que tenemos
+orangeec[oraneec$GDP.PC>=15000,]
+```
+
+Para hacer una selección de elementos de un vector, matriz o data frame podemos usar la función `subset`.
+```r
+neworangeec <- subset(orangeec, Internet.penetration...population > 80 & Education.invest...GDP >= 4.5)
+neworangeec
+```
+```r
+# La informacion sobre la penetracion de intener y la ninversion en educacion la queremos ver pero en paises desde la variable de economia naranja.
+# el 'select' lo usamos para seleccionar columnas(variables)
+neworangeec <- subset(orangeec, Internet.penetration...population > 80 & Education.invest...GDP >= 4.5, select = Creat.Ind...GDP)
+neworangeec
+```
+
+Podemos **renombrar una variable** de nuestro dataset orangeec, para ello debemos tener instalado el paquete `plyr.` En caso de no tener el paquete instalado solamente corremos en la consola el código `install.packages(“plyr”)`.
+
+```r
+rename(oraneec,c("Creat.Ind...GDP"="AporteEcNja"))
+```
+**Importante**
+Para usar `rename` luego de instalar el paquete `plyr` deben cargarlo:
+`library(“plyr”)`
+ó
+en el panel de Packages dar check a la casilla de `plyr`.
+
+## Factores, listas , ver dataset
+
+- **head**: es una función que nos retorna los primeros elementos de un dataset, por defecto nos retorna los primeros 6.
+```r
+head(mtcars)
+# cuando usamos la función head() por defecto devuelve los 6 primeros valores, pero este puede ser configurable añadiendo un parámetro:
+head(orangeec, n = 3)
+```
+- **tail**: función similar a head solamente que esta función nos retorna los últimos elementos.
+```r
+tail(mtcars)
+# para añadimos mas valores
+tail(orangeec, n = 2)
+```
+
+Además de poder visualizar un dataset con str podemos instalar el paquete **dplyr**: `install.packages(“dplyr”)`. Una vez instalado usamos la función **glimpse**.No olvidar `library(dplyr)`.
+```r
+# dbl son los numeros con decimales
+glimpse(orangeec)
+```
+
+Una **lista** es un vector genérico que puede contener objetos de todo tipo, en R para crear una lista solamente debes llamar a la función `list` y pasarle como argumentos los elementos.
+
+Las **listas** son un super objeto que nos permiten almacenar cualquier otro tipo de objetos, nos permite almacenar vectores, matrices, dataframe.
+
+```r
+my_vector <- 1:8
+my_vector
+#  se está indicando que la tabla se arme con 3 columnas, el que la secuencia se ordene por columnas es el método por defecto de R, no obstante, si a esta misma instrucción le agregamos el parámetro byrow = TRUE ahí estamos cambiando el comportamiento por defecto especificando que la secuencia se ordene por filas
+my_matrix <- matrix(1:9, ncol=3)
+my_matrix
+
+my_df <- mtcars[1:4,]
+my_df
+
+my_list <- list(my_vector, my_matrix, my_df)
+```
+
+## EDA
+
+**QUÉ ES EDA?**
+Por sus siglas EXPLORATORY DATA ANALYSIS, es la visualizaciòn de los datos antes de aplicar las formulas estadísticas
+
+Al momento de tener nuestro dataset es **importante** visualizarlos en alguna grafica antes de enfocarnos en las fórmulas estadísticas.
+Pueden suceder casos donde datasets distintos muestran los mismos valores estadísticos, pero sus elementos en una gráfica son totalmente diferentes. Es por ello por lo que es **importante** visualizarlos antes.
+
+El **cuarteto de Anscombe** nos habla de la importancia de visualizarlos en alguna grafica antes de enfocarnos en las fórmulas estadísticas.
+
+## Gráficas de dispersión e histogramas
+
+Existen varios tipos de gráficas para visualizar la información al momento de hacer EDA:
+
+- **Histograma**: sirve para ver la distribución de las frecuencias de una variable, es diferente a la gráfica de barras.
+- **Gráfica de dispersión(scatterplot)**: los ejes solamente pueden ser valores numéricos y los puntos no se pueden unir.
+- **Box plot**: nos muestra elementos como el mínimo, el máximo, el primer cuartil, la mediana y el tercer cuartil.
+
+## Box Plot
+
+Los 5 puntos clave en estadística descriptiva se pueden visualizar en el box plot:
+
+- Primer cuartil: es el piso de la caja o línea inferior.
+- Tercer cuartil: es el techo de la caja o línea superior.
+- Mediana: es la línea que se encuentra dentro de la caja.
+- Mínimo: la extensión inferior de la caja.
+- Máximo: la extensión superior de la caja.
+
+## EDA con dataset proyecto - Gráficas de dispersión.
+
+Para realizar EDA con una **gráfica de dispersión** dentro de R debemos utilizar la función plot, los argumentos que debemos pasarle son:
+
+- la información en el eje X y Y.
+- **xlab**: título para el eje x.
+- **ylab**: título para el eje y.
+- **main**: título de la gráfica.
+
+```r
+# EDA SCATTER PLOT MTCARS
+plot(mtcars$mpg ~ mtcars$cyl, xlab="cilindros", ylab = "millas por galon", main = "Relacion cilindros y millas por galon")
+
+# EDA SCATTER PLOT MTCARS
+plot(mtcars$mpg ~ mtcars$hp, xlab="caballos de fuerza", ylab = "millas por galon", main = "Relacion caballos de fuerza y millas por galon")
+
+# EDA orangeec
+plot(orangeec$Unemployment ~ orangeec$Education.invest...GDP, xlab = "Inversion educacion (%PIB", ylab = "Desempleo", main = "Relacion inversion en eduacion y desempleo")
+
+# EDA orangeec
+plot(orangeec$GDP.PC ~ orangeec$Creat.Ind...GDP, xlab = "Aporte economia naranja al PIB(%)", ylab = "PIB per capita", main = "Relacion economia naranja y pib per capita")
+```
+
+## EDA con histogramas
+
+Para realizar **EDA con un histograma** dentro de R debemos utilizar la función `qplot`, los argumentos que debemos pasarle son:
+
+- la información en el eje X.
+- **geom**: describir el tipo de gráfica que se va a imprimir.
+- **xlab**: título para el eje x.
+- **main**: título de la gráfica.
+- **aes** : contenido estético del gráfico. Es decir, la función le dará indicios a ggplot2 sobre cómo dibujar las formas y tamaños
+- **fill** : color de barra
+- **color** : contorno de barra
+- **binwidth** : ancho de barra
+- **labs** : etiquetas del eje (x,y)
+- **title** : nombre del histograma
+- **xlim** : escalas en el eje x
+- **theme** : color de fondo
+
+Además, podemos crear histogramas con el paquete ggplot2 para ello debemos `instalarlo: install.packages(“ggplot2”)`.
+
+```r
+install.packages("ggplot2")
+library(ggplot2)
+```
+```r
+# histograma mtcars qplot
+qplot(mtcars$hp, geom="histogram", xlab="caballos de fuerza", main="carros segun caballos de fuerza")
+
+# histograma mtcars ggplot2
+# 'aes' es la parte esteticas 
+ggplot(mtcars, aes(x=hp))+geom_histogram()+labs(x="Caballos de fuerza", y="Cantidad de carros", title="Caballos de fuerza en carros seleccionados")
+
+# agregando un fondo de color blanco con 'theme'
+ggplot(mtcars, aes(x=hp))+geom_histogram()+labs(x="Caballos de fuerza", y="Cantidad de carros", title="Caballos de fuerza en carros seleccionados")+theme(legend.position = "none")+theme(panel.background = element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+# modificando el grosor de la barra con 'binwidth'
+ggplot(mtcars, aes(x=hp))+geom_histogram(binwidth = 30)+labs(x="Caballos de fuerza", y="Cantidad de carros", title="Caballos de fuerza en carros seleccionados")+theme(legend.position = "none")+theme(panel.background = element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+# cambiar barras de color 
+ggplot()+geom_histogram(data=mtcars, aes(x=hp), fill="blue", color="red", binwidth=20)+labs(x="Caballos de fuerza", y="Cantidad de carros", title="Caballos de fuerza en carros seleccionados")+xlim(c(80,280))+theme(legend.position = "none")+theme(panel.background = element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+```
