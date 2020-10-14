@@ -280,7 +280,7 @@ Operadores| Significado
 `<=` | Menor o igual que
 `>` | Mayor que 
 `>=` | Mayor o igual que
-`|` | o
+`'|'` | o
 `!` | No
 `%in%` | que este es el dataset
 
