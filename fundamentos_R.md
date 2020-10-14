@@ -280,9 +280,11 @@ Operadores| Significado
 `<=` | Menor o igual que
 `>` | Mayor que 
 `>=` | Mayor o igual que
-`'|'` | o
 `!` | No
 `%in%` | que este es el dataset
+```
+| significa o
+```
 
 ```r
 # Despues de que escribimos el signo '$' nos va a mostrar las variables que tenemos
