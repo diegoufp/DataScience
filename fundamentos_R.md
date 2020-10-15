@@ -570,3 +570,58 @@ my_graph
 p <- ggplotly(my_graph)
 p
 ```
+
+## Buscando correlaciones con pairs 
+
+La función `pairs` nos permite cruzar todas las variables del dataset a modo de tabla donde el eje x de una gráfica corresponde a la columna donde se encuentra y el eje y a la fila.
+
+- **select**: función para seleccionar variables o columnas.
+- **filter**: función para filtrar datos de un dataset, retorna las filas que pasen el filtro.
+
+**select**:
+```r
+# cuando le estamos inficando solente una coma lo que queremos decir es que queremos todas las columnas.
+pairs(mtcars[,2:6])
+
+# Grafica de pairs con variables especificas
+# para ello usamos el paquete 'dplyr' y para cargarlo usamos library(dplyr)
+newdata <- subset(mtcars, select=c(1,6:7,10,11))
+pairs(newdata)
+
+# otra forma de hacer el subseting es indicar las columnas que no queremos
+pairs(mtcars[,-c(1,3,4,5,6,9,10)])
+
+## para selecionar variables que no son consecutivas usamos select
+```
+
+**filter**
+```r
+# 
+Eficientes <-filter(mtcars, mpg >= 30)
+Eficientes
+
+# queremos ver la relacion de unas variable pero solamente en esta seleccion que hicimos
+pairs(Eficientes[,1:5])
+
+# si queremos hacer una seleccion de modelos por algun nombre especifico o marca usaremos un paquete que se llama stringr
+install.packages("stringr")
+library(stringr)
+
+merc <- mtcars %>% filter(str_detect(mtcars[,1], "Merc"))
+merc
+pairs(mtcars[,1:5])
+```
+
+### Confirmando correlaciones con la función cor
+
+
+La función cor nos retorna la correlación entre los datos. Recordemos que el valor de una correlación va de -1 a 1, si se acerca a 0 no hay correlación.
+```r
+pairs(mtcars[,1:5])
+# para la observar la correlacion simplemente remplazamos pairs por cor
+
+cor(mtcars[,1:5])
+
+# hay ocaciones en que no hay datos existente asi que para solucionar este inconveniente le diremos a cor que use las observaciones que estan completas y asi no toma encuenta los 'NA'.
+cor(mtcars[,1:5], use="complete.obs")
+```
