@@ -625,3 +625,175 @@ cor(mtcars[,1:5])
 # hay ocaciones en que no hay datos existente asi que para solucionar este inconveniente le diremos a cor que use las observaciones que estan completas y asi no toma encuenta los 'NA'.
 cor(mtcars[,1:5], use="complete.obs")
 ```
+
+## Desviación estándar
+
+- **Desviación estándar**: la desviación Estándar, en un conjunto de datos es una medida de dispersión, que nos indica cuánto pueden alejarse los valores respecto al promedio (media).es útil para determinar entre qué rango puede moverse una determinada variable.
+(por lo tanto es útil para buscar probabilidades de que un evento ocurra)
+
+- **Coeficiente de variación**: este expresa la desviación estándar como porcentaje de la media, mostrando una mejor interpretación porcentual del grado de variabilidad que la desviación estándar.
+
+La formula del coeficiente de variación nos es útil al momento de evaluar estos casos:
+`(desviación estándar)/(promedio) * 100 = coeficiente`
+
+Si el coeficiente es mayor al 25% entonces los datos no son homogéneos, varían mucho.
+
+Dentro de R podemos sacar la desviación estándar con la función `sd` y el promedio con `mean`.
+
+```r
+# desviacion estandar
+sd(mtcars$mpg)
+# media
+mean(mtcars$mpg)
+
+# formula del coeficiente de variación
+prom <- mean(mtcars$mpg)
+desv <- sd(mtcars$mpg)
+CoefVar <- (desv/prom)*100
+CoefVar
+# y nos da de resultado 29.99881 entonces ese promedio en millas por galon los datos estan muy desviados del promedio
+```
+
+## Eliminando los NA\'s para hacer los cálculos.
+
+Al momento de sacar el promedio de nuestro dataset orangeec encontramos variables que tienen valores NA, para que estos no afecten nuestro cálculo solamente debemos añadir como argumento `na.rm=TRUE`.
+
+```r
+mean(orangeec$Creat.Ind...GDP, na.rm = TRUE)
+```
+
+El **eliminar los NA** del dataset puede ser **contraproducente** y puede generar **Sesgo**. En los entornos productivos es mejor aplicar técnicas de imputación de datos y esa directriz no la puede dar la industria. Por ejemplo una técnica de imputación es remplazar los valores NA por el valor promedio de la variable, otro ejemplo es remplazar los NA por el valor que más se repite en la variable.
+
+En las empresas esto no es una buena práctica, porque deja huecos en los resultados y eso indica una respuesta no tan refinada.
+
+## Generando tablas, filtrando y seleccionando datos - dplyr
+
+```r
+# Generando tablas, filtrando y seleccionando datos - dplyr-Parte 1
+eficientes <- mean(mtcars$mpg)
+eficientes
+# si aparece un error en %>% es por que no has activado dplyr, si ya lo tienes instalados solo tiene que ejecutar: library(dplyr)
+mtcars <- mtcars %>% mutate(mas_eficientes=ifelse(variable<eficientes,
+
+# recordemos que la coma despues del 16 es para que tome todas las observaciones
+Mas_veloces <- mtcars[mtcars$qsec<16,]
+Mas_veloces
+
+# se crea una nueva avriable
+mtcars <- mtcars %>% mutate(Velocidad_Cuarto_milla=ifelse(qsec < 16, "menos 16 segs", "mas 16 segs"))
+
+mtcars <- mtcars %>% mutate(Peso_kilos=(wt/2)*1000)
+
+mtcars <- mtcars %>% mutate(Peso=ifelse(Peso_kilos <= 1500, "Livianos", "Pesados"))
+```
+
+```r
+# Generando tablas, filtrando y seleccionando datos - dplyr-Parte 2
+orangeec <- orangeec %>% mutate(Crecimiento_GDP = ifelse(GDP.Growth.. >= 2.5, "2.5% o mas", "Menos 2.5%"))
+
+orangeec <-  orangeec %>% mutate(Anaranjados = ifelse(Creat.Ind...GDP >= 2.5, "Mas anaranjados", "Menos anaranjados"))
+
+# ranking
+orangeec %>% arrange(desc(Creat.Ind...GDP))
+
+# %in% quiere decir que nos va a buscar todo lo que tenga ciertas etiquetas
+TopNaranjas <- orangeec %>% filter(Country %in% c("Mexico", "Panama", "Argentina", "Colombia", "Brazil"))
+TopNaranjas
+
+TopNaranjas %>% arrange(desc(Creat.Ind...GDP))
+```
+
+## Viendo más información con facet wrap - Parte 1
+
+```r
+#
+mtcars %>% arrange(desc(Peso_kilos))
+
+mtcars_orderby_pesados<-mtcars %>% arrange(desc(Peso_kilos))
+
+mas_pesados <- filter(mtcars_orderby_pesados[1:4,])
+mas_pesados
+
+#facet_wrap permite ver diferentes observaciones en la misma grafica
+ggplot(mtcars, aes(x=cyl, y=mpg, size=Peso_kilos))+geom_point()+facet_wrap(~am)
+
+# 
+ggplot(mas_pesados, aes(x=hp, y= mpg))+geom_point()+facet_wrap(~model)
+
+# Para agregar color a la visualizacion necesitamos intalar el paquete RColorBrewer
+# install.packages("RColorBrewer")
+# library(RColorBrewer)
+# Lo primero que se hara es hacer una escala de colores 
+myColors <- brewer.pal(9, "Reds")
+
+ggplot(TopNajranjas, aes(x=Internet.penetration...population, y= GDP.PC, fill=Creat.Ind...GDP))+geom_tile()+facet_wrap(~Country)+scale_fill_gradientn(colors=myColors)
+```
+
+[Seguir practicando](http://eio.usc.es/pub/pateiro/files/pubdocentepracticasestadistica.pdf "Seguir practicando")
+
+## R Markdown
+
+Conociendo R Markdown y organizando los hallazgos del análisis en un documento PDF.
+
+Es momento de generar nuestro **documento con todas las gráficas y observaciones** que hemos realizado a nuestro dataset, para ello necesitamos instalar el paquete `rmarkdown`: `install.packages("rmarkdown")` y despues `library(rmarkdown)`. Y tambien el paquete `knitr`: `install.packages("knitr")` y `library(knitr)`
+
+Para **usar rmarkdown** salimos del ambiente de trabajo y nos vamos a `File/New File/R Markdown...` ahi nos pide qu escribamos un titulo 
+
+R Markdown nos permite **generar archivos en formato HTML, PDF y Word**. La mejor opción es trabajar en un formato **HTML** para compartirlo por internet y posteriormente convertirlo ya sea a PDF o Word.
+
+Dentro de nuestro archivo de R Markdown iremos escribiendo con sintaxis de markdown el archivo y cuando escribamos código por si solo se va a ejecutar y añadir las gráficas o cálculos a nuestro archivo.
+
+````r
+---
+title: "orangeec"
+author: "sann"
+date: "10/15/2020"
+output: html_document
+---
+```{r}
+orangeec <- read.csv("~/Documents/Data Science/orangeec.csv")
+data(orangeec)
+summary(orangeec)
+```
+````
+despues vamos a los botones que estan arriba de la hoja de Markdown, un boton con el nombre `Knit`, que lo usaremos para guardar el archivo.
+
+Tambien podemos agregar las **graficas** solemente poniendo la sintaxis
+````r
+---
+title: "orangeec"
+author: "sann"
+date: "10/15/2020"
+output: html_document
+---
+```{r}
+orangeec <- read.csv("~/Documents/Data Science/orangeec.csv")
+data(orangeec)
+summary(orangeec)
+```
+Este es un comentario que se puede hacer y se podra ver en el archivo.
+```{r}
+pairs(orangeec[,5:10])
+```
+````
+Para usar las **librerias** tenemos que indicarle a Markdown que la usaremos
+````r
+---
+title: "orangeec"
+author: "sann"
+date: "10/15/2020"
+output: html_document
+---
+```{r}
+orangeec <- read.csv("~/Documents/Data Science/orangeec.csv")
+data(orangeec)
+summary(orangeec)
+```
+Este es un comentario que se puede hacer y se podra ver en el archivo.
+```{r}
+pairs(orangeec[,5:10])
+```
+```{r}
+library(ggplot2)
+```
+````
