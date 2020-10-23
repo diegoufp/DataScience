@@ -85,6 +85,26 @@ sudo -u postgres psql
 \dt
 ```
 
+- Listar los esquemas de la base de datos actual
+```
+\dn
+```
+
+- Listar las funciones disponibles de la base de datos actual
+```
+\df
+```
+
+- Listar las vistas de la base de datos actual
+```
+\dv
+```
+
+- Listar los usuarios y sus roles de la base de datos actual
+```
+\du
+```
+
 - Cambiar de base de datos
 ```
 \c nombre_BD
@@ -120,10 +140,41 @@ SELECT version();
 \g
 ```
 
-- Inicializar el contador de tiempo para que la consola te diga en cada ejecucion cuando temoro en ejecutar esa funcion.
+- Ver el historial de comandos ejecutados
+```
+\s 
+```
+
+- Si se quiere guardar la lista de comandos ejecutados en un archivo de texto plano
+```
+\s <nombre_archivo>
+```
+
+- Ejecutar los comandos desde un archivo
+```
+\i <nombre_archivo>
+```
+
+- Permite abrir un editor de texto plano, escribir comandos y ejecutar en lote. \e abre el editor de texto, escribir allí todos los comandos, luego guardar los cambios y cerrar, al cerrar se ejecutarán todos los comandos guardados.
+```
+\e
+```
+
+- Equivalente al comando anterior pero permite editar también funciones en PostgreSQL
+```
+\ef
+```
+
+- Inicializar el contador de tiempo para que la consola te diga en cada ejecucion cuando temoro en ejecutar esa funcion.Activar / Desactivar el contador de tiempo por consulta
 ```
 \timing
 ```
+
+- Cerrar la consola
+```
+\q
+```
+
 
 - Crear base de datos
 ```
@@ -144,11 +195,19 @@ ALTER USER postgres PASSWORD 'newPassword';
 
 ## Archivos de Configuración
 
-- postgresql.conf
+- **postgresql.conf**:
+Configuración general de postgres, múltiples opciones referentes a direcciones de conexión de entrada, memoria, cantidad de hilos de pocesamiento, replica, etc.
 
-- pg_hba.conf
+- **pg_hba.conf**:
+Muestra los roles así como los tipos de acceso a la base de datos(IP's).
 
-- pg_ident.conf
+- **pg_ident.conf**:
+Permite realizar el mapeo de usuarios. Permite definir roles a usuarios del sistema operativo donde se ejecuta postgres.
+
+Para encontrar los **archivos de configuracion** tenemos que ejecutar en pgAdmin o en la terminarl de comando pero ya iniciado postgres:
+```
+SHOW config_file;
+```
 
 ## Aplicación de la ciencia de datos
 
@@ -419,3 +478,148 @@ CREATE TABLE persona_prueba(
 INSERT INTO persona_prueba VALUES ('Pablo', 'feliz');
 -- si en lugar de feliz ponemos un dato como 'enojado' que no existe entonces dara un error como resultado.
 ```
+
+## Agregación de datos
+
+La agregacion de datos es el encontrar formas en las que podamos juntar lso datos y sacar  totales para poder entregarse en reportes.
+
+```sql
+-- 'MAX' nos ayuda a sacar el maximo de cualquier tabla
+-- 'MIN' nos ayuda a sacar el minimo de cualquier tabla
+-- Para agrupar los datos usamos 'GROUP BY'
+--  Los valores de una tabla los ordenamos con 'ORDER BY'
+SELECT titulo, MAX(precio_renta)
+FROM peliculas
+GROUP BY titulo
+ORDER BY MAX(precio_renta) ASC;
+
+-- 'SUM' hace la suma de los valores en una tabla, sirve en la mayoria de ocaciones para suma monetarias.
+SELECT SUM(precio_renta)
+FROM peliculas;
+
+-- 'COUNT' coonteo
+SELECT clasificacion, COUNT(*)
+FROM peliculas
+GROUP BY clasificacion;
+
+-- 'AVG' se usa para sacar el promedio
+SELECT AVG(precio_renta)
+FROM peliculas;
+
+SELECT clasificacion, AVG(precio_renta) AS precio_promedio
+FROM peliculas
+GROUP BY clasificacion
+ORDER BY precio_promedio DESC;
+```
+
+## Trabajando con objetos
+
+Una caracteristica muy importante de PostgreSQL es su capacidad de trabajar con estructuras JSON.
+
+- JSON Texto plano - Es unicamente un string de texto.
+- JSON Binary - Es más rápido de procesar ya que se guarda como un archivo binario. Es una manejo mas eficiente que JSON Texto plano.
+
+El uso de objetos nos dará más flexibilidad en el trabajo.
+```sql
+-- 'serial' nos ayuda a que el id vaya aumentando de uno en uno para enumerar los valores de la tabla.
+-- si queremos trabajar con json binario tenemos que poner 'jsonb'
+CREATE TABLE ordenes (
+    ID serial NOT NULL PRIMARY KEY,
+    info json NOT NULL
+);
+
+-- insertamos 'info' para que el id se genere de manera automatica.
+INSERT INTO ordenes(info)
+VALUES 
+    (
+        '{"cliente": "David Sanchez", "items": {"producto":"Biberon", "cantidad":"24"}}'
+    )
+    (
+        '{"cliente": "Edna Cardenas", "items": {"producto":"Carro juguete", "cantidad":"1"}}'
+    )
+    (
+        '{"cliente": "Israel Vazquez", "items": {"producto":"Tren juguete", "cantidad":"2"}}'
+    )
+
+-- Para extraer datos en formato json;
+SELECT
+    info -> 'cliente' AS cliente
+FROM ordenes;
+
+-- Extraer los datos en formato cadena(string)
+SELECT
+    info ->> 'cliente' AS cliente
+FROM ordenes;
+
+
+SELECT
+    info ->> 'cliente' AS cliente
+FROM ordenes
+WHERE info -> 'items' ->> 'producto' = 'Biberon';
+```
+
+Hacer **operaciones** con tipo de dato json:
+
+```sql
+-- 'CAST' lo que hace es transformar un tipo de dato en otro
+SELECT 
+    MIN(
+        CAST(
+            info -> 'items' ->> 'cantidad' AS INTEGER
+        )
+    ),
+    MAX(
+        CAST(
+            info -> 'items' ->> 'cantidad' AS INTEGER
+        )
+    ),
+    SUM(
+        CAST(
+            info -> 'items' ->> 'cantidad' AS INTEGER
+        )
+    ),
+    AVG(
+        CAST(
+            info -> 'items' ->> 'cantidad' AS INTEGER
+        )
+    )
+FROM ordenes;
+
+```
+
+## [Common table expressions](https://www.postgresql.org/docs/12/queries-with.html#QUERIES-WITH-SELECT "Common table expressions")
+
+Las **Common table expression** pueden usar para simplificar el código, con ellas puede crear tablas temporales de un query determinado y luego poder hacer un query sobre el resultado final.
+por ejemplo generar una tabla resumen y luego hacer un query de esa tabla, de esta forma puede evitar hacer sub-queries o queries anidados que son difíciles de leer.
+
+en la clase se enseño solo una version de las common tables expressions “recursiva”, que hace exactamente lo mismo que lo que dije anteriormente pero en lugar de crear varias tablas temporales, usa los resultados de ella misma hasta que tenga una condición de parada.
+
+```sql
+WITH RECURSIVE tabla_recursiva(n) AS (
+    VALUES(1)
+    UNION ALL
+    SELECT n+1 FROM tabla_recursiva WHERE n <100
+) SELECT SUM(n) FROM tabla_recursiva;
+```
+
+- Es una herramienta que usa expresiones de tablas para agilizar en postgres cálculos en casos de uso específicos.
+
+- Ofrecen una mayor aplicabilidad a casos de usos **iterantes**, casos en los cuales su estructura bajo lenguaje SQL es dispendiosa tanto en su construcción como su ejecución para el servidor.
+
+- Es necesario ahondar más en este tema ya que su versatilidad es interesante.
+
+## [Window functions](https://www.postgresql.org/docs/12/functions-window.html "Window functions")
+
+Las window function se ocupan para entender la **relación que guarda un registro** en particular con respecto al resto del dataset, ya sea una tabla, una partición o un query. Generalmente se encargan de hacer **rankings**.
+
+## Particiones
+
+**Particionado** - Dividir una tabla en segmentos lógicos. Es una practica común de los manejadores, pero no todos ofrecen la opción para los usuarios de administrar estas particiones. Resulta útil para optimizar las consultas de datos.
+
+**Observaciones:**
+
+- No todas las tablas deben de ser particionadas, vale la pena hacerlo unicamente cuando hay muchos registros.
+- Permite optimizar algunas consultas al no tener que buscar dentro de toda una tabla sino unicamente en un segmento especifico.
+- El particionado altera la consistencia de la tablas
+    - No existen los indices (llaves primarias) en las particiones, o mejor dicho, estos indices cambian basándose en la partición. e.g Si particionas una tabla por fechas, al buscar un dato especifico el primer criterio de búsqueda será la fecha
+    - En una tabla de usuario o tabla de productos donde es importante tener un ID no es recomendable hacer particiones.
