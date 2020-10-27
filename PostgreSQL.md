@@ -623,3 +623,12 @@ Las window function se ocupan para entender la **relación que guarda un registr
 - El particionado altera la consistencia de la tablas
     - No existen los indices (llaves primarias) en las particiones, o mejor dicho, estos indices cambian basándose en la partición. e.g Si particionas una tabla por fechas, al buscar un dato especifico el primer criterio de búsqueda será la fecha
     - En una tabla de usuario o tabla de productos donde es importante tener un ID no es recomendable hacer particiones.
+
+
+## Presentación del proyecto
+
+### Top 10
+Se hara un top 10 peliculas que se an rentado mas
+
+sudo netstat -plunt |grep postgres
+
