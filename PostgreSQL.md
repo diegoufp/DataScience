@@ -16,6 +16,11 @@ psql --version
 ```
 sudo -u postgres psql
 ```
+**Saber puerto de postgres**
+```
+sudo netstat -plunt |grep postgres
+```
+
 **Estatus del servicio**
 ```
 sudo service postgresql status 
