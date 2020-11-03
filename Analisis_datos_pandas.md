@@ -577,3 +577,303 @@ df['t1'].iloc[::3].sub(df['t2'], fill_value=1000)
 df['t1'].dot(df['t1'])
 
 ```
+
+## Funciones más complejas y lambdas
+
+```py
+import pandas as pd
+import numpy as np
+from google.colab import drive
+drive.mount('/content/drive')
+
+%cd '/content/drive/My Drive/Colab Notebooks/db'
+!ls
+
+df_meteorites = pd.read_csv('Meteorite_Landings.csv')
+df_lmerged['timestamp'] = pd.to_datetime(df_lmerged['timestamp'])
+df_lmerged['hour'] = df_lmerged['timestamp'].dt.hour
+df = df_lmerged.iloc[:,1:]
+df
+
+def fun_1(x):
+  y = x**2 + 1
+  return y
+
+np.arange(-5,6).shape
+
+fun_1(np.arange(-5,6))
+
+# Usar una funcion en un dataframe
+df['hour'].apply(fun_1)
+
+# Tambien podemos usar funciones mas complejas
+def fun_2(x, a=0, b=0):
+  y = x**2 + a*x + b
+  return y
+
+fun_2(10,a=20,b=-100)
+
+# Usar una funcion mas compleja en un dataframe
+df['hour'].apply(fun_2, args=(20,-100))
+# tambien podemos especificar los argumentos
+df['hour'].apply(fun_2,a=20,b=-100)
+
+# Usar funcion lambda
+# lambda es un forma de definir una funcion en una sola linea
+df['t1'].apply(lambda x: x+273)
+
+# lambas mas complejos 
+# eso sacara la media de cada una de las columnas
+df.apply(lambda x:x.mean())
+# tambien se puede hacer a las filas
+df.apply(lambda x:x.mean(), axis=1)
+# operaciones esta las columnas con lambdas
+df.apply(lambda x:x['t1']-x['t2'], axis=1)
+
+# aplicar un mismo cambio a todo el dataframe
+df.applymap(lambda x:x/1000)
+```
+
+## Múltiples índices
+
+En esta practica usaremos una base de datos de [The World Bank](https://data.worldbank.org/ "The World Bank") la cual es esta [base de datos](https://data.worldbank.org/indicator/SP.POP.TOTL "base de datos"), simplemente buscamos l opcion de `Download` en `csv` y la subimos a nuestro google drive.
+
+```py
+import pandas as pd
+import numpy as np
+from google.colab import drive
+drive.mount('/content/drive')
+
+%cd '/content/drive/My Drive/Colab Notebooks/db/'
+!ls
+
+df_pob = pd.read_csv('poblacion.csv')
+df_pob
+
+# para quitar la notacion cientifica
+pd.options.display.float_format = '{:,.1f}'.format
+
+# cambiar de variable numerica a variable categorica en formato str
+df_pob['year'] = pd.Categorical(df_pob['year'].apply(str))
+
+df_pob.dtypes
+
+# La funcion llamada isin crea un vector de variables booleanas (falso, verdadero), que me permitira filtrar ambos paises
+idx_filtro = df_pob['Country'].isin(['Aruba', 'Colombia']) # hacemos que los demas paises sean falsos y ['Aruba', 'Colombia'] sean verdaderos
+idx_filtro
+# df.le devuelve un filtro (True, False) si en esa columna es menor a un valor (less) coloca True.
+# idx_filtro_pop = df_pob['pop'].le(1000000)
+
+# usamos el filtro para solo tener informacion de los dos paises
+df_sample = df_pob[idx_filtro]
+df_sample
+
+# Crear multiples indices
+# soret_index nos ayuda a tener una mejor vista
+df_sample = df_sample.set_index(['Country', 'year']).sort_index()
+df_sample
+
+# ahora si solo queremos eleccionar de indicie a colombia
+df_sample.loc['Colombia',:]
+# si queremos buscar ademas un a;o en especifico
+df_sample.loc['Colombia',:].loc['2016',:]
+
+# atraves de la funcion xs tambien podemos seleccionar multiples indices
+df_sample.xs(['Aruba', '2018'])
+
+# si solo queremos seleccionar los a;os ne el segundo indice podemos especificar la busqueda a bajo nivel
+df_sample.xs('2018',level='year')
+
+# aplicarlo a toda la base de datos
+df_contries = df_pob.set_index(['Country', 'year']).sort_index()
+# tambien podemos organizar nuestros datos mediante la funcion 'ascending'
+# en el cual establecemos el orden(en esta ocacion establecemos orden alfabetico inverso)
+#df_contries = df_pob.set_index(['Country', 'year']).sort_index(ascending=[False,True])
+df_contries
+
+# IndexSlice
+ids = pd.IndexSlice
+df_contries.loc[ids['Aruba':'Austria', '2015':'2017'],:].sort_index()
+
+# si queremos tener todos los indices del primer nivel podemos usar:
+df_contries.index.get_level_values(0)
+# si queremos tener todos los indices del segundo nivel podemos usar:
+df_contries.index.get_level_values(1)
+
+# Cuando trabajamos con un df con multiples indices tenemos que da multiples intrucciones para encontrar un dato en especifico
+df_contries['pop']['Colombia']['2018']
+
+# la ventaja de tener dos indices es a la hora de usar funciones matematicas sobre el
+# podemos definir que nos calcule la suma de la poblacion, pero en el nivel de indice 'year'
+df_contries.sum(level='year')
+
+# cambiar el formato de los indices
+# unstack lo que va a ser es convertir los indices en columnas
+df_sample.unstack('year')
+```
+
+## Cómo trabajar con variables tipo texto en Pandas 
+
+Pandas cuenta con una gran funcionalidad a la hora de interactuar con texto, es super versatil si estas interesado en crear modelos de análisis de lenguaje natural.
+
+Comencemos cargando nuestra librería y creando un diccionario con nombres de personas.
+```py
+import pandas as pd
+data = {'names':['Sara Moreno 34',
+                 'jUAn GOMez 23',
+                 'CArlos mArtinez 89',
+                 'Alfredo VelaZques 3',
+                 'luis Mora 56',
+                 '@freddier #platzi 10',pd.NA]}
+```
+
+Usemos los datos del diccionario para crear nuestro DataFrame. Nuestro DataFrame contiene una columna tipo texto, con variedades de caracteres especiales, números, mayúsculas e inclusive variables nulas.
+
+```py
+df = pd.DataFrame(data)
+df
+```
+
+Para usar las funciones asociadas a texto usamos str en nuestro DataFrame, por ejemplo, si se quiere colocar el texto en minúscula, basta con escribir:
+
+```py
+df['names'].str.lower()
+```
+
+Para mayúsculas igualmente:
+```py
+df['names'].str.upper()
+```
+
+O si queremos solo la primera letra en mayúscula:
+```py
+df['names'].str.capitalize()
+```
+
+Para contar la longitud de nuestro texto usamos:
+```py
+df['names'].str.len()
+```
+
+Para dividir el texto por espacios usamos split y definimos el carácter por
+el que queremos dividir, en este caso, un espacio vacío ' ' o '#':
+```py
+df['names'].str.split(' ')
+df['names'].str.split('#')
+```
+
+Para seleccionar los primeros o últimos 5 caracteres usamos:
+```py
+df['names'].str[:5]
+df['names'].str[-5:]
+```
+Podemos reemplazar una secuencia de caracteres por otra mediante:
+```py
+df['names'].str.replace('Alfredo','Antonio')
+```
+
+También podemos buscar una secuencia de texto en específico, en este caso,
+'ara':
+
+```py
+df['names'].str.findall('ara')
+```
+
+También podemos crear un filtro basándonos en una secuencia de texto en
+específico, en este caso, las filas que tengan 'or':
+```py
+df['names'].str.contains('or')
+```
+Así mismo, podemos contar el número de ocurrencias de un caracter en específico,
+por ejemplo, cuántas veces aparece la letra 'a':
+```py
+df['names'].str.lower().str.count('a')
+```
+
+Existen comandos más avanzados usando Regex, por ejemplo, si quiero extraer los
+caracteres numéricos:
+```py
+df['names'].str.extract('([0-9]+)', expand=False)
+```
+
+O, por ejemplo, si quiero extraer las menciones '@xxxx' del texto:
+```py
+df['names'].str.replace('@[^\s]+','')
+```
+
+## Concatenación de DataFrames: concat y append
+
+```py
+import pandas as pd
+import numpy as np
+
+# para que las cantidades sean mas legibles en pandas y en numpy
+pd.options.display.float_format =  '{:.2f}'.format
+np.set_printoptions(precision=1)
+
+# CONCATENACION CON NUMPY
+
+# crear numero aleatorio con numpy
+# 'rand' crear un numero aleatorio entre 0 y 1
+np.random.rand
+# 'randn' crea un numero aleatorio -1 y 1
+
+# en este caso crearemos una matris de 2 x 5  en numeros aleatorios
+x1 = np.random.rand(2,5)*10
+x2 = np.random.rand(2,5)*-1
+
+# numpy puede concadenar matrices con la funcion 'concatenate'
+np.concatenate([x1,x2])
+
+# si vemos las dimenciones del objeto que hemos creado podemos ver que ahora crecio a uno de 4 x 5
+np.concatenate([x1,x2]).shape
+
+# podemos concadenar a lo largo del eje de las columnas y esto lo hacemos especificando su eje
+np.concatenate([x1,x2], axis= 1)
+
+# si vemos las dimenciones del objeto que hemos creado podemos ver que ahora crecio a uno de 2 x 10
+np.concatenate([x1,x2], axis= 1).shape
+
+# CONCATENACION CON PANDAS
+
+s1 = pd.Series(x1[0], index=['a', 'b', 'c', 'd', 'e'])
+s2 = pd.Series(x2[0], index=['c', 'd', 'e', 'f', 'g'])
+
+# para hacer una concatenacion en pandas usamos la funcion de 'concat'
+pd.concat([s1,s2])
+# para concatenar a lo largo de las columnas
+pd.concat([s1,s2], axis=1)
+# para concatenar a lo largo de las columnas sin respetar el indice
+# para hacer esto simplemente vamos resetear su indice
+# 'reset_index' borra el indice previamente decinido y para que no siga apareciendo como una columna usamos 'drop=True'
+# ahora optenemos ua serie con indice nuevos
+s1.reset_index(drop=True)
+
+# Y lo remplazamos en la concatenacion 
+pd.concat([s1.reset_index(drop=True),s2.reset_index(drop=True)], axis=1)
+
+# CONCATENACION DE DATAFRAMES
+
+df1 = pd.DataFrame(np.random.rand(3,2)*10, columns=['a','b'])
+df2 = pd.DataFrame(np.random.rand(3,2)*-1, columns=['a','b'], index=[2,3,4])
+
+pd.concat([df1,df2])
+
+# si queremos concatenar a lo largo de las columnas
+pd.concat([df1,df2], axis=1)
+
+# si estamos concadenan dos df y queremos hacer enfacis en una columna donde se comparten los elementos lo podemos hacer atravez del argumento 'join'
+pd.concat([df1,df2], axis=1, join='inner')
+
+# si queremos concadenar sin respetar sus indices tambin podemos resetear los indices
+pd.concat([df1.reset_index(drop=True),df2.reset_index(drop=True)], axis=1)
+
+# hay una forma mas simple de concadenar dos dataframes y es con 'append'
+df1.append(df2)
+
+# siq uermeos hacer un append a lo largo del eje de las columas 
+# primero invertimos las filas y las columnas con 'T'
+df1.T
+# ya hora lo aplicamos para unir atraves del eje de las columnas
+df1.T.append(df2.T).T
+```
