@@ -877,3 +877,303 @@ df1.T
 # ya hora lo aplicamos para unir atraves del eje de las columnas
 df1.T.append(df2.T).T
 ```
+
+## Merge de DataFrames
+
+**Marge** es un tipo de concatenacion que se da cuando los dos dataframes contienen una columna en comun, estoy es muy util cuando tienes fuentes de datos diferentes y quieres unirficarlos atravez de un parametro que se comparte entre ellas.
+
+```py
+import pandas as pd
+import numpy as np
+from google.colab import drive
+drive.mount('/content/drive')
+
+%cd '/content/drive/My Drive/Colab Notebooks/db/'
+!ls
+
+df_left = pd.DataFrame(
+    {'X':['x0','x1','x2','x3'],
+    'W':['w0','w1','w2','w3'],
+    'Y':['y0','y1','y2','y3'],
+    'Mix':['y2','y3','a2','a3']},
+    index = ['y2','y3','a2','a3'])
+
+df_right = pd.DataFrame(
+    {'Z':['z2','z3','z4','z5'],
+     'A':['a2','a3','a4','a5'],
+     'Y':['y2','y3','y4','y5']},
+    index = [2,3,4,5])
+
+# ahora las dos columnas se an unificado atravez de una columna en comun
+pd.merge(df_left, df_right)
+
+# en general siempre es bueno especificar el tipo de union  que se esta presentando 
+pd.merge(df_left, df_right, how='inner', on='Y')
+
+# puedpd.merge(df_left, df_right, how='inner', on='Y')e que queramos unir la columna 'Y' con la columna 'mix' para ello:
+pd.merge(df_left, df_right, how='inner', left_on='Mix', right_on='Y')
+# tambien podemos hacerlo atraves de la columna 'A' por que esta tiene parametros de 'y' y 'a'
+pd.merge(df_left, df_right, how='inner', left_on='Mix', right_on='A')
+
+# Merge posibles:
+# 'inner'(natural join): que funciona trayendo los parametros que tienen en comun los dataframe 
+# 'left'(left outer join): que siemplemente se a;aden los parametros que tiene a la derecha 
+# 'right'(right outer join): que siemplemente se a;aden los parametros que tiene a la izquierda
+# 'outer'(full outer join): En donde se juntar todos los parametros
+
+df_left = pd.DataFrame(
+    {'X':['x0','x1','x2','x3'],
+    'W':['w0','w1','w2','w3'],
+    'Y':['y0','y1','y2','y3']},
+    index = ['y2','y3','a2','a3'])
+
+df_right = pd.DataFrame(
+    {'Z':['z2','z3','z4','z5'],
+     'A':['a2','a3','a4','a5'],
+     'Y':['y2','y3','y4','y5']},
+    index = [2,3,4,5])
+
+# 'inner'(natural join): que funciona trayendo los parametros que tienen en comun los dataframe 
+pd.merge(df_left, df_right, how='inner', on='Y')
+
+# 'left'(left outer join): que siemplemente se a;aden los parametros que tiene a la derecha 
+pd.merge(df_left, df_right, how='left', on='Y')
+
+# 'right'(right outer join): que siemplemente se a;aden los parametros que tiene a la izquierda
+pd.merge(df_left, df_right, how='right', on='Y')
+
+# 'outer'(full outer join): En donde se juntar todos los parametros
+pd.merge(df_left, df_right, how='outer', on='Y')
+
+# Hay otros tipo de merge que se pueden hacer cuando se comparte mas de un solo parametro
+df_left = pd.DataFrame(
+    {'X':['x0','x1','x2','x3'],
+    'W':['w0','w1','w2','w3'],
+    'Y':['y0','y1','y2','y3'],
+     'A':['a0','a1','a2','a3']}
+    )
+
+df_right = pd.DataFrame(
+    {'Z':['z2','z3','z4','z5'],
+     'A':['a2','a3','a4','a5'],
+     'Y':['y2','y3','y4','y5']},
+    index = [2,3,4,5])
+
+pd.merge(df_left, df_right, how='outer', on=['Y','A'])
+# Es importante el definir las columnas a las cuales vamos a ahcer el merge
+# si especificamos solamente la columna 'A' entonces las columnas con mismo valores que no especificames apareceran con un sufijo para diferenciarlas
+pd.merge(df_left, df_right, how='outer', on='A')
+# Estos sufijos se pueden cambiar con 'suffixes'
+pd.merge(df_left, df_right, how='outer', on='A', suffixes=['_left', '_right'])
+```
+
+## ¿Cómo lidiar con datos faltantes en tus DataFrames? 
+
+Es muy común que nuestros DataFrames presenten datos faltantes, antes de empezar a procesar nuestros DataFrames veamos un poco en qué consisten los objetos NaN (Not a Number).
+
+Importemos las librerias Pandas y Numpy para esto:
+
+```py
+import numpy as np
+import pandas as pd
+```
+
+Un número que no está definido usualmente se representa con el siguiente objeto:
+```
+np.nan
+> nan
+```
+
+¡Este objeto tiene propiedades matemáticas! Al sumar un número, obtenemos como
+respuesta el mismo NaN.
+```py
+np.nan + 0
+> nan
+
+np.nan > 0
+> False
+```
+
+La versión 1.0 de pandas incluye un nuevo objeto NA, que es mucho más
+general pues, ademas de interactuar con números, tambien puede hacerlo con
+cadenas de texto u otras varaibles como las de tipo booleano. Si quieres que
+esta nueva definición este incluida entre tus cálculos usa:
+
+```py
+pd.options.mode.use_inf_as_na = True
+```
+
+Al sumar NA a una cadena de texto, obtengo el mismo NA:
+```
+pd.NA +'Hola mundo'
+> <NA>
+
+pd.NA | False
+> <NA>
+```
+
+A continuación, vamos a crear un DataFrame
+```py
+df = pd.DataFrame(np.arange(0, 15).reshape(5, 3), columns=['a', 'b', 'c'])
+df
+```
+
+Y vamos a añadir algunas variables no definidas:
+```py
+df['d'] = np.nan
+df['e'] = np.arange(15, 20)
+df.loc[5,:] = pd.NA
+df.loc[4,'a'] = pd.NA
+df.loc[0,'d'] = 1
+df.loc[5,'d'] = 10
+df
+```
+
+Para reconocer cuando un objeto es nulo simplmente usamos:
+```
+df.isnull()
+```
+
+En dónde todas nuestras variables no definidas fueron marcadas con `TRUE`,
+`df.isna()` tambien cumple esta función.
+
+
+
+Conocer el número de variables nulas por columna puede hacerse juntando el
+comando anterior con la funcion de suma:
+
+```
+df.isnull().sum()
+```
+
+Si lo que nos interesa es conocer el número de filas con elementos nulos, basta
+con usar `axis=1`:
+```
+df.notnull().sum(axis=1)
+```
+
+O todos los elementos nulos de nuestro DataFrame:
+```
+df.size-df.isnull().sum().sum()
+```
+
+Reconocer estos elementos nos puede ayudar a filtrar en nuestro DataFrame, en
+este caso, me gustaría filtrar por las variables no nulas de la columna ‘a’:
+```py
+df[df['a'].notnull()]
+```
+
+`dropna` es perfecto para elimnar rapidamente las filas con registros faltantes:
+```py
+df.dropna()
+df[['a']].dropna()
+```
+
+Ya que hemos visto cómo funcionan las variable nulas, veamos cómo lidiar con
+ellas. Usando la función fillna podremos reemplazarlas por el valor que
+querramos, en este caso 0.
+```
+df.fillna(0)
+```
+
+Si quisieramos remplazar con el valor siguiente usamos `method="ffill"`:
+```py
+df.fillna(method="ffill")
+```
+
+Si quisieramos remplazar con el valor previo usamos `method="bfill"`, eso es lo contrario a `method="ffill"`:
+```
+df.fillna(method="bfill")
+```
+
+El mismo ejercicio anterior se puede aplicar con las filas usando `axis=1`:
+```py
+df.fillna(method="bfill",axis=1)
+```
+
+Podemos usar también una serie para reemplazar los valores de una columna en especifico, es importante que haya emparejamiento entre los índices:
+```
+fill = pd.Series([100, 101, 102])
+fill
+```
+```py
+df['d'] = df['d'].fillna(fill)
+df['d']
+df
+```
+
+Una de las **formas más usadas** para reemplazar datos es usar el promedio de las columnas, esto se hace con la función `mean`. O si se quiere un mejor estimador, usamos median.
+```
+df.fillna(df.median())
+```
+
+Por último, Pandas también puede **interporlar** los valores faltanes calculando el valor que puede haber existido en el medio.
+```py
+df_d = pd.concat([df[['d']], df[['d']].interpolate()],axis=1)
+df_d.columns = ['d_antes','d_interpolado']
+df_d
+```
+
+## Group by
+
+La funcion `Group by` permite agrupar atravez de una serie de elemetos y sobre este aplicar diversas funciones.
+
+```py
+import pandas as pd
+import numpy as np
+# seaborn es una base de datos que esta dentro de una importante herramienta de visualizacion
+import seaborn as sns
+
+df = sns.load_dataset('diamonds')
+df
+
+# con gruupby agruparemos los datos de acuerdo a una variable 
+df.groupby('cut').mean()
+# tambien podemos usar otros estimadores estadisticos como median que no esta sesgado y es mucho las preciso cuando tienes distribuciones con colas muy largas
+df.groupby('cut').median()
+
+# podemos hacer uso de este tipo de funciones a niveld e columnas como 'count' que contara los datos
+df.groupby('cut')['carat'].count()
+# pero tambien podemos extraer el valor maximo
+df.groupby('cut')['carat'].max()
+# y tambien podemos extraer el valor minimo
+df.groupby('cut')['carat'].min()
+
+# funcion para agrupar sobre un parametro
+for key_group, group in df.groupby('cut'):
+  grouped_price = group['price'].mean()
+
+  print(f'cut: {key_group}, Price: {grouped_price} \n')
+
+# funcion para agrupar sobre varios parametros
+# to_frame es para convertir en un dataframe
+df.groupby(['cut','color'])['price'].mean().to_frame()
+# EStos se convirtio en un dataframe con multiples indices
+
+# Con 'aggregate' podemos definir una lista de las funciones que queremos aplicar 
+df.groupby(['cut','color'])['price'].aggregate(['min', np.mean,max])
+# con esto obtenemos que por las dos vaiables(indices) por las cuales estamos agrupando y cada una de las funciones que le emos pedido en el agrupamiento son columnas
+
+# nosotros podemos definir nuestras propias funciones para hacer este mismo proceso
+# para ello primero crearemos una funcion de ejemplo
+def mean_kilo(x):
+  return np.mean(x)/1000
+
+# y ahora la agregamos al elemento
+df.groupby(['cut','color'])['price'].aggregate(['min', np.mean,max, mean_kilo]).head(10) #pondremos un head para no mostrar todo los elementos
+
+# podemos hacer un diccionario de instrucciones que podemos colocar sobre 'aggregate'
+dict_agg = {'carat': [min,max], 'price':[np.mean,mean_kilo]}
+df.groupby(['cut','color']).aggregate(dict_agg)
+# y con esto logramos tener multiples indices en filas y columnas
+
+# podemos definir una funcion de filtro 
+def f_filter(x):
+  return mean_kilo(x['price'])>4
+
+df.groupby('cut').filter(f_filter)
+# para entender lo que esta sucediendo vamos a utilizar 'unique'
+df.groupby('cut').filter(f_filter)['cut'].unique()
+# En esta ocacion se filtraron 2 categorias : ['Premium', 'Fair']
+# que son los tipos de corte que mas coste elevado tienen en los cortes
+```
