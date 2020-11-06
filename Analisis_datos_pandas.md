@@ -1177,3 +1177,288 @@ df.groupby('cut').filter(f_filter)['cut'].unique()
 # En esta ocacion se filtraron 2 categorias : ['Premium', 'Fair']
 # que son los tipos de corte que mas coste elevado tienen en los cortes
 ```
+
+## Cómo lidiar con datos duplicados en Pandas 
+
+Es muy usual que los registros de una base de datos aparezcan más de una vez, así que veamos cómo pandas puede ayudarnos a lidiar con estos casos. Para comenzar, importemos pandas y creemos un DataFrame con dos columnas y algunos datos repetidos.
+
+```py
+import pandas as pd
+
+df = pd.DataFrame({'a': ['w'] * 4 + ['x'] * 3 + ['y'] * 2 + ['z']+['v'], 
+                   'b': [1, 1, 1, 1, 2, 2, 2, 3, 3, 4,5]})
+df
+```
+
+Para encontrar los registros duplicados usamos duplicated , que marca con True aquellos casos de filas duplicadas:
+
+```
+df.duplicated()
+```
+
+Podemos usar `keep='first'` para marcar solo la primera ocurrencia o keep='last' para marcar la última:
+```py
+df.duplicated(keep='first')
+```
+```py
+df.duplicated(keep='last')
+```
+
+Identificados los casos duplicados, podemos usar este resultado para filtrar y seleccionar aquellos que no tienen un registro duplicado:
+```py
+df[~ df.duplicated()]
+```
+
+Si quisieras dejar el primer registro de los duplicados o el último, recuerda usar `keep='first'` o `keep='last'`. Remarco el hecho de que usé negación `'~'` para ver los registros no duplicados.
+
+Y si me interesara ver cuáles son los registros duplicados, podemos usar `keep=False`:
+
+```py
+df.duplicated(keep=False)
+```
+```py
+df[df.duplicated(keep=False)]
+```
+
+Por último, puedes usar el comando 'drop_duplicates' para eliminar los duplicados. Por defecto, la función guarda el primer resultado keep='first':
+```py
+df.drop_duplicates()
+```
+
+Y si quieres solo borrar duplicados teniendo en cuenta una sola columna, lo puedes hacer mediante una lista nombrando las columnas donde vas a eliminar los duplicados, en este caso, ['a']:
+
+```py
+df.drop_duplicates(['a'],keep='last')
+```
+
+## Aggregation y groupby
+
+```py
+import pandas as pd
+import numpy as np
+# seaborn es una base de datos que esta dentro de una importante herramienta de visualizacion
+import seaborn as sns
+
+pd.options.display.float_format = '{:,.3f}'.format
+
+df = sns.load_dataset('tips')
+df
+
+df.describe(include='all')
+
+df['day'].value_counts()
+# para obtener los porcentajes
+df['day'].value_counts() / df['day'].value_counts().sum()*100
+
+# tener estimaciones estadisticas por alguna de las categorias
+df.groupby('sex').mean()
+
+# nueva columna de relacion entre el valor de la propina y el costo de la factura total para ver el porsentaje que el corresponde a esta factura 
+df['prct_tip'] = df['tip']/df['total_bill']
+df
+
+df.groupby('sex').mean()
+# volvemos a observar el df con el groupby('sex') podemos observar que en el caso de las mujeres la pripina es mayor 
+# sin embargo aveces usar promedios no son muy buenos ya que son estimadores que estan sesgados estadisticamente por los outliers de la misma distribucion
+# por esta razon usamos la media 
+df.groupby('sex').median()
+
+# tambien podemos aplicar un grupo de funciones 
+df.groupby('sex')[['prct_tip']].describe()
+# obtenemos los mismo estimadores pero aplicados a la variable 'prct_tip' y por generos
+# de igual forma podemos agregar mas grupos de analicis estadisticos 
+df.groupby('sex')[['total_bill','prct_tip']].describe()
+
+# Para aplicar una funcion directamente
+def mean_eur2usd(x):
+  return np.mean(x)*1.12
+
+mean_eur2usd(100)
+
+df.groupby('sex')[['total_bill','prct_tip']].apply(mean_eur2usd)
+# esto tambien se puede hacer para ams variables
+df.groupby(['sex', 'time'])[['total_bill','prct_tip']].apply(mean_eur2usd)
+# cuando usamos 'apply' podemos poner funciones definidas por nosotros o funciones ya definidas(como numpy por ejemplo
+df.groupby(['sex', 'time'])[['total_bill','prct_tip']].apply(np.std) # desviacion estandar
+# tambien podemos definir nuestars funciones con 'lambda'
+df.groupby(['sex', 'time'])[['total_bill','prct_tip']].apply(lambda x: np.mean(x)*1.12)
+
+# si queremos agregar mas de una funcion entonces tenemos que usar 'aggregate' o tambien se podria escribir 'agg' y sera la misma funcion
+df.groupby(['sex', 'time'])[['total_bill','prct_tip']].aggregate([np.mean, np.max])
+df.groupby(['sex', 'time'])[['total_bill','prct_tip']].agg([np.mean, np.max])
+
+# diccionario con un conjuntos de funciones
+dict_agg = {'tip':[min,max], 'total_bill':[np.mean, mean_eur2usd]}
+dict_agg
+
+df.groupby(['sex', 'time'])[['total_bill','tip']].agg(dict_agg)
+
+# podemos definir filtros
+def f_filter(x):
+  return mean_eur2usd(x['total_bill'].mean()) > 20
+
+df.groupby(['sex', 'time']).filter(f_filter)
+
+# para validar que el filtro funciona
+df_filter = df.groupby(['sex', 'time']).filter(f_filter)
+df_filter.groupby(['sex', 'time']).count()
+```
+
+**Extraer valor con variables categóricas**
+
+```py
+df['ones'] = 1
+
+df_g = df.groupby(['sex','smoker'])[['ones']].sum()
+df_g
+# se hizo un conteo de l total de personas que componen estos dos grupos '['sex','smoker']'
+# ES interesante por que se extrajo informacion de dos variables que eran totalmente categoricas 
+# ESto se logro con el peque;o truco de generar una columna de numeros 1
+
+# si lo quisieramos convertir a porsendaje lo que tendriamos que hacer es:
+df_g / df.groupby(['sex'])[['ones']].count()*100
+# la otra forma de hacerlo con 'groupby:
+df_g.groupby(level=0).apply(
+    lambda x:
+    x / x.sum() * 100
+)
+
+# Otra forma en la cual podemos extraer valor de nuestros datos es tambien transformar nuestras variables numericas en una variable categorica
+# la vamos a trasformar en una variable categorica para intervalos
+# los bins el numero de categorias 
+pd.cut(df['total_bill'], bins=3)
+
+# si queremos ver las categorias que creo
+pd.cut(df['total_bill'], bins=3).value_counts()
+# tambien se pueden crear en cuantiles
+pd.qcut(df["total_bill"], q = 10).value_counts()
+
+# tambien podemos definir el encho de nuestras cateogrias siemplemte poniendo una lista 
+pd.cut(df['total_bill'], bins= [3,18,35,60]).value_counts()
+
+# ahora lo agregaremos al dataframe
+df['bin_total'] = pd.cut(df['total_bill'], bins=[3,18,35,60])
+df
+
+# dentro de estas categorias tambien podemso hacer gruopby
+df.groupby(['time','bin_total'])[['ones']].count()
+# en porcentajes
+df.groupby(['time','bin_total'])[['ones']].count() / df.groupby(['time'])[['ones']].count()*100
+# o de la segunda forma para encontrar el porcenaje
+df.groupby(['time','bin_total'])[['ones']].count().groupby(level=0).apply(
+    lambda x:
+    x / x.sum() * 100
+)
+```
+
+**Tablas dinámicas con Pivot Table**
+
+```py
+# la funcion de pandas 'Pivote table' nos permite extraer cuando tenemos variables categoricas gran informacion y valor de nuestros df
+df
+
+df.groupby(['sex', 'time'])[['total_bill']].mean() 
+
+# sobre le elementos se hara un 'reset_index' para resetear los indices
+df_gp = df.groupby(['sex', 'time'])[['total_bill']].mean().reset_index()
+df_gp
+
+# se creara una tabla dinamica con 'pivot_table'
+# lo que obtenemos es que la tabla se a restrcuturado, lo que antes eran datos de una columna se volvio el indice y
+# los datos de la columna 'time' ahora son las variables(columnas)
+df_gp.pivot_table(values='total_bill', index='sex', columns='time')
+# si hubieramos aplicado el 'pivote_table' directamente sobre el dataframe completo tendriamos el mismo resultado
+# ESto es por que internamente 'pivot_table' esta realizando el promedio de cada uno de los valores 
+# pero la funcion se puede manipular, esta funcion se llama 'aggfunc'
+# si en lugar del promedio queremos la media, lo podemos especificar
+df.pivot_table(values='total_bill', index='sex', columns='time', aggfunc=np.median)
+
+# asi como se puede poner una funcion, tambien se puede colocar un diccionario o una lista de funcciones
+df_pivot = df.pivot_table(values='total_bill', index='sex', columns='time', aggfunc=[np.median, np.std])
+df_pivot
+
+# 'unstack' lo que va hacer es desacer mis categorias 
+# y despues lo volvemos un dataframe con 'reset_index'
+# podemos observar que se agrega una columna llamda 'level_0' la cual es las funciones que agregamos '[np.median, np.std]' 
+df_pivot.unstack().reset_index()
+```
+
+## Series de Tiempo
+
+Para esta practica eligiremos un dataset sobre [covid 19](https://www.kaggle.com/search?q=covid+19+in%3Adatasets "covid 19")
+
+```py
+from google.colab import drive
+drive.mount('/content/drive')
+
+%cd '/content/drive/My Drive/Colab Notebooks/db'
+%ls
+
+df = pd.read_csv('covid_19_data.csv')
+df.sample(10)
+# le daremos formato tipo timepo a la columna 'ObservationDate'
+df['ObservationDate'] = pd.to_datetime(df['ObservationDate'])
+
+# Esto muestra todas las columnas 
+list(df)
+
+# Y eliminamos las colunas que nos nos ineteresen
+df = df[[
+ 'ObservationDate',
+ 'Country/Region',
+ 'Confirmed',
+ 'Deaths',
+ 'Recovered']]
+
+df
+
+df_time = df.groupby('ObservationDate').sum()
+# con esto el timepo ha quedado como el indice del dataframe
+df_time.head(5)
+
+df1 = df_time['Confirmed'].iloc[10:15]
+df1
+
+df2 = df_time['Deaths'].iloc[12:17]
+df2
+
+# cuando tenemos dos series con un sistema de indices por fechas podemos hacer operaciones entre las mismas 
+df1 - df2
+# podemos ver que donde nos se compraten los indices en nuestras series obtenemos una variable nula 'NaN'
+
+# 'diff' lo que va hacer es restar cada dia con el dia previo
+# haremos esto para ver como es que ha ido el aumento de casos en el dia a dia 
+df_time.diff()
+# y tambien podemos aplicar sobre esto un promedio
+df_time.diff().mean()
+
+# cuando hicimos 'diff'(df_time.diff()) notamos que teniamos una variable nula 'NaN' en la primera fila
+# Esto ocurrio debido a que este no tiene con quien restarse y por lo tanto que da nulo
+# lo que podemos hacer es completar este valor y para ello usaremos 'fillna'
+df_diff = df_time.diff()
+df_diff.fillna
+
+# El registro faltante corresponde a nuestro primer registro en nuestro df
+# convertiremos este registro a un diccionario con 'to_dict'
+df_time.head(1).to_dict()
+
+df_diff = df_diff.fillna({'Confirmed':555.0,
+ 'Deaths': 17.0,
+ 'Recovered':28.0})
+# lo que obtenemos es que nuestro df ya no tiene variables nulas y hemos remprazado el primer valor por el valor antes de aplicar el operador 'diff'
+
+# ahora si aplicamos la suma acumulativa podemos recuperar el dataframe original
+df_diff.cumsum()
+# con 'resample' podemos hacer algunas estimacione estadisticas 
+# En esta ocacion le vamos a pedir que haga un resample a cada 7 dias 
+df_diff.resample('7D').sum()
+# lo que ocurri es que del incio (2020-01-22) hasta 7 dais despues (antes del 2020-01-29) van a estar sumados en esta fila y asi mismo ocurre cada 7 dias
+# se pueden definir otros intervamos de frecuencia para aplicar el vector suma, por ejemplo algo semanal como cada domingo 
+df_diff.resample('W-Sun').sum()
+# Si queremos hacer la suma mensual
+df_diff.resample('M').sum()
+
+```
+
+**variables nulas**
+
