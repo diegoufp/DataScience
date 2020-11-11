@@ -1462,3 +1462,138 @@ df_diff.resample('M').sum()
 
 **variables nulas**
 
+```py
+df_diff.resample('12h').sum()
+# Extraer valos estadistico segun un intervalo definido por nosotros en este caso cada 12 horas
+# sic ambiamos al suma por el promedio apareceran varios numeros nulos 
+df_diff.resample('12h').mean()
+
+# Vamos a establecer que para que se haga una suma tiene que haber almenos un elemento
+df_cum = df_time.resample('12h').sum(min_count=1)
+df_cum
+
+# Para completar los valores nulos, para eso usaremos 'bfill'
+# 'bfill' lo que hace es copiar el valor siguiente en la selda donde habia un valor nulo
+df_cum.bfill()
+# o tambien podemos usar 'ffill' que lo que hace es traer el valor previo para completar el valor nulo
+df_cum.ffill()
+# o tambine podmeos usar 'fullna' y colocar el valor que querramos, por ejemplo remplazar numero nulos con -1000
+df_cum.fillna(-1000)
+
+# En esta ocacion vamos a usar 'interpolate' para interpolar los valores medios entre una selda y otra (interpolacion lineal)
+df_cum = df_cum.interpolate()
+df_cum
+
+# vamos a crear una nueva columna
+df_cum['rate'] = 1 - df_cum['Deaths']/df_cum['Confirmed']
+
+# ahora la columna a sido creada
+# despues vamos a recetear el indice
+df_cum = df_cum.reset_index()
+df_cum
+
+# cuando nuestra variable tipo tiempo no pertenece al indice , ahora como podemos extraer informacion?
+# usaremos un groupby especial que es usada en series de tiempo 
+# en 'key' ingresaremos la referencia a la variable tipo tiempo
+# 'freq' es la frecuencia en la cual se quiere hacer la observacion estadistica
+# con esto se quiere estimar si la taza de supervivencia a tenido una variacion
+df_cum.groupby(pd.Grouper(key='ObservationDate', freq='M'))[['rate']].mean()
+
+# con esto podemos ver graficamente como la taza de supervivencia a ido variando
+sr = df_cum.groupby(pd.Grouper(key='ObservationDate', freq='1D'))[['rate']].mean()
+sr.plot()
+
+# 'rolling' permite hacer promedios con unas ventanas de frecuencias
+# En este caso vamos a especificar que exista una ventana que se desplace cada 7 dias y eso se hara en 'window
+sr.rolling(window=7).mean().plot()
+
+# tambien se pueden unir varias graficas en una para compararlas
+import matplotlib.pyplot as plt
+
+plt.plot(sr, label = 'Original')
+plt.plot(sr.rolling(window = 7).mean(), label = '7 días')
+plt.plot(sr.rolling(window = 14).mean(), label = '14 días')
+plt.xticks(rotation = '90')
+plt.legend()
+plt.title('Promedio móvil de Tasa de Supervivencia')
+
+# tambien podemos definir nuestras propais funciones para graficarlas con 'apply'
+import numpy as np
+
+sr.rolling(window=14).apply(lambda x: np.std(x)).plot()
+```
+
+
+**Visualización y graficación de datos**
+
+[Documentacion de pandas plot](https://pandas.pydata.org/docs/reference/frame.html#plotting "Documentacion de pandas plot")
+
+```py
+# cual es el pais donde mas ocurrencias de coronavirus existe?
+# para ver los datos usaremos 'sort_values'
+df.groupby('Country/Region')['Confirmed'].max().sort_values(ascending=False)
+
+df_time = df.groupby(['Country/Region',
+            pd.Grouper(key='ObservationDate', freq='1D')
+            ]).sum()
+df_time
+
+# en esta ocacion solotrabajeremos con chine ya que es el pais donde mas casos han ocurrido
+df_china =  df_time.loc['Mainland China']
+df_china
+
+# para definir el tama;o de una grafica con plot usamos 'figsize'
+# y con 'title' le pode mos agregar un titulo a la grafica
+df_china.plot(figsize= (10,7), title = 'CODV-19')
+
+# si queremos agregar informacion a anuestros ejes, lo podemos hacer con la libreria de matplotlib
+import matplotlib.pyplot as plt
+
+df_china.plot(figsize= (10,7), title = 'CODV-19')
+plt.xlabel('Date')
+plt.ylabel('People')
+plt.show()
+# y ahora neustros ejes tiene nombres
+
+# hay muchos aspectos que se pueden modificar de un plot
+# en este caso cambiaremos la legenda(no la queremos mostrar)
+# tambien cambiaremos el estilo de las grafica, para cambiar el estilo usaremos 'style' y queremos que la primera linea sea de color rojo y que sea una linea continua, esto se especifica con 'r-',
+# la segunda linea queremos que sea verde y con una linea punteda 'g--'
+# y la tercera queremos que sea azul y usaremos estrellitas 'b:*'
+ax = df_china.plot(figsize= (10,7), title = 'CODV-19', 
+              legend = False, style = ['r-', 'g--', 'b:*'])
+# Para crear una leyenda lo acemos con ax.legend
+ax.legend(['1', 'dos', '3'])
+plt.xlabel('Date')
+plt.ylabel('People')
+plt.show()
+
+df_monthly = df_china.resample('M').max()
+df_monthly
+# con esto hacer un dataframe en el cual muestre los pasientes confimados, fallecidos y recuperados de cada mes
+
+# en este caso haremos una grafica de barras especificando " kind='bar' "
+df_monthly.plot(figsize= (10,7),kind='bar')
+
+# podemos juntar las graficas en una sola con stacked
+df_monthly.plot(figsize= (10,7),kind='bar', stacked = True)
+# y ahora todas las barras se sobreponen
+
+df_monthly['Traitment'] = df_monthly['Confirmed'] - df_monthly['Deaths'] - df_monthly['Recovered']
+df_monthly
+
+# para ahcer una grafica tipo pastel
+df_monthly[['Deaths','Recovered','Traitment']].T.plot(figsize= (10,7),kind='pie', subplots=True)
+# lo que obtenemos son 3 tipos de grafica de tipo pastel que me muestra la evolucion del coronavirus en los meses
+
+# lo que queremos hacer ahora es un histograma que se dsitribuye esta taza de supervivencia y esto se hace con 'hist'
+df_china['rate'] = 1 - df_china['Deaths']/ df_china['Confirmed']
+df_china['rate'].hist(figsize= (10,7), bins = 10)
+
+# tambien podemos cambiar el histograma agregando nuevas opciones
+# se puede normalizar la frecuencia atravez del parametro normed = True
+#df_china['rate'].hist(figsize= (10,7), bins = 10, normed = True)
+# tambien podemos cambiar el tipo de histograma especificando en kind
+# en esta ocacion queremos usar uno parametrico asi que especificaremos 'kde'
+df_china['rate'].plot(kind = 'kde',figsize= (10,7))
+```
