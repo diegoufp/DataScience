@@ -300,3 +300,50 @@ B = vector.dot(matriz)
 print("\nvectorXmatriz: ",B)
 # Y cómo se puede apreciar… los resultados no son iguales…
 ```
+
+## Producto interno entre dos matrices
+
+```py
+import numpy as np
+
+A = np.array([[1,2,3],[4,5,6],[7,8,9],[10,11,12]])
+B = np.array([[2,3],[5,7],[11,13]])
+
+print(A.shape) # (4, 3)
+print(B.shape) # (3, 2)
+
+# A = (4, 3) y B = (3, 2)
+# En este caso el '3' del A y el 3 del B son iguales y estan alineados
+C = A.dot(B)
+# en el orden operacion B = (3, 2), (4, 3)
+# la dimecion de B '2' y A '4' no son iguales y no estan alineados por lo cual sale un error al tratar de hacer un producto interno
+#D = B.dot(A)
+
+print(A)
+print(B)
+print(C)
+# A = [[ 1  2  3]
+#     [ 4  5  6]
+#     [ 7  8  9]
+#     [10 11 12]]
+
+# B = [[ 2  3]
+#     [ 5  7]
+#     [11 13]]
+
+# C = [[ 45  56]
+#     [ 99 125]
+#     [153 194]
+#     [207 263]]
+
+# Los valores son:
+
+    # 1x2+2x5+3x11= 45
+    # 1x3+2x7+3x13=56
+    # 4x2+5x5+6x11=99
+    # 4x3+5x7+9x11=125
+    # 7x2+8x5+9x11=153
+    # 7x3+8x7+9x13=194
+    # 10x2+11x5+12x11=207
+    # 10x3+11x7+12x13=263
+```
