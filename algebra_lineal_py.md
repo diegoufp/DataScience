@@ -341,9 +341,264 @@ print(C)
     # 1x2+2x5+3x11= 45
     # 1x3+2x7+3x13=56
     # 4x2+5x5+6x11=99
-    # 4x3+5x7+9x11=125
+    # 4x3+5x7+6x11=125
     # 7x2+8x5+9x11=153
     # 7x3+8x7+9x13=194
     # 10x2+11x5+12x11=207
     # 10x3+11x7+12x13=263
+```
+
+## Propiedades de las matrices
+
+**la multiplicación de matrices es asociativa y distributiva, no es conmutativa**
+
+```py
+# Propiedades
+# Asociativa: Es si tenemos una matriz 'A' y la multiplicamos por (BxC)
+# podemos elegir el orden por el cual realizamos estas operaciones y nos daria el mismo resultado:
+# Ejemplo:  Ax(BxC) = (AxB)xC
+
+# Distributivo: Esto es que si tenemos 'Ax(B+C)' es lo mismo que hacer (AxB)+(AxC)
+
+# Conmutativa: Si tenemos una multiplicacion 'BxC' es lo mismo que hacer 'CxB'
+
+import numpy as np
+
+A = np.array([[2,3],[5,7],[11,13]])
+B = np.array([[1,3],[2,1]])
+C = np.array([[3,1],[4,2]])
+
+# Asociativa
+ABC= A.dot(B.dot(C))
+ABC
+
+AB_C = A.dot(B).dot(C)
+AB_C
+
+# Distributiva
+D = A.dot(B+C)
+E = (A.dot(B))+(A.dot(C))
+
+print(D)
+print(E)
+
+print(D==E)
+
+# Commutativa
+# No siempre o casi nunca ocurre la commutativa
+F = B.dot(C)
+G = C.dot(B)
+
+print(F==G)
+
+print(F)
+print(G)
+
+# pero la multiplicacion de vectores si es commutativa
+v1 = np.array([[2],[7]])
+v2 = np.array([[3],[5]])
+
+v1_tv2 = v1.T.dot(v2)
+v2_tv1 = v2.T.dot(v1)
+
+print(v1_tv2)
+print(v2_tv1)
+
+# El producto interno de matrices es:
+
+#     Asociativa: Sí
+#     Distributiva: Sí
+#     Conmutativa: NO
+#     El producto interno de vectores es:
+#     Asociativa: Sí
+#     Distributiva: Sí
+#     Conmutativa: Sí
+```
+
+## Transposición de un producto de matrices
+
+```py
+# En matematicas existe una propiedad que si tengo '(A.dot(B)).T' == 'B.T.dot(A.T)'
+# Esto nos permite operar con las matrices como si fueran numeros y juegar con las propiedades como por ejemplo transponer dos veces ya que transponer dos veces es igual a no transponer
+# '(A.dot(B)).T.T' == 'B.dot(A)'
+
+import numpy as np
+
+A = np.array([[2,3],[5,7],[11,13]])
+B = np.array([[1,3],[2,1]])
+
+print(A)
+print(B)
+
+AB_t = A.dot(B).T
+B_tA_t = B.T.dot(A.T)
+
+print(AB_t == B_tA_t)
+```
+
+## Cómo comprobar la solución de un sistema de ecuaciones lineal
+
+```py
+# Que es un sistema de ecuaciones lineales?
+# si nosotros tenemos y = 3x + 5     y = 2x+3
+# esto es un sistema de ecuaciones lineales, cada una de las variables no esta multiplicada por otra variable y a su vez tampoco esta elevada a una potencia (es de primer grado)
+
+%matplotlib inline
+import numpy as np
+import matplotlib.pyplot as plt
+
+x = np.arange(-5,5)
+
+y_1 = 3*x + 5
+y_2 = 2*x + 3
+
+plt.figure()
+plt.plot(x, y_1)
+plt.plot(x, y_2)
+# definiremos entre que valos queremos que nos muestre cada eje
+plt.xlim(-5,5)
+plt.ylim(-5,5)
+# con esto agregamos las coordenadas(como queremos verlo)
+plt.axvline(x=0, color='grey')
+plt.axhline(y=0, color='grey')
+# EN la greafica podemos ver en que lugar se estan cruzando nuestro sistema de ecuaciones lineal 
+# quiere decir que existe un valor de 'x' y un valor de 'y' que hacen verdaderas a esas ecuaciones al mismo tiempo
+
+# si hacemos el despeje manual:
+# y = 3x + 5    
+# y = 2x+3
+# 2x+3 = 3x + 5
+# 3-5 = 3x - 2x
+# -2 = x -> el primero de nuestros valores
+
+# y = 2x+3
+# y = 2(-2)+3
+# y = -1 -> el segundo valor
+
+# esto tambien se puede hacer en un sistema matricial:
+
+#[[-3 1]   [[x]   =   [[5]
+# [-2 1]]   [y]]       [3]]
+
+# a esto lo multiplicamos con 
+# [[x]
+#  [y]]
+
+# el resultado que nos da es:
+# -3x + 1y = 5 
+
+# que este es igual al primer problema de la ecuacion lineal
+# y = 3x + 5 
+# -3x + y = 5
+
+
+# en codigo se haria de esta manera:
+A = np.array([[-3,1],[-2,1]])
+print(A)
+# [[-3  1]
+#  [-2  1]]
+
+b = np.array([[5],[3]])
+print(b)
+# [[5]
+#  [3]]
+
+solucion_1 = np.array([-2,-1])
+print(solucion_1) # [-2 -1]
+
+A.dot(solucion_1)
+# array([5, 3])
+# Efectivamente lo que acavamos de hacer es escribir y resulver nuestros sistemas de ecuaciones y escibir 'Ax=b'
+
+# Realmente la división de vectores o matrices “NO EXISTE”. Debido a que no existe tal cosa como “división de matrices” lo que se hace es obtener la matriz inversa.
+# Lo correcto para despejar la matriz (o vector) x seria multiplicar por la izquierda la inversa de A y por tanto nos quedaria como: x = A_inv * b
+import numpy as np
+A = np.array([[-3,1],[-2,1]])
+b = np.array([5,3])
+A_inv = np.linalg.inv(A) 
+# El valor de x es
+x =  A_inv.dot(b)
+print(x)
+
+```
+
+## Tipos especiales de matrices: Identidad, Inversa, Singulares
+
+```py
+import numpy as np
+
+# matriz de identidad
+# la matriz de identidad tiene la particularidad de no hacer ninguna modificacion, es el elemento neutro para el producto interno
+# el elemento neutro es como el uno para los numeros, ejemplo: 5 * 1
+
+# numpy tiene una funcion que se llama 'eye' cuando se le da un valor nos devuelve una matriz de esa dimecion con todos 1 en la diagonal y 0 fuera de ellas
+# estos valores estan todos definidos como floats
+# esto quiere decir que aun que nostros le estemos entregando o estemos operando con esta misma matriz con un vector que tenga nada mas que enteros lo que vamos a recibir en respuesta es un float
+identidad = np.eye(4)
+print(identidad)
+# [[1. 0. 0. 0.]
+#  [0. 1. 0. 0.]
+#  [0. 0. 1. 0.]
+#  [0. 0. 0. 1.]]
+
+vector = np.array([[2],[3],[5],[7]])
+print(identidad.dot(vector))
+# [[2.]
+#  [3.]
+#  [5.]
+#  [7.]]
+# como podemos ver los devuelve exactamente el mismo vector que habiamos cargado
+# la matriz de identidad tiene la particularidad de no hacer ninguna modificacion, es el elemento neutro dentro de las matrices 
+
+# lo siguiente que podemos hacer es pensar a la matriz como una transformacion lineal 
+# una transformacion lineal es, tengo un vector que lo trsnformo cuando le aplico una matriz(aplicar una matriz es multiplicar)
+# si tenemos la matriz:
+# [[2 3]    [[1]   = [[2+3]
+#  [4 5]]    [1]]     [   ]]
+
+# del vector [[1],[1]] la primer coordenada se transformo en 5
+# la 'identidad' no transforma ese espacio
+
+# Matriz inversa
+# si estamos multiplicando '5x3 = 15' la inversa seria dividir '15/3' y este nos daria un igual a '5'
+# Existe una matriz 'A' a la cual multiplicada por algo nos de la identidad 'Id'?
+# En algunos casos existe
+# Creamos una matriz a la cual queremos calcular la inversa
+A = np.array([[1,0,1],[0,1,1],[-1,1,1]])
+print(A)
+# [[ 1  0  1]
+#  [ 0  1  1]
+#  [-1  1  1]]
+
+inversa_A = np.linalg.inv(A)
+print(inversa_A)
+# [[ 0.  1. -1.]
+#  [-1.  2. -1.]
+#  [ 1. -1.  1.]]
+# nos devuelve otra matriz de las mismas dimenciones 
+# la formula era 'A * A**-1 = Id'
+
+print(A.dot(inversa_A))
+# [[1. 0. 0.]
+#  [0. 1. 0.]
+#  [0. 0. 1.]]
+# lo que nos devuelve es la 'identidad'
+
+# se habia dicho que no siempre existe esta 'identidad'
+# cuando no existe la identidad la llamamos una matriz 'singular'
+# cuando no existe la inversa la llamamos una matriz 'singular'
+singular = np.array([[1,1],[1,1]])
+print(singular)
+# [[1 1]
+#  [1 1]]
+
+# si intentamos hacer la inversa de la matriz singular nos debolvera un error
+print(np.linalg.inv(singular))
+# por el momento sabemos calcular inversas de aquellas matrices que son cuadradas
+# no podemos intentar esto con una matriz que no fuera cuadrada
+# La inversa nos sirve para operar directamente sobre nuestra forma matricial y con eso tendriamos el resultado que estamos buscando para resolver un sistema de ecuaciones lineales
+
+# Matriz identidad = Como el 1 en matematicas, el elemento neutro
+# Matriz Inversa = Cumple lo siguiente: A*A^-1 = Id
+# Matriz Singular = No se le puede calcular la inversa
 ```
