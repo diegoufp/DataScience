@@ -63,6 +63,19 @@ En el recuadro de search packages pon:
 - seaborn (visualizaciones estadísticas)
 - scikit-learn (aprendizaje automático - lo usaremos para un ejemplo de PCA)
 
+**funciones en archivos diferentes de jupyter notebook**
+
+Crearemos un carpeta en jupyter nootbook y crearemos un archivo de python3 en el cual pondremos nuestra funcion.
+
+Ahora podemos llamar a esta funcion desde otros archivo de notebook.
+
+tenemos que escribir:
+```py
+# entre comillas sera la direccion donde se encuentra el archivo de la funcion.
+%run './funciones_auxiliares/graficarVectores.ipynb'
+```
+
+
 **Ejercicio**
 
 Instala el paquete seaborn. Es un paquete para visualizar datos.
@@ -601,4 +614,368 @@ print(np.linalg.inv(singular))
 # Matriz identidad = Como el 1 en matematicas, el elemento neutro
 # Matriz Inversa = Cumple lo siguiente: A*A^-1 = Id
 # Matriz Singular = No se le puede calcular la inversa
+```
+
+## Sistema de ecuaciones lineales
+
+### Ejemplos de sistemas sin solución, con una solución y con infinitas soluciones
+
+```py
+%matplotlib notebook
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# sistema de ecuaciones sin soluciones
+# cuando tenemos mas ecuaciones que variables es 'sobre determinado'
+# 'y = 3x + 5'
+# 'y = -1x + 3'
+# 'y = 2x + 1'
+
+x = np.arange(-6,6)
+
+y_1 =  3*x + 5
+y_2 = -1*x + 3
+y_3 = 2*x + 1
+
+plt.figure()
+plt.plot(x, y_1)
+plt.plot(x, y_2)
+plt.plot(x, y_3)
+
+plt.xlim(-8,8)
+plt.ylim(-8,8)
+
+plt.axvline(x=0, color='grey')
+plt.axhline(y=0, color='grey')
+plt.show()
+# este va a ser un grafico distinto a los que se habia visto anteriormente
+# en este hay un boton el cual mientras este activo nos permite interactuar con el grafico
+# lo que podemos concluir de las tres lineas que estan representando nuestras ecuaciones es que:
+# Es que no existe un punto en el que hacia ciertas estas ecuaciones al mismo tiempo 
+# Solamente s ellegan a unir dos ecuaciones y no las 3
+# por lo tanto este es un sistema 'sobredeterminado'
+# 'sobredeterminado' es que tenemos mas ecuaciones que variables entonces no tiene solucion
+
+
+
+# sistemas de ecuaciones con solucion 
+# cuando solamente nos quedamos con dos ecuaciones entonces esta 'determinado'
+x = np.arange(-6,6)
+
+y_2 = -1*x + 3
+y_3 = 2*x + 1
+
+plt.figure()
+plt.plot(x, y_2)
+plt.plot(x, y_3)
+
+plt.xlim(-8,8)
+plt.ylim(-8,8)
+
+plt.axvline(x=0, color='grey')
+plt.axhline(y=0, color='grey')
+plt.show()
+# En este caso las ecuaciones logran cruzarse en un punto
+# por lo tanto esta tiene solucion y es unica
+
+
+
+# sistema de ecuaciones donde tiene infinitas soluciones
+# cuando se dara el caso de que existen infinitas soluciones?
+# cuando nos quedamos unicamente con una de las variables
+# cuando solamente nos quedamos con una ecuaciones que tiene dos variables entonces esta 'indeterminado' y tiene infinitas soluaciones
+x = np.arange(-6,6)
+# si tenemos una sola ecuacion con dos varaibles entonces nuestro sistema tiene una grado de libertad, 
+# cualquier valor que tome 'x' va a ser solucion 
+y_3 = 2*x + 1
+
+plt.figure()
+plt.plot(x, y_3)
+
+plt.xlim(-8,8)
+plt.ylim(-8,8)
+
+plt.axvline(x=0, color='grey')
+plt.axhline(y=0, color='grey')
+plt.show()
+# cuando graficamos nos queda nadamas que una recta, 
+# entonces cualquier punto de la recta resulta ser la solucion del sistema
+```
+
+### Graficar vectores
+
+```py
+%matplotlib inline
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+v1 = np.array([2,5])
+v2 = np.array([3,2])
+
+# 'alpha' indica el valor de transparencia que va a tener al momento de graficar 
+def graficarVectores(vecs, cols, alpha = 1):
+    
+    plt.figure()
+    plt.axvline(x=0, color = 'grey', zorder = 0)
+    plt.axhline(y=0, color = 'grey', zorder = 0)
+    
+    for i in range(len(vecs)):
+        # cuando queremos graficar un vector lo estamos haciando dentro de nuestro sistema de ejes cartesianos
+        # para poder graficar un vector necesitamos decir cuales es el origen 
+        # y lo que estamos haciendo es decir que todos los vectores van a tener como origen el [0,0]
+        x = np.concatenate([[0,0], vecs[i]])
+        plt.quiver([x[0]],
+                   [x[1]],
+                   [x[2]],
+                   [x[3]],
+                   angles='xy', scale_units = 'xy', scale=1, color =cols[i],
+                   alpha= alpha)
+
+graficarVectores([v1,v2],['orange', 'blue'])
+# agregaremos cuales son los limites para los 'x' y 'y'
+plt.xlim(-1,8)
+plt.ylim(-1,8)
+```
+
+### ¿Qué es una combinación líneal?
+
+```py
+# Una conbinacion lineal es multiplicar a un vector por un escalar, a otros vector por otro escalar ysumar el resultado de ambos para obtener un nuevo vector.
+# (v1*2)+(v2*3) = V1V2
+
+%matplotlib inline
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+%run './funciones_auxiliares/graficarVectores.ipynb'
+
+v1 = np.array([2,5])
+v2 = np.array([3,2])
+
+v1v2 = 2*v1+1*v2
+
+print(v1v2)
+
+graficarVectores([v1,v2,v1v2], ['orange', 'blue', 'red'])
+plt.xlim(-1,8)
+plt.ylim(-1,12)
+
+# definamos una funcion para graficar todas las posibles combinaciones lineales
+# o almenos un subconjunto de ellas, que nos permitira tener una mejor nocion de la importancia de las combianciones lineales
+for a in range(-10,10):
+    for b in range(-10,10):
+        plt.scatter(v1[0]*a + v2[0]*b, v1[1]*a+v2[1]*b,
+                   marker = '.',
+                   color = 'orange')
+        
+plt.xlim(-100,100)
+plt.ylim(-100,100)
+
+plt.axvline(x=0, color = 'grey')
+plt.axhline(y=0, color = 'grey')
+
+plt.show()
+# aqui lo que estamos viendo son unas posibles combinaciones lineales de dos vectores
+# por lo que estamos viendo si continuaramos ampliando el rango en los cuales se mueven los escalares 'a' y 'b' podriamos describir todo el espacio
+# con los vectores correctos nos permiten descrirbir un espacio entero.
+```
+
+### ¿Qué es un espacio y un subespacio?
+
+```py
+# veremos que ocurre dependiendo de los vectores con los que trabajemos
+%matplotlib notebook
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+v1 =  np.array([1,1])
+v2 = np.array([-1,-1])
+
+for a in range(-10,10):
+    for b in range(-10,10):
+        plt.scatter(v1[0]*a + v2[0]*b, v1[1]*a+v2[1]*b,
+                   marker = '.',
+                   color = 'orange')
+        
+plt.xlim(-25,25)
+plt.ylim(-25,25)
+
+plt.axvline(x=0, color = 'grey')
+plt.axhline(y=0, color = 'grey')
+
+plt.show()
+# lo que nos ocurrio es que vimos dos vectores que son [1,1] y [-1,-1]
+#y cuando hicimos las convinaciones lineales lo unico que obtuvimos es una recta 
+# esto en si mismo es un espacio
+# si nos abstaemos de que estamos en 'r2' y solamente hubieramos entregado para graficar a 'x' hubieramos obtenido lo mismo
+# En lugar de esos nosotros lo que dimos son elementos en 'R2' y lo que conseguimos es un 'subespacio' que es 'R1'
+# ser un espacio o un subespacio depende de donde nos estemos parando y como lo estemos viendo 
+
+# que ocurre cuando damos otros elementos?
+v1 = np.array([1,0])
+v2 = np.array([2,-3])
+
+for a in range(-10,10):
+    for b in range(-10,10):
+        plt.scatter(v1[0]*a + v2[0]*b, v1[1]*a+v2[1]*b,
+                   marker = '.',
+                   color = 'orange')
+        
+plt.xlim(-100,100)
+plt.ylim(-100,100)
+
+plt.axvline(x=0, color = 'grey')
+plt.axhline(y=0, color = 'grey')
+
+plt.show()
+# esta vez nos esta dando 'R2'
+# es posible entonces con estos dos vectores generar todo el espacio
+# la convinacion lineal de dos elemetos solo nos podran devolver un elemento del mismo lugar donde ellos estan viviendo 
+# En algebra lineal nosotros siempre estamos trabajando en espacios vectoriales
+# los 'espacios vectoriales' no son mas que numeros 'R', 'R1', 'R2', 'R3', no es mas que los numeros que usamos habitualmente escritos como vectores 
+
+# ahora veamos como 'R2' que recien vimos que era un espacio
+# en realidad era un subespacio de 'R3'
+# esta libreria nos va a permitir visualizar lo que estamos queriendo relaizar
+from mpl_toolkits.mplot3d import Axes3D
+# vamos a crear un vector en 'R3' pero que solamente cuenta con valores en 'R1' y 'R2'
+v1 = np.array([1,0,0])
+v2 = np.array([2,-3,0])
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
+for a in range(-10,10):
+    for b in range(-10,10):
+        ax.scatter(v1[0]*a + v2[0]*b, v1[1]*a+v2[1]*b, 
+                   v1[2]*a + v2[2]*b,
+                   marker = '.',
+                   color = 'orange')
+        
+ax.set_xlabel('Eje X')
+ax.set_ylabel('Eje Y')
+ax.set_zlabel('Eje Z')
+
+plt.axvline(x=0, color = 'grey')
+plt.axhline(y=0, color = 'grey')
+
+plt.show()
+# aqui vemos que engregamos 2 vectores pero solo fuimos capaces de generar un elemento en 'R2' por mas que nuestros vectores estan viviendo en 'R3'
+# En algebra lineal se llama hiperplano a una dimencion menos del espacio en el cual estamos trabajando 
+# si estamos trabajando en'R3' un hiperplano es 'R2'
+```
+
+### Vectores linealmente independientes
+
+Un conjunto de vectores se dice [**linealmente independiente**](https://www.superprof.es/apuntes/escolar/matematicas/analitica/vectores/vectores-linealmente-dependientes-e-independientes.html "linealmente independiente") si ninguno de ellos puede ser escrito con una combinación lineal de los restantes. 
+
+```py
+# cuando tenemos una matriz 'ax = b' en este caso podemos pensar que tenemos:
+# un vector 'v1' y un vector 'v2' que se multiplica por 'x'
+# y lo que nos preguntamos es, Sera posible escribir a nuestra solucion 'b' como una convinacion lineal de 'v1 y 'v2'
+# si eso fuera posible obtendriamos los valores de 'x1' y 'x2' que hicieran verdadero este sistema de ecuaciones lineal
+# con esto vemos a nuestra matriz 'a' como un sistema generador 
+# donde puede estar generadondo un espacio o un subespacio , dependera de los vectores que componen a 'a'
+
+%matplotlib inline
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+v1 = np.array([1,1])
+v2 = np.array([-1,-1])
+
+for a in range(-10,10):
+    for b in range(-10,10):
+        plt.scatter(v1[0]*a+v2[0]*b,
+                   v1[1]*a+v2[1]*b,
+                   marker = '.',
+                   color='orange')
+        
+plt.xlim(-25,25)
+plt.ylim(-25,25)
+
+plt.axvline(x=0, color='grey')
+plt.axhline(y=0, color='grey')
+
+plt.show()
+# lo que estamos teniendo es una matriz con los valores [[1,1],[-1,-1]] que nos esta generando solamente una dimecion dentro de 'R2'
+# Si proponemos como solucion de este sistema los valores de [[-10,10]]
+# sera que existe un 'x1' y un 'x2' que hacen esto verdadero?
+
+
+# En realiad no es posible por que el vector que estamos intenando escribir '[[-10,10]]' vive completamente afuera del subespacio generado por los dos vectores [[v1],[v2]]
+# podemos ver entonces que el sistema de ecuaciones lineal no tendra solucion
+# esto ocurre por que enrealidad 'v1' es linealmente dependiente con respecto a 'v2', no son linealmente infependientes 
+print(v1 == -1 * v2)
+# lo que ocurre al hacer esto que nos quedamos con una dimecion menos
+# mas alla de que nuestra matriz en principio parece cuadrada(es cuadrada), pero no todos us vectores son linealmente independientes
+# Se concluye que un conjunto de vectores es 'linealmente indendiente' si ninguno de ellos se puede escribir como combinacion lineal de los otros vectores
+# visto de otra manera esto es:
+# si vemos el espacio generado por 'v1' y 'v2' es el mismo espacio que genera solamente usar 'v1' o solamente usando 'v2'
+# esto quiere decir que usar los dos vectores al mismo tiempo no nos aporta informacion, no nos aporta una nueva dimencion
+```
+
+### Validar que una matriz tenga inversa
+
+```py
+# para que un sistema de ecuaciones lineales tenga solucion necesitamos que la matriz 'a' que representa este sistema de ecuaciones sea cuadrada y que todos sus vectores sean linealmente idependientes
+# osea que no contenga ningun vector 'ld'
+import numpy as np
+
+A = np.array([
+[0,1,0,0],
+[0,0,1,0],
+[0,1,1,0],
+[1,0,0,1]]
+)
+# a primera vista esta matriz es cuadrada pero vamos a ver que no es ese el caso
+# Es cuadrada pero no todos sus vectores son linealmente idependientes 
+# cuando quitemos el vector que es lineal mente dependiente para que nos queden todos linealmente idependientes, la matriz dejara de ser cuadrada
+
+# Una forma de identificar cual fila es la que es linalmente dependiente 
+# es usando los autovectores y autovalores
+# los autovectores y autovalores es una forma de descomponer nuestra matriz
+# asi como cuando tenemos un numero , por ejemplo:
+# 8 = 4 * 2
+# aqui lo que estamos haciendo es decomponer al 8 como la multiplicacion de dos elementos
+# tambien podemos elegir descomponer al 8 como la suma de dos elementos
+# 8 = 5 + 3
+# En este caso al descomponer nuestra matriz 
+# la estamos descomponiendo como la multiplicacion de otras dos matrices que enverdad seran 3
+
+
+# 'linealg.eig' es la manera de buscar los autovalores y autovectores 
+lambdas, V = np.linalg.eig(A.T)
+
+# esto lo que nos va a estar devolviendo es la fila que es li
+print(A[lambdas == 0, :])
+#print: [[0 1 1 0]]
+# aqui lo que podemos ver es que la tercera fila, la '[[0 1 1 0]]' es linealmente dependiente
+# lo que esta ocurriendo es que el [[0 1 1 0]] lo podriamos escribir como la suma del vector una que es el [[0 1 0 0]] y el vector 2 que es el [[0 0 1 0]], si los sumaramos obtenemos [[0 1 1 0]]
+# decir que el vector 3 es el que es lineal mente dependiente es una convencion, tambien podemos decir que en realidad es el vector dos al cual lo podemos escribir como una convinacion lineal del vector 1 y el vector 3
+# si tenemos 3 vesctores y una de ellos puede ser escrito en funcion de los otros dos podemos elegir a cual vamos a escribir en funcion de los otros
+# entonces podemos ver que si intentamos calcular la inversa de esta matriz nos va  adar que es singular 
+# sigular es una matriz que no tiene inversa
+# pero tambien se le puede caracterisar por que tiene un vector ld dentro de sus filas
+#np.linalg.inv(A)
+
+
+
+# se concluye que para que un sistema de ecuaciones lineales tenga solucion
+# la matriz 'A' que los reprecenta no debe tener vectores 'linealmente dependientes'
+# osea no tiene que haber ni filas ni columnas que puedan ser escritas como combinacion de las demas filas o columnas 
+
+# También quiero mencionarles que existe una versión de inversa cuando la matriz “no es cuadrada”. se llama la “inversa generalizada” o “inversa de Penrose-Moore”. 
+
+
+# matematicamente pasa lo siguiente:
+#para calcular la matriz inversa se calcula primero la transpuesta de la matriz adjunta y esta se divide por el determinante de la matriz.
+
+#Cuando en una matriz tenemos vectores LD tantos en columnas como en filas el determinante es 0, SIEMPRE haciendo que la division no se pueda resolver
+
 ```
