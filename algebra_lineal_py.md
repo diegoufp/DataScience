@@ -979,3 +979,200 @@ print(A[lambdas == 0, :])
 #Cuando en una matriz tenemos vectores LD tantos en columnas como en filas el determinante es 0, SIEMPRE haciendo que la division no se pueda resolver
 
 ```
+
+## Normas
+
+### Qué es una norma y para qué se usa. Desigualdad Triangular
+
+**Norma** es una funcion que ayuda a medir el tama;o de una vector. La norma lo que hace es recibir de entrada un vector y a ese vector asociarle un numero, un numero que no puede ser negativo.
+
+**Para que quisieramos saber cual es tam;o de un vector?**
+Nos ayuda a identificar el error que estamos comentiendo al hacer nuestras aproximaciones o las clasificaciones.
+
+```py
+# primera propiedad
+# La norma de un vector 'v' tiene que ser igual o mayor a 0
+# norma(v) >= 0
+# si pensamos que la norma mas habitual que conocemos es la que mide la distancia de un punto al origen 
+# y tal como es una distancia nunca puede ser negativa
+
+# segunda propiedad
+# 'norma(v) == 0' si y solo si 'v = 0' 
+
+# la tercera propiedad es lo que se conoce como la desigualdad triangular 
+# y esto quiere decir que si tenemos 2 vectores y realizamos la suma de ambos y calculamos entonces sus nomas, entonces la norma de el vector recultante 'v3' es menor o igual que la suma de las normas 
+# 'norma(v3) <= norma(v1) + norma(v2)'
+
+# cuarta propiedad
+# la norma del un escalar por un vector es igual al valor absoluto por la norma del vector original
+# 'norma(a*v)=abs(a)*norma(v)'
+
+%matplotlib inline
+
+import numpy as np
+
+import matplotlib.pyplot as plt
+# sacaremos la paleta de colores de 'seaborn'
+import seaborn as sns 
+
+
+v1 = np.array([2,7])
+v2 = np.array([3,5])
+
+v1v2 = v1+v2
+
+
+# para calcular las norma usamos la funcion de numpy 'linalg.norm'
+# 'linalg.norm' utiliza varios parametros, en esta ocacions usaremos el paremetro por default(la norma 2)
+np.linalg.norm(v1v2)
+
+# la desigualdad triangular nos dice que:
+# nos indica que la norma de 'v1v2' tiene que ser menor que la norma v1 mas la norma v2
+# norma(v1v2) <= norma(v1) + norma(v2)
+
+norma_v1 = np.linalg.norm(v1)
+norma_v2 = np.linalg.norm(v2)
+norma_v1v2 = np.linalg.norm(v1v2)
+
+print(norma_v1v2 <= (norma_v1 + norma_v2))
+# print: True
+# efectivamente vemos que esta cumpliendo la desigualdad triangular 
+# el unico caso en el cual la desigualdad triangular adquiere la igualdad es:
+# cuando los 3 vectores estan uno sobre el otro, este es el unico caso.
+
+# agregaremos esta vez dos corrdenadas 0 al principio , con esto estamos incluyendo el origen del vector y el finald el vector 
+v1 = np.array([0,0,2,7])
+v2 = np.array([0,0,3,5])
+
+v1_aux = np.array([v1[2], v1[3], v2[2], v2[3]])
+v1v2 = np.array([0,0,5,12])
+
+plt.quiver([v1[0], v1_aux[0], v1v2[0]],
+           [v1[1], v1_aux[1], v1v2[1]],
+           [v1[2], v1_aux[2], v1v2[2]],
+           [v1[3], v1_aux[3], v1v2[3]],
+           angles = 'xy', scale_units = 'xy',
+           scale = 1, color = sns.color_palette()
+           )
+
+plt.xlim(-0.5, 6)
+plt.ylim(-0.5,15)
+```
+
+### Tipos de normas: norma 0, norma 1, norma 2, norma infinito y norma L2 al cuadrado 
+
+```py
+# hay muchos tipos de normas que se usan en aprendizaje automatico (machine learning), para medir diversas cosas, algunas de ellas son los errores.
+# a las normas las vamos a estas llamando con la aletra 'L'
+# 'L0' nos devuelve la cantidad de elementos de nuestro vector distintos de 0
+# 'L0: #vi != 0'
+
+# 'L1' nos va a devolver la suma sobre 'i' de los valores absoluto de los elementos de nuestro vector 
+# 'L1: sum(i).abs(vi)'
+
+# 'L2' es la magnitud del vector desde su origen.(distancia euclidiana)
+# se usa mucho en lenguaje automatico la '(L2)**2' esto es la misma distancia auclidiana pero si calcularle la raiz cuadrada 
+# la ventaja es que podriamos calcularle la norma a aun vector directamente aplicando el producto interno del vector contra si mismo, esto tiene muchas ventajas computacionales
+# por ejemplo: podemos representar todo con una matriz, calcular el producto interno y tener la norma al mismo tiempo de muchisimos vectores (todos los que estuvierand entro de esa matriz)
+
+# 'L_infinito' lo que nos devuelve es el mayor valor dentro de los valores absolutos de nuestro vector
+# 'L_infinito: max(i).abs(vi)' 
+
+import numpy as np
+
+vector = np.array([1,2,0,5,6,0])
+# al momento de pedirle la norma 'L0' nos va a devolver la cantidad de elementos distintos de 0
+# En este caso cuando lo hagamos nos tendria que devolver 4 por que tenemos 2 valores 0 de los 6 totales
+# 'ord' es el numero de la norma que deseams calcular
+print(np.linalg.norm(vector, ord=0))
+# print: 4.0
+
+vector = np.array([1,-1,1,-1,1])
+# la norma 'L1' nos devuelve la suma de los valores absolutos 
+# entonces lo que esperamos que nos devuelva es la longitud del vector
+print(np.linalg.norm(vector, ord=1))
+# print: 5.0
+
+vector = np.array([1,1])
+# vamos a ahcer un representacion grafica
+# esto tiene sentido hacerlo cuando estamos en 'R2' o 'R3' donde nuestra mente es capaz de ver una representacion grafica de estos vectores
+# lo importante de las normas es que las podemos utilizar independientemente del tama;oque estamos teniendo(del espacio en el cual estamos trabajando), aun cuando nosotros no logremos interpretar cual seria su representacion fisica 
+# probaremos ejecutar la norma sin el parametro 'ord' y con el parametro 'ord'
+print(np.linalg.norm(vector, ord=2))
+print(np.linalg.norm(vector))
+# print:
+# 1.4142135623730951
+# 1.4142135623730951
+# nos regerso el mismo numero ya que la funcion norma nos devulve por defecto la norma 2
+
+# ahora probaremos la norma 'L2' elevada al cuadrado
+vector = np.array([1,2,3,4,5,6])
+print(np.linalg.norm(vector, ord=2)**2)
+# print: 91.0
+#seria que es igual a que si hacemso el rpoducto interno?
+print(vector.T.dot(vector))
+# print: 91
+# como se hia dicho esto tiene una serie de ventajas computacionales y es por eso que la noma 'L2' es la norma mas usada
+
+vector = np.array([1,2,3,-100])
+# como la norma 'L3' nos tiene que devolver el valor absoluto mas grande nos tendria que devolver 100 en esta ocacion
+# para especificar la norma infinito tenemos que usar 'np.inf' el cual es el infinito de numpy
+print(np.linalg.norm(vector, ord=np.inf))
+# print: 100.0
+```
+
+### El producto interno como función de una norma y su visualización
+
+```py
+# SI tenemos un vector 'v1'  y un vector 'v2, lo que queremos decir es que:
+# 'v1' traspuesto, producto interno 'v2' va a sef igual a la norma 2 de 'v1' por la norma 2 de 'v2' por el angulo, por el coseno del angulo que estan formado
+# 'v1.t.dot(v2) = norma_2(v1)*norma_2(v2)cos(algulo)'
+
+%matplotlib inline
+
+import numpy as np
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+v1 = np.array([0,0,0,3])
+v2 = np.array([0,0,3,3])
+
+plt.xlim(-2,6)
+plt.ylim(-2,6)
+
+plt.quiver([v1[0], v2[0]],
+          [v1[1], v2[1]],
+          [v1[2], v2[2]],
+          [v1[3], v2[3]],
+          angles = 'xy', scale_units= 'xy',
+          scale = 1, color= sns.color_palette()
+          )
+plt.show()
+
+# para comprobar la igualdad
+v1 =  np.array([0,3])
+v2 = np.array([3,3])
+# cuando tenemos esto podemos ver cual es eproducto interno que estamos tendiendo entre las traspuesta de 'v1' con 'v2'
+
+print(v1.T.dot(v2))
+#print: 9
+
+norma_v1 =  np.linalg.norm(v1)
+norma_v2 =  np.linalg.norm(v2)
+
+# pasa usar coseno numpy nos da al funcion 'np.cos', ahora esta funcion necesita que le pasemos los valores en radianes y nosotros los tenemos en grados
+# entonces vamos a usar la funcion 'np.np.deg2rad'
+# en esta ocasio el calor de 45 son los grados que forman los vectores
+print(norma_v1 * norma_v2 * np.cos(np.deg2rad(45)))
+# print: 9.0
+# entonces la igualdad de esta se verifica
+
+# lo que acavamos de hacer nos da tambien una manera de poder calcular el angulo que forma nuestros vectores si conocemos el producto interno y a su vez tenemos cual es la norma de cada uno de ellos.
+# una de las cosas que se usan en 'machine learning' es la similitud coseno
+# si nosotros somos capaces de representar en un vector todas las palabras de un documento y en otro vector todas las palabras de otro documento
+# podriamos evaluar cual es el angulo que estos dos vectores estan formando y si ese angulo fuese peque;o esto quiere decir que esos dos documentos se parecen mucho 
+# por el contrario, si difirieran en 90 grados dirian que no tienen nada que ver un documento con el otro
+
+# se concluye que el producto interno lo podemos expresar con normas y con el angulo que forman nuestros vectores 
+```
