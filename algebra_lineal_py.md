@@ -1176,3 +1176,186 @@ print(norma_v1 * norma_v2 * np.cos(np.deg2rad(45)))
 
 # se concluye que el producto interno lo podemos expresar con normas y con el angulo que forman nuestros vectores 
 ```
+
+## Matrices y vectores especiales
+
+## La matriz diagonal y la matriz simétrica: sus propiedades 
+
+```py
+# La 'amatriz de identidad' es elemento neutro del producto interno
+# otra matriz especial es la 'matriz inversa' :
+# si tenemos una matriz 'A' y la multiplicamos por su inversa 'A**-1' lo que obtenemos es la 'Matriz de Identidad': 'A.dot(A_inv)= Id'
+# La 'matriz singular' es aquella tal que no existe su inversa.
+
+# ahora veamos las 'matrices diagonales' y 'matriz simetrica'
+# MATRIZ DIAGONAL
+import numpy as np
+
+vector = np.array([1,2,3,4,5])
+
+matriz = np.diag(vector)
+print(matriz)
+# [[1 0 0 0 0]
+#  [0 2 0 0 0]
+#  [0 0 3 0 0]
+#  [0 0 0 4 0]
+#  [0 0 0 0 5]]
+
+print(matriz[0:4,0:3])
+# este es un ejemplo de amtriz diagonal pero que no es cuadrada
+# [[1 0 0]
+#  [0 2 0]
+#  [0 0 3]
+#  [0 0 0]]
+
+print(matriz[0:3,0:4])
+# este seria otro ejemplo de una matriz diagonal pero que no es cuadrada
+# [[1 0 0 0]
+#  [0 2 0 0]
+#  [0 0 3 0]]
+
+A = np.diag([2,3,4,5])
+print(A)
+# [[2 0 0 0]
+#  [0 3 0 0]
+#  [0 0 4 0]
+#  [0 0 0 5]]
+
+v1 = np.array([[1,1,1,1]])
+
+print(v1) # [[1 1 1 1]]
+# Esto es una 'ponderacion de los elementos por el vector por el cual estamos multiplicando'
+print(A.dot(v1.T))
+# Nos devolvio el vector columna:
+# [[2]
+#  [3]
+#  [4]
+#  [5]]
+# no hubo ninguna tipo de combinacion lineal y solamente nos quedaron amplificados las componentes de cada uno de nuestros vectores 
+
+# calcular la inversa
+# si tenemos una matriz 'A' y la multiplicamos por su inversa 'A**-1' lo que obtenemos es la 'Matriz de Identidad': 'A.dot(A_inv)= Id'
+
+# en est ocacion iniciaremos por un medio por que el primer elemento era un 2
+A_inv = np.diag([1/2, 1/3, 1/4, 1/5])
+print(A_inv)
+# [[0.5        0.         0.         0.        ]
+#  [0.         0.33333333 0.         0.        ]
+#  [0.         0.         0.25       0.        ]
+#  [0.         0.         0.         0.2       ]]
+
+identidad = A.dot(A_inv)
+
+print(identidad)
+# [[1. 0. 0. 0.]
+#  [0. 1. 0. 0.]
+#  [0. 0. 1. 0.]
+#  [0. 0. 0. 1.]]
+# esto computacionalmente tiene muchos beneficios por que si la inversa es solamente calcular 1 sobre el numero que esta en la diagonal, entonces no son muchas las operaciones que debo realizar
+
+# ahora vamos a intentar calcular la inversa con la funcion que usamos antes
+A_inv_calc = np.linalg.inv(A)
+# si la imprimimos obtenemos lo mismo
+print(A_inv_calc)
+# [[0.5        0.         0.         0.        ]
+#  [0.         0.33333333 0.         0.        ]
+#  [0.         0.         0.25       0.        ]
+#  [0.         0.         0.         0.2       ]]
+
+
+# cuando una matriz es simetrica?
+# una matriz es 'simetrica' cuando su traspuesta es igual a la matriz: 'A = A.T'
+# En este caso nuestra matriz 'A' es simetrica.
+print(A.T) 
+# [[2 0 0 0]
+#  [0 3 0 0]
+#  [0 0 4 0]
+#  [0 0 0 5]]
+print(A)
+# [[2 0 0 0]
+#  [0 3 0 0]
+#  [0 0 4 0]
+#  [0 0 0 5]]
+
+# para matrices en general es un poco mas complicado
+simetrica = np.array([[1,2,3],
+                     [2,-1,7],
+                     [3,7,11]])
+print(simetrica)
+print(simetrica.T)
+# en este caso nos arroja de vuelta la misma matriz
+# No es unicamente las amtrices diagonales las que pueden ser simetricas 
+
+# una propiedad que se vio antes es que si:
+#'(A.dot(B)).T == B.T.dot(A.T)'
+# cuando son simetricas lo que queda quedando es que:
+# '(A.dot(B)).T == B.dot(A)
+# esto tambien tiene implicaciones muy importantes por que simplifica mucho las operaciones que estamos realizando.
+```
+
+## Vectores ortogonales, matrices ortogonales y sus propiedades
+
+```py
+# Existe en solitario un vector ortogonal?
+# la respuesta es no, para poder ser ortogonal hacen referencia a otro vector, entonces siempre que hablemos de vectores ortogonales vamos a estar hablando de 2 o mas vextores.
+# Ser 'ortogonal' es que el angulo que forman estos dos vectores es de 90 grados.
+# usaremos el producto interno por que nos permite conocer el angulo entre los vectores.
+
+%matplotlib inline
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+x = np.array([0,0,2,2])
+y = np.array([0,0,2,-2])
+
+plt.quiver([x[0],y[0]],
+           [x[1],y[1]],
+           [x[2],y[2]],
+           [x[3],y[3]],
+           angles = 'xy', scale_units = 'xy',
+           scale= 1)
+plt.xlim(-2,4)
+plt.ylim(-3,3)
+
+plt.show()
+# lo que vemos es que tenemos dos vectores que forman un angulo de 90 grados 
+
+# vamos a comprobar esto mismo usando el producto interno
+v1 = np.array([2,2])
+v2 = np.array([2,-2])
+
+print(v1)
+print(v2)
+
+print(v1.dot(v2.T)) # 0
+# los que nos devuelve es el cero, entonces estos dos vectores efectivamente tienen un aungulo de 90 grados
+# y podemos decir que son ortogonales entre ellos
+
+
+# ORTONORMAL
+# Para que un vector sea 'ortonormal' su normal debe ser 1.
+print(np.linalg.norm(v1)) # 2.8284271247461903
+print(np.linalg.norm(v2)) # 2.8284271247461903
+# con los resultados obtenidos podemos ver que estos dos vectores no son ortonormales
+
+# lo que podriamos hacer para volverlos ortonomales es dividirlos con su norma
+vector_ortonormal = v1 * (1/np.linalg.norm(v1))
+print(np.linalg.norm(vector_ortonormal)) # 0.9999999999999999
+# probemos con otros vectores
+v1 = np.array([[1,0]])
+v2 = np.array([[0,-1]])
+# si calculamos su producto interno podemos ver que nos da 0
+print(v1.dot(v2.T)) # 0
+# y si calculamos la norma podemos ver qu es 1
+print(np.linalg.norm(v1)) # 1
+print(np.linalg.norm(v2)) # 1
+# por lo tanto son vectores ortonormales
+
+# sin entrar en demacioados detalles
+# podemos decir que es inposible tener 'n' vectores mutuamente ortogonales en un espacio de dimencion 'n' osea 'rn', 
+#llevado a 'r2' por ejemplo: no podemos tener mas de dos vectores que sean mutuamente ortogonales 
+# seria posible incluir un tercer vector que tambien estuviera a 90 grados de los dos vectores anteriores?
+# la respuesta es que no es posible 
+# para poder tenerlo necesitariamos ir a 'r3' incluyendo una nueva dimencion que nos permitiria tener un tercer vector mutuamente ortogonal a los anteriores
+```
