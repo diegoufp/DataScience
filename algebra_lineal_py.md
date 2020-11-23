@@ -1179,7 +1179,7 @@ print(norma_v1 * norma_v2 * np.cos(np.deg2rad(45)))
 
 ## Matrices y vectores especiales
 
-## La matriz diagonal y la matriz simétrica: sus propiedades 
+### La matriz diagonal y la matriz simétrica: sus propiedades 
 
 ```py
 # La 'amatriz de identidad' es elemento neutro del producto interno
@@ -1293,7 +1293,7 @@ print(simetrica.T)
 # esto tambien tiene implicaciones muy importantes por que simplifica mucho las operaciones que estamos realizando.
 ```
 
-## Vectores ortogonales, matrices ortogonales y sus propiedades
+### Vectores ortogonales, matrices ortogonales y sus propiedades
 
 ```py
 # Existe en solitario un vector ortogonal?
@@ -1358,4 +1358,110 @@ print(np.linalg.norm(v2)) # 1
 # seria posible incluir un tercer vector que tambien estuviera a 90 grados de los dos vectores anteriores?
 # la respuesta es que no es posible 
 # para poder tenerlo necesitariamos ir a 'r3' incluyendo una nueva dimencion que nos permitiria tener un tercer vector mutuamente ortogonal a los anteriores
+```
+
+### Matrices ortogonales y sus propiedades
+
+```py
+# Una matriz es ortogonal cuando todas sus filas son mutuamente ortonormales y todas sus columnas son mutuamente ortonomales
+import numpy as np
+
+matriz = np.array([[1,0,0],
+                   [0,1,0],
+                   [0,0,1]])
+print(matriz)
+# [[1 0 0]
+#  [0 1 0]
+#  [0 0 1]]
+
+# para ver que esta matriz es ortogonal neceitamos comprobar que sus columnas son mutuamente ortogonales
+# quenemos que ver que 'v1' es ortogonal al 'v2', que 'v1' es ortogonal a 'v3' y que 'v2' sea ortogonal a 'v3'
+# 'v1 ortogonal a v2':
+print(matriz[:,0].dot(matriz[:,1])) # 0
+# 'v1 ortogonal a v3':
+print(matriz[:,0].dot(matriz[:,2])) # 0
+# 'v2 ortogonal a v3':
+print(matriz[:,1].dot(matriz[:,2])) # 0
+
+# ahora comprobaremos si son ortonormales
+print(np.linalg.norm(matriz[:,0])) # 1
+print(np.linalg.norm(matriz[:,1])) # 1
+print(np.linalg.norm(matriz[:,2])) # 1
+# por lo tanto podemos asegurar que son ortonormales
+# pero esta es solo una de las caracteristicas
+# necesitamos ver tambien que las filas son ortogonales
+
+# filas ortogonales:
+# 'v1 ortogonal a v2':
+print(matriz[0,:].dot(matriz[1,:])) # 0
+# 'v1 ortogonal a v3':
+print(matriz[0,:].dot(matriz[2,:])) # 0
+# 'v2 ortogonal a v3':
+print(matriz[1,:].dot(matriz[2,:])) # 0
+
+# filas ortonormales:
+print(np.linalg.norm(matriz[0,:])) # 1
+print(np.linalg.norm(matriz[1,:])) # 1
+print(np.linalg.norm(matriz[2,:])) # 1
+
+# porlotanto podemos decir que esta matriz es una matriz ortogonal
+
+# una matriz ortogonal tiene la siguiente propiedad:
+# 'A.T.dot(A) ==  A.dot(A.T) == 'identidad''
+# por lo tanto se concluye que 'A.T == A**-1' por que esta desaciendo las operaciones que ya hizo
+
+# veamos una manera sensilla de generar matrices ortogonale en python
+A = np.array([[np.cos(100), -np.sin(100)],
+              [np.sin(100), np.cos(100)]])
+print(A)
+# [[ 0.86231887  0.50636564]
+#  [-0.50636564  0.86231887]]
+
+# Ahora comprovaremos si esta matriz es ortonormal
+print(np.linalg.norm(A[0,:])) # 0.9999999999999999
+print(np.linalg.norm(A[1,:])) # 0.9999999999999999
+print(np.linalg.norm(A[:,0])) # 0.9999999999999999
+print(np.linalg.norm(A[:,1])) # 0.9999999999999999 
+
+# una vez que vemos esto nos devuelve algo que es casi 1
+# pero empezamos a ver los problemas que se tiene al representar computacionalmente nuestros numeros
+# este numero deberia haber sido 1
+# en lugar de eso fue 0.9999999999999999
+
+# ahora veamos que el angulo que forman entre ellos es 0
+print(A[0,:].dot(A[1,:])) # 0
+print(A[:,0].dot(A[:,1])) # 0
+
+# entonces ahora queremos ver que la propiedad funcione
+A_t = A.T
+print(A_t.dot(A))
+# [[ 1.00000000e+00 -7.93771519e-18]
+#  [-7.93771519e-18  1.00000000e+00]]
+print(A.dot(A_t))
+# [[1.00000000e+00 7.93771519e-18]
+#  [7.93771519e-18 1.00000000e+00]]
+
+# vemos que ambas matrices son iguales
+# pero notemos que lo que nos devolvieron es la 'identidad'
+# vemos que tenemos un exponenete a la '-18' eso en lenguaje maquina significa que es un numero muy cercano al 0 aun que no lo parezca
+# queremos mostrar los efectos que tiene al no tener cuidado
+
+# si lo hacemos como conmunemente se hace de dividir entre el producto interno nos saldra un resulato erroneo:
+A_inv = np.linalg.inv(A)
+print(A_inv)
+print(A_t)
+# [[ 0.86231887 -0.50636564]
+# [ 0.50636564  0.86231887]]
+# en este caso vemos que la inversa y la traspuesta son iguales
+print(1/A_t.dot(A))
+# [[ 1.00000000e+00 -1.25980837e+17]
+#  [-1.25980837e+17  1.00000000e+00]]
+# ahora en lugar de tener un numero muy cercano al 0 lo que tenemos es un numero infinitamente grande
+# si multiplicaramos por esta matriz estariamos amplificando nuestro error
+# al hacer esta division nos deviera ver devuelto que la operacion no estaba definida. porque?
+# por que el numero '-7.93771519e-18' tendria que haber sido 0
+# entonces al dividir 1 / 0 el resultado debio ser infinito o que la operacion no estaba definida
+# en lugar de eso devolvio un numero muy grande que si lo comparo con la presision de la maquina
+# me va a decir que ese numero es practicamente infinito 
+# debemos tener mucho cuidado en este casos para no expandir nuestros errores
 ```
