@@ -1465,3 +1465,128 @@ print(1/A_t.dot(A))
 # me va a decir que ese numero es practicamente infinito 
 # debemos tener mucho cuidado en este casos para no expandir nuestros errores
 ```
+
+### El determinante y la traza
+
+```py
+# vamos a aprender dos funciones que aplicada a nuestra matriz o a nuestras matrices tienen propiedades interesantes
+# unas de ellas es la traza:
+# nosotros vimos que tenemos vectores con los cuales podemos crear nuestro espacio y si en lugar de los vectores normales eligiramos unos que fueran mas peque;os?
+# entonces si reescribieramos nuestra matriz en funcion de estos nuevos vectores hay varias funciones que cambiarian 
+# bueno la traza nos va  devolver siempre el mismo numero independientemente de que sistema de referencia utilizemos para expresar nuestra matriz
+import numpy as np
+
+matriz = np.array([[1,2,3],
+                   [4,5,6],
+                   [7,8,9]])
+print(matriz)
+
+# ahora usemos para calcular la traza la funcion 'np.trace'
+traza = np.trace(matriz)
+print(traza) # 15
+# independientemente de que e slo que hagamos siempre nos va a devolver 15
+# aqui vemos que el valor que nos devuelve la traza es la suma de los elementos que tiene en la diagonal:
+# [[1 0 0]
+#  [0 5 0]
+#  [0 0 9]]   
+# 1 + 5 + 9 = 15
+# traza(ABC) == traza(CAB) == traza(BCA)
+# El determinante de una matriz nos habla sobre la transformacion que ejerce esa matriz sobre el espacio que esta transformando 
+
+
+# por ejemplo: si estamos en 'R2' y el determinante es negativo, lo que esta haciendo es darnos el espejo de nuestro espacio 
+%matplotlib inline
+
+import matplotlib.pyplot as plt
+
+
+#%run './funciones_auxiliares/graficarVectores.ipynb'
+def graficarVectores(vecs, cols, alpha = 1):
+    
+    plt.figure()
+    plt.axvline(x=0, color = 'grey', zorder = 0)
+    plt.axhline(y=0, color = 'grey', zorder = 0)
+    
+    for i in range(len(vecs)):
+        # cuando queremos graficar un vector lo estamos haciando dentro de nuestro sistema de ejes cartesianos
+        # para poder graficar un vector necesitamos decir cuales es el origen 
+        # y lo que estamos haciendo es decir que todos los vectores van a tener como origen el [0,0]
+        x = np.concatenate([[0,0], vecs[i]])
+        plt.quiver([x[0]],
+                   [x[1]],
+                   [x[2]],
+                   [x[3]],
+                   angles='xy', scale_units = 'xy', scale=1, color =cols[i],
+                   alpha= alpha)
+
+v1 = np.array([0,1])
+v2 = np.array([1,0])
+
+graficarVectores([v1,v2],['blue','red'])
+
+plt.xlim(-0.25,2)
+plt.ylim(-0.25,2)
+plt.show()
+# estamos tendiendo dos vectores, uno sobre el eje 'y' con altura 1
+# y el otro por el eje 'x' con distancia 1
+# que ocurre cuando le aplicamos una matriz con estos dos vectores?
+
+# cuando los tranformamos con una matriz que tenga:
+A = np.array([[2,0],[0,2]])
+# lo que habiamos dicho es que estas matrices solamente aplificaban las coordenadas 
+# entonces lo que estamos esperando es que sin cambiar los vectores originales que teniamos dupliquen su largo
+v1_transformado = A.dot(v1)
+v2_transformado = A.dot(v2)
+
+graficarVectores([v1_transformado,v2_transformado],['orange','green'])
+
+plt.xlim(-0.25,3)
+plt.ylim(-0.25,3)
+plt.show()
+# lo que estamos viendo es que cada vector se quedo en la misma posicion en la que estaba pero se alargo en la misma media que figura la diagonal para cada uno de los ejes
+
+# veamos que es lo que esta sucediendo si calculamos el area de estos cuadrados
+# en el primero tenemos un area de 1 * 1 =1
+# en el segundo es un area de 2 * 2 = 4
+# que es lo que nos va a devolver este determinante en cuando calculemos la funcion sobre la matriz?
+det_A = np.linalg.det(A)
+print(det_A) # 4.0
+# esto quiere decir que si tomamos el cuadrado primario aumento 4 veces su volumen 
+# calculemos lo mismo para cada uno de las coordenadas
+area_transformada = abs((v1_transformado[0] - v2_transformado[0]))*abs((v1_transformado[1] - v2_transformado[1]))
+print(area_transformada) # 4
+
+# ahora hagamos lo mismo pero con uan matriz que lo que este teniendo es determiante negativo
+B = A * [-1, 1]
+print(B)
+
+
+det_B = np.linalg.det(B)
+print(det_B) # -4.0
+# va a ser nuegativo por que cuando la matriz es diagonal, el tenerminante es la multipliacion de cada uno de los elementos que estan en la diagonal 
+
+v1 = np.array([0,1])
+v2 = np.array([1,0])
+# veremos que es lo que esta ocurriendo graficandolo
+v1_transformado = B.dot(v1)
+v2_transformado = B.dot(v2)
+
+graficarVectores([v1_transformado, v2_transformado, v1, v2],
+                 ['blue', 'red', 'orange', 'green'])
+
+plt.xlim(-3,1.5)
+plt.ylim(-0.5,2.5)
+
+plt.show()
+# nuestra matriz ademas de aplificar nuestros vectores, lo que hizo fue invertir una de las coordenadas, la espejo..
+# la matriz con determinante 4 y -4 modificaron el espacio en un mismo factor, digamos que lo aplificaron por 4.
+# mientras que la matriz con determiante 4 lo dejo quieto 
+# y el que tiene determinante -4 genero un espejado de nuestro espacio
+
+
+# lo que podemos concluir entonces es que la informacion del determiante es muy importante
+# pero que no nos deja saber todo lo que esta ocurriendo con el espacio 
+# por ejemplo: no podmeos saber si esta rrotacion que esta ocurriendo por que tienen un signo negativo esta ocurriendo en el eje 'x' o en el eje 'y' 
+# y si enrelidad lo que estuviera pasando es que el eje 'x' y el 'y' al mismo tiempo se estan invitiendo?
+# terminariamos con un espacio completamente distinto pero el determinante seguira siendo 4 positivo.
+
