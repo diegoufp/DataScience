@@ -341,3 +341,42 @@ print(A)
 # de esta manera vimos que podemos escribir a nuestra matriz cuando es cuadrada en funcion de los autovalores y los autovectores 
 # y en el caso de que sea simietrica podemos usar la traspuesta enlugar de la inversa 
 ```
+
+### ¿Cómo descompongo una matriz no cuadrada (SVD)?
+
+```py
+# la descomposicion de matrices en autovalores y autovectores solo podemos efectuarla cuando nuestra matriz es cuadrada 
+# eso quiere decir que no podemos descomponer una matriz que no sea cuadrada?
+# no, para ello necesitamos la descomposicion en valores singulares(SVD)
+# de que se trata la descomposicion en valores singulares?
+# antes nostros teniamos  que podiamos descomponenlo todo en matrices cuadradas 
+# ahora vamos a ver un ejemplo donde toda las matrices que tengamos van a ser distintas salvo la diagonal que tambien podria ser no cuadrada 
+import numpy as np
+
+A = np.array([[1,2,3],[3,4,5]])
+print(A)
+
+U, D, V = np.linalg.svd(A)
+
+print(U)
+# [[-0.46410668 -0.88577931]
+#  [-0.88577931  0.46410668]]
+print(D) # [7.97638869 0.61418515]
+# 'D' nos r4egresa dos valores, si queremos ver la matriz de 'D' tenemos que:
+print(np.diag(D))
+# [[7.97638869 0.        ]
+#  [0.         0.61418515]]
+print(V)
+# [[-0.39133557 -0.5605708  -0.72980603]
+#  [ 0.8247362   0.13817999 -0.54837623]
+#  [ 0.40824829 -0.81649658  0.40824829]]
+# 'V' en este caso es una matriz de 3x3
+# lo que estamos teniendo son dos matrices de 2x2 y por otro lado una matriz de 3x3
+# entonces lo que obtendriamos al recontruir nuestra matriz es que lo vamos a estar escribiendo como:
+# A = U D V
+
+# los vectores y matrices pueden ser pensados como subtransformaciones del espacio
+# si tuvieramos por ejemplo una matriz de 3x2, lo que estamos haciando al transformar el espacio
+# es tomar un espacio de 'R3' y convertirlo en 'R2' 
+# esto quiere decir que lo que estamos haciendo es condensar informacion que tenemos en el tercer eje dentro de los unicos dons ejes que vamos a conservar  
+```
