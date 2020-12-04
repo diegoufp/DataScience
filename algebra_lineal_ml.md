@@ -97,3 +97,181 @@ print(np.linalg.norm(vector))
 print(np.linalg.norm(vector_transformado))
 ```
 
+### Autovalores y Autovectores
+
+```py
+# las transformaciones lineales ejercen transformaciones sobre nuestros vectores
+# busquemos un vectore que cuando le aplicamos informacion no sufre ninguna modificacion
+# Esto seria un 'autovector'
+%matplotlib inline
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+# vamos a necesitar definir una funcion que va ser utilizada varias veces
+# lo mejor es escribirla en un archivo separado para despues llamarlo desde este archivo
+# Recibirá los vectores, los colores y el nivel de trasparencia con el cual trabajaremos 
+
+def graficarVectores(vecs, cols, alpha = 1):
+    
+    # Agregamos el eje vertical. Este se cruzará en x = 0, el color será gris y el orden de z será 0 
+    plt.axvline(x = 0, color = "grey", zorder = 0)
+    # Agregamos el eje horizontal. Este se cruzará en y = 0, el color será gris y el orden de z será 0 
+    plt.axhline(y = 0, color = "grey", zorder = 0)
+    
+    # Ahora ara cada uno de los vectores en el parámetro 
+    for i in range(len(vecs)):
+        # Tomaremos que la x es la concatenación de esos valores como 0 0 que es lo que estamos tomando como punto de origen 
+        # Después de agregar el 0 0 le concatenamos el vector i 
+        x = np.concatenate([[0,0], vecs[i]])
+        # Vamos a graficar y agregamos todas las coordenadas
+        plt.quiver([x[0]],
+                   [x[1]],
+                   [x[2]],
+                   [x[3]],
+                   # Los ángulos estarán expresados en xy y la escuela de unidad será xy 
+                   angles = 'xy', scale_units = 'xy',
+                   # La escala con la que graficaremos será 1 
+                   scale = 1,
+                   color = cols[i],
+                   alpha = alpha
+                  )
+
+organge_light = '#FF9A13'
+blue_light = '#1190FF'
+
+
+X = np.array([[3,2],[4,1]])
+print(X)
+
+v = np.array([[1],[1]])
+# lo que queremos hacer es encontrar un vectore que cuando le apliquemos la matriz siga siendo el mismo vector 
+# incluso si esto fuera un multiplo del vectore original
+u = X.dot(v)
+print(u)
+# [[5]
+#  [5]]
+
+graficarVectores([u.flatten(),v.flatten()], cols=[organge_light, blue_light])
+
+plt.xlim(-1,6)
+plt.ylim(-1,6)
+# aqui lo que estamo teniendo es nuestro vector original que se llamaba 'v' con color azul
+# que fue expandido al aplicarle nuestra transformacion x 
+# y obtenemos el vector naranja 
+
+
+# pero no es el mismo vectore, que es loq ue esta ocurriendo?
+# lo que esta ocurriendo es que nuestro autovetor, nuestro autovalor  es el autovalor=5 
+lambda_1 = 5
+lambda_1 * v
+# array([[5],
+#        [5]])
+# aqui lo que estamo diciendo es:
+# que un autovector es aquel que cuando le aplico una matriz me devuelve el vector con la misma direccion pero puede tener una amplitud distinta
+# osea que puede esta multiplicado por el autovalor 
+
+# veamos que este valor no es unico, podemos tener otro
+s = np.array([[-1],[2]])
+print(s)
+
+t = X.dot(s)
+print(t)
+# [[ 1]
+#  [-2]]
+# vemos que tenemos el mismo vector que el origial 
+# que es lo que esta ocurriendo en este caso?
+# es que esta siendo miltiplicado por -1
+
+graficarVectores([t.flatten(), s.flatten()], cols=[organge_light, blue_light])
+
+plt.xlim(-3,3)
+plt.ylim(-3,3)
+# al graficarlo vemos que esta tendiendo un cambio de direccion 
+# pero la direccion se mantiene, asi que en realidad no es un cambio de direccion, es un cambio de sentido 
+# El vector ahora apunta en el sentido opuesto 
+
+# con esto vimos que una matriz de 2x2 tiene dos autovectores con dos autovalores asociados
+
+# Aquí algunos datos útiles:
+
+#     Para conseguir los autovalores y autoverctores de la matriz A, esta debe ser cuadrada (ej: 2x2, 3x3, 9x9…)
+#     La matriz A tendrá tantos autovalores como dimensión tenga A (ej: una Matriz de 3x3 tiene 3 autovalores, matriz de 2x2 tiene dos autovalores)
+#     Los autovalores pueden repetirse
+#     Estos autovalores son los que forman los autovectores
+#     Los autovectores deben ser base, es decir, que desde esos autovectores se pueda generar todo el espacio o demás vectores
+# https://www.ciencia-explicada.com/2012/01/autovectores-otro-inutil-capricho-de.html#:~:text=En%20este%20caso%2C%20los%20autovalores,%C3%A1tomo%20de%20hidr%C3%B3geno%20(fuente).
+```
+### Cómo calcular los autovalores y autovectores
+
+```py
+# como calcular los autovalores y los autovectores?
+%matplotlib inline
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+X = np.array([[3,2],[4,1]])
+print(X)
+# ya conocemos los resultados con lo cual ahora comparemos como podriamos encontrarlos sin ofrecerlos directamente
+
+# python por medio de numpy nos ofrece la libreria 'np.linalg.eig' que Obtiene los autovalores y autovectores asociados
+print(np.linalg.eig(X))
+# (array([ 5., -1.]), array([[ 0.70710678, -0.4472136 ],
+#        [ 0.70710678,  0.89442719]]))
+
+autovalores, autovectores = np.linalg.eig(X)
+print(autovalores) # [ 5. -1.]
+print(autovectores[:,0]) #[0.70710678 0.70710678]
+# pero ese autovector no se parece al que nostros teniamos, sera que es el mismo?
+print(autovectores[:,1]) # [-0.4472136   0.89442719]
+# este segundo autovector tampoco se parece al que teniamos de antes
+
+# vamos a necesitar definir una funcion que va ser utilizada varias veces
+# lo mejor es escribirla en un archivo separado para despues llamarlo desde este archivo
+# Recibirá los vectores, los colores y el nivel de trasparencia con el cual trabajaremos 
+
+def graficarVectores(vecs, cols, alpha = 1):
+    
+    # Agregamos el eje vertical. Este se cruzará en x = 0, el color será gris y el orden de z será 0 
+    plt.axvline(x = 0, color = "grey", zorder = 0)
+    # Agregamos el eje horizontal. Este se cruzará en y = 0, el color será gris y el orden de z será 0 
+    plt.axhline(y = 0, color = "grey", zorder = 0)
+    
+    # Ahora ara cada uno de los vectores en el parámetro 
+    for i in range(len(vecs)):
+        # Tomaremos que la x es la concatenación de esos valores como 0 0 que es lo que estamos tomando como punto de origen 
+        # Después de agregar el 0 0 le concatenamos el vector i 
+        x = np.concatenate([[0,0], vecs[i]])
+        # Vamos a graficar y agregamos todas las coordenadas
+        plt.quiver([x[0]],
+                   [x[1]],
+                   [x[2]],
+                   [x[3]],
+                   # Los ángulos estarán expresados en xy y la escuela de unidad será xy 
+                   angles = 'xy', scale_units = 'xy',
+                   # La escala con la que graficaremos será 1 
+                   scale = 1,
+                   color = cols[i],
+                   alpha = alpha
+                  )
+
+v = np.array([[-1],[2]])
+Xv = X.dot(v)
+
+v_np = autovectores[:,1]
+
+graficarVectores([Xv.flatten(), v.flatten(), v_np], cols = ['green', 'orange', 'blue'])
+
+plt.ylim(-4,2)
+plt.xlim(-7,3)
+# lo que estamos viendo es que efectivamnete los 3 son el mismo vector en algun sentido 
+# en el sentido de que conservan la misma direccion 
+# lo unico que esta cmabiando es su amplitud
+# y en algun caos tambien la direccion
+# entonces lo que estamos tiendo es que lo que cambia es el autovalor asociado
+# entonces podemos ver que al autovector encontrado por numpy es un multiplo del autovector que nosotros propusimos 
+# que quiere decir esto?
+# los autovectores son el mismo, lo que pueden variar es en amplitud o en direccion pero el sentido se mantiene  
+```
