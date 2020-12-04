@@ -275,3 +275,69 @@ plt.xlim(-7,3)
 # que quiere decir esto?
 # los autovectores son el mismo, lo que pueden variar es en amplitud o en direccion pero el sentido se mantiene  
 ```
+
+### Descomposición de matrices
+
+```py
+# descomponer una matriz quiere decir entontrar dos o mas matrices que me puedan ayudar a escribir mi matriz original y que tengan ciertas propiedades
+# como por ejemplo: cuando tenemos el 6, que lo podemos escribir como 3x2 y el 3 y el 2 tienen la propiedad de ser primos 
+#A = ['autovectores']['autovalores']['inversa de  la matriz de autovectores']
+import numpy as np
+
+A = np.array([[3,2],[4,1]])
+print(A)
+
+autovalores, autovectores = np.linalg.eig(A)
+
+print(autovalores)
+print(autovectores)
+
+
+# queremos ver que esto nos sirve para calcular estas matrices que dijimos
+#A = ['autovectores']['autovalores']['inversa de  la matriz de autovectores']
+# ['autovectores'] = v
+# ['autovalores'] = lambda
+# ['inversa de  la matriz de autovectores'] = v**1
+A_calc = autovectores.dot(np.diag(autovalores)).dot(np.linalg.inv(autovectores))
+print(A_calc)
+# [[3. 2.]
+#  [4. 1.]]
+# y nos imprime exactamente la matriz que teniamos antes 
+print(A)
+# [[3 2]
+#  [4 1]]
+
+# tenemos otros descomposiciones que tambien son muy utiles 
+# por ejemplo:
+# en el caso de que nuestra matriz 'A' sea una matriz, real(que todos los numero que tiene dentro de la matriz son los numeros que conocemos habitualmente y no hay numero complejos ) y simetrica(que 'A' sea igual a 'A' traspuesta)
+A = np.array([[3,2],[2,3]])
+print(A)
+
+print(A == A.T)
+# [[ True  True]
+#  [ True  True]]
+# efectivamente coincide con su traspuesta 
+
+autovalores, autovectores = np.linalg.eig(A)
+print(autovalores) # [5. 1.]
+print(autovectores)
+# [[ 0.70710678 -0.70710678]
+#  [ 0.70710678  0.70710678]]
+
+# A = A.T
+#A = v.diag(lamdas).v.T
+# calcular una traspuesta es muchusimo mas sensillo y computacionalmente mas economico  que calcular una inversa
+# entonces nuestro caso ideal seria que en lugar de tener una matriz cualquiera, tengamos una matriz real y simetrica 
+# lo cual nos permitiria calcular todos estos numeros sin tener que realizar la inversa
+A_calc = autovectores.dot(np.diag(autovalores)).dot(autovectores.T)
+print(A_calc)
+# [[3. 2.]
+# [2. 3.]]
+# y obtenemos asi nuestra matriz original
+print(A)
+# [[3 2]
+#  [2 3]]
+
+# de esta manera vimos que podemos escribir a nuestra matriz cuando es cuadrada en funcion de los autovalores y los autovectores 
+# y en el caso de que sea simietrica podemos usar la traspuesta enlugar de la inversa 
+```
